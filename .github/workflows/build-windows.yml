@@ -42,7 +42,8 @@ jobs:
       KDECI_PACKAGE_PROJECT: teams/ci-artifacts/krita-windows
       KDECI_REPO_METADATA_PATH: ${{ github.workspace }}\krita-deps-management\repo-metadata
       KDECI_CACHE_PATH: C:\kdeci\artifacts
-      KDECI_CC_CACHE: C:\kdeci\ccache
+      # KDECI_CC_CACHE is deliberately unset: it switches Krita's runner to ccache,
+      # which is not reliably on PATH for its subprocesses on hosted Windows runners.
       KDECI_COMPRESS_PACKAGES_ON_DOWNLOAD: 'False'
       KDECI_EXTRA_CMAKE_ARGS: -DHIDE_SAFE_ASSERTS=ON -DBUILD_TESTING=OFF
       KRITACI_SKIP_DEBUG_PACKAGE: 'True'
@@ -68,8 +69,8 @@ jobs:
           Expand-Archive llvm-mingw.zip -DestinationPath C:\tools
           "C:\tools\$name\bin" | Out-File -Append $env:GITHUB_PATH
           "C:\tools\$name\x86_64-w64-mingw32\bin" | Out-File -Append $env:GITHUB_PATH
-          New-Item -ItemType Directory -Force $env:KDECI_CACHE_PATH, $env:KDECI_CC_CACHE | Out-Null
-          choco install ccache ninja -y --no-progress
+          New-Item -ItemType Directory -Force $env:KDECI_CACHE_PATH | Out-Null
+          choco install ninja -y --no-progress
 
       - name: Restore dependency cache
         uses: actions/cache@v4
