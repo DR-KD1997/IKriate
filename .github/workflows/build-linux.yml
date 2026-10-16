@@ -28,6 +28,9 @@ jobs:
   appimage:
     runs-on: ubuntu-24.04
     timeout-minutes: 350
+    defaults:
+      run:
+        shell: bash   # implies -eo pipefail, so "| tee" keeps failures visible
     steps:
       - uses: actions/checkout@v4
 
@@ -80,10 +83,10 @@ jobs:
             -DCMAKE_INSTALL_PREFIX=/usr \
             -DCMAKE_PREFIX_PATH=/opt/kdeps \
             -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
-            -DBUILD_TESTING=OFF -DFOUNDATION_BUILD=ON
+            -DBUILD_TESTING=OFF -DFOUNDATION_BUILD=ON 2>&1 | tee configure.log
 
       - name: Build
-        run: cmake --build build --parallel 4
+        run: cmake --build build --parallel 4 2>&1 | tee build.log
 
       - name: Install into AppDir
         run: DESTDIR="$PWD/AppDir" cmake --install build
@@ -100,10 +103,14 @@ jobs:
           ./linuxdeploy-x86_64.AppImage --appdir AppDir \
             --desktop-file AppDir/usr/share/applications/org.kde.krita.desktop \
             --icon-file krita/pics/branding/IKriate/256-apps-krita.png --icon-filename krita \
-            --plugin qt --output appimage
+            --plugin qt --output appimage 2>&1 | tee appimage.log
 
       - uses: actions/upload-artifact@v4
         with:
           name: ikriate-linux-x86_64
           path: IKriate-*.AppImage
           if-no-files-found: error
+
+      - name: Report failure
+        if: failure()
+        run: python3 .github/scripts/report-log.py configure.log build.log appimage.log

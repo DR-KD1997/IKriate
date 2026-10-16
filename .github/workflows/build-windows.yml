@@ -106,6 +106,10 @@ jobs:
             ikriate-x64-*-setup.exe
           if-no-files-found: error
 
+      - name: Report failure
+        if: failure()
+        run: python .github/scripts/report-log.py build-ikriate.log build-package.log
+
       - uses: actions/upload-artifact@v4
         if: failure()
         with:
