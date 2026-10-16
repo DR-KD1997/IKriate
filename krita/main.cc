@@ -728,8 +728,8 @@ if (!qEnvironmentVariableIsEmpty("KRITA_OPENGL_DEBUG")) {
                             "", // TODO: "short description" needs new string exception
                             KAboutLicense::GPL,
                             i18nc("@info:credit", "IKriate is based on Krita. © 1999–2026 The Krita Developers"));
-    aboutData.setHomepage(QStringLiteral("https://github.com/ikriate/ikriate"));
-    aboutData.setBugAddress("https://github.com/ikriate/ikriate/issues");
+    aboutData.setHomepage(QStringLiteral("https://github.com/DR-KD1997/IKriate"));
+    aboutData.setBugAddress("https://github.com/DR-KD1997/IKriate/issues");
     aboutData.setOrganizationDomain("krita.org");
 
     // this call sets corresponding fields of QApplication as well
