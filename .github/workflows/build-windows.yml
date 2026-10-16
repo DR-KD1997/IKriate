@@ -1,0 +1,113 @@
+# SPDX-FileCopyrightText: 2026 IKriate contributors
+# SPDX-License-Identifier: CC0-1.0
+#
+# Windows x64 build of IKriate.
+#
+# Follows upstream Krita's CI (build-tools/ci-scripts/windows.yml): the ~90
+# third-party dependencies are not built here but downloaded as prebuilt
+# packages from KDE's public package registry (teams/ci-artifacts/krita-windows),
+# using Krita's own krita-deps-management / krita-ci-utilities tooling.
+#
+# Those packages are built with llvm-mingw (clang 21); the compiler here must
+# match. If the dependency packages move to a newer toolchain, bump
+# LLVM_MINGW_VERSION to the matching llvm-mingw release.
+name: Windows (x64)
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: windows-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  LLVM_MINGW_VERSION: '20251216'
+  DEPS_BRANCH: master
+  PYTHONUTF8: '1'
+
+jobs:
+  windows:
+    runs-on: windows-2022
+    timeout-minutes: 350
+    defaults:
+      run:
+        shell: pwsh
+    env:
+      KDECI_BUILD_TYPE: Release
+      KDECI_GITLAB_SERVER: https://invent.kde.org/
+      KDECI_PACKAGE_PROJECT: teams/ci-artifacts/krita-windows
+      KDECI_CACHE_PATH: C:\kdeci\artifacts
+      KDECI_CC_CACHE: C:\kdeci\ccache
+      KDECI_COMPRESS_PACKAGES_ON_DOWNLOAD: 'False'
+      KDECI_EXTRA_CMAKE_ARGS: -DHIDE_SAFE_ASSERTS=ON -DBUILD_TESTING=OFF
+      KRITACI_SKIP_DEBUG_PACKAGE: 'True'
+      KRITACI_BUILD_INSTALLERS: 'False'
+      KRITACI_SKIP_UPLOAD_NIGHTLY_PACKAGE: 'True'
+      # Krita's scripts read GitLab CI variables; map the GitHub equivalents.
+      CI_PROJECT_DIR: ${{ github.workspace }}
+      CI_COMMIT_SHA: ${{ github.sha }}
+      CI_REPOSITORY_URL: ${{ github.server_url }}/${{ github.repository }}.git
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install llvm-mingw toolchain
+        run: |
+          $name = "llvm-mingw-$env:LLVM_MINGW_VERSION-ucrt-x86_64"
+          Invoke-WebRequest "https://github.com/mstorsjo/llvm-mingw/releases/download/$env:LLVM_MINGW_VERSION/$name.zip" -OutFile llvm-mingw.zip
+          Expand-Archive llvm-mingw.zip -DestinationPath C:\tools
+          "C:\tools\$name\bin" | Out-File -Append $env:GITHUB_PATH
+          "C:\tools\$name\x86_64-w64-mingw32\bin" | Out-File -Append $env:GITHUB_PATH
+          New-Item -ItemType Directory -Force $env:KDECI_CACHE_PATH, $env:KDECI_CC_CACHE | Out-Null
+
+      - name: Restore dependency cache
+        uses: actions/cache@v4
+        with:
+          path: C:\kdeci
+          key: kdeci-windows-${{ env.DEPS_BRANCH }}-${{ hashFiles('.kde-ci.yml') }}
+          restore-keys: kdeci-windows-${{ env.DEPS_BRANCH }}-
+
+      - name: Fetch Krita CI tooling
+        run: |
+          git clone --depth=1 -b $env:DEPS_BRANCH https://invent.kde.org/packaging/krita-deps-management.git
+          git clone --depth=1 https://invent.kde.org/packaging/krita-ci-utilities.git krita-deps-management/ci-utilities
+          python -m venv venv --upgrade-deps
+          ./venv/Scripts/Activate.ps1
+          pip install -r krita-deps-management/requirements.txt
+          pip install -r build-tools/ci-scripts/requirements-windows.txt
+
+      - name: Build IKriate
+        run: |
+          ./venv/Scripts/Activate.ps1
+          git config --global --add safe.directory $env:CI_PROJECT_DIR
+          python -u krita-deps-management/tools/replace-branch-in-seed-file.py krita-deps-management/latest/krita-deps.yml -p -o branch-corrected-deps.yml -d $env:DEPS_BRANCH
+          python -u krita-deps-management/tools/generate-deps-file.py -s branch-corrected-deps.yml -o .kde-ci.yml
+          python -u krita-deps-management/ci-utilities/run-ci-build.py --project krita --branch $env:DEPS_BRANCH --platform Windows/Qt5/Shared --skip-publishing 2>&1 | Tee-Object -FilePath build-ikriate.log
+
+      - name: Package (portable zip)
+        run: |
+          ./venv/Scripts/Activate.ps1
+          python -u build-tools/ci-scripts/build-windows-package.py 2>&1 | Tee-Object -FilePath build-package.log
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ikriate-windows-x64
+          path: |
+            ikriate-x64-*.zip
+            ikriate-x64-*-setup.exe
+          if-no-files-found: error
+
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: windows-build-logs
+          path: '*.log'

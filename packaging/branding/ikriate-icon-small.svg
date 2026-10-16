@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  SPDX-FileCopyrightText: 2026 IKriate contributors
+  SPDX-License-Identifier: CC-BY-SA-4.0
+
+  Simplified IKriate icon for 16-32 px: the colour ring is dropped so the
+  brush tip and accent dot stay legible.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <clipPath id="badge"><circle cx="256" cy="256" r="250"/></clipPath>
+  </defs>
+  <g clip-path="url(#badge)">
+    <g transform="translate(256 256) scale(6.9444) translate(-54 -54)">
+      <rect width="108" height="108" fill="#17181B"/>
+      <circle cx="54" cy="28" r="9" fill="#F2A541"/>
+      <path d="M54 38 C63 47 64 59 54 70 C44 59 45 47 54 38Z" fill="#EFE3CF" transform="rotate(35 54 54)"/>
+    </g>
+  </g>
+</svg>

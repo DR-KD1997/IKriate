@@ -20,7 +20,7 @@ QString DlgCrashLog::originalFileName()
 {
 #ifdef Q_OS_WIN
     return QStandardPaths::writableLocation(QStandardPaths::GenericConfigLocation).replace(L'/', L'\\')
-         + QStringLiteral("\\kritacrash.log");
+         + QStringLiteral("\\ikriatecrash.log");
 #elif defined(Q_OS_ANDROID)
     return QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/kritacrashlog.txt";
 #else

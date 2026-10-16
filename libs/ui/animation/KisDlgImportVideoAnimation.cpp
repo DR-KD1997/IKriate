@@ -61,7 +61,7 @@ KisDlgImportVideoAnimation::KisDlgImportVideoAnimation(KisMainWindow *mainWindow
     } else {
         enableButtonOk(false);
         m_ui.tabGeneral->setEnabled(false);
-        QMessageBox::warning(this, i18nc("@title:window", "Krita"), i18n("FFMpeg not found! Please add a path to FFMpeg in the \"Advanced\" tab"));
+        QMessageBox::warning(this, i18nc("@title:window", "IKriate"), i18n("FFMpeg not found! Please add a path to FFMpeg in the \"Advanced\" tab"));
     }
 
     QJsonObject ffprobeInfo = KisFFMpegWrapper::findFFProbe(ffprobeFileInfo.absoluteFilePath());
@@ -169,7 +169,7 @@ RenderedFrames KisDlgImportVideoAnimation::renderFrames(const QDir& directory)
     QList<int> &frameTimeList = frames.renderedFrameTargetTimes;
 
     if ( !directory.mkpath(".") ) {
-        QMessageBox::warning(this, i18nc("@title:window", "Krita"), i18n("Failed to create a work directory, make sure you have write permission"));
+        QMessageBox::warning(this, i18nc("@title:window", "IKriate"), i18n("Failed to create a work directory, make sure you have write permission"));
         return frames;
     }
 
@@ -286,7 +286,7 @@ RenderedFrames KisDlgImportVideoAnimation::renderFrames(const QDir& directory)
     }
 
     if ( frameFileList.isEmpty() ) {
-         QMessageBox::critical(this, i18nc("@title:window", "Krita"), i18n("Failed to export frames from video"));
+         QMessageBox::critical(this, i18nc("@title:window", "IKriate"), i18n("Failed to export frames from video"));
     }
 
     return frames;
@@ -564,7 +564,7 @@ void KisDlgImportVideoAnimation::slotFFProbeFile()
             m_ui.cmbFFProbeLocation->setCurrentText(filenames[0]);
             return;
         }
-        QMessageBox::warning(this, i18nc("@title:window", "Krita"), i18n("FFProbe is invalid!"));
+        QMessageBox::warning(this, i18nc("@title:window", "IKriate"), i18n("FFProbe is invalid!"));
     }
 
 }
@@ -585,14 +585,14 @@ void KisDlgImportVideoAnimation::slotFFMpegFile()
                 m_ui.cmbFFMpegLocation->addItem(filenames[0],ffmpegInfo);
                 m_ui.cmbFFMpegLocation->setCurrentText(filenames[0]);
             } else {
-                QMessageBox::warning(this, i18nc("@title:window", "Krita"), i18n("FFMpeg is invalid!"));
+                QMessageBox::warning(this, i18nc("@title:window", "IKriate"), i18n("FFMpeg is invalid!"));
             }
             m_ui.tabGeneral->setEnabled(true);
             return;
         }
 
         m_ui.tabGeneral->setEnabled(false);
-        QMessageBox::critical(this, i18nc("@title:window", "Krita"), i18n("No FFMpeg found!"));
+        QMessageBox::critical(this, i18nc("@title:window", "IKriate"), i18n("No FFMpeg found!"));
     }
 
 }
@@ -659,7 +659,7 @@ KisBasicVideoInfo KisDlgImportVideoAnimation::loadVideoInfo(const QString &input
     QJsonObject ffprobeJsonObj;
 
     std::function<void(void)> warnFFmpegFormatSupport = [this](){
-        QMessageBox::warning(this, i18nc("@title:window", "Krita"), i18n("Your FFMpeg version does not support this format"));
+        QMessageBox::warning(this, i18nc("@title:window", "IKriate"), i18n("Your FFMpeg version does not support this format"));
     };
 
     if (ffprobeInfo["enabled"].toBool()) {
@@ -699,7 +699,7 @@ KisBasicVideoInfo KisDlgImportVideoAnimation::loadVideoInfo(const QString &input
         }
 
         if ( videoInfoData.stream == -1 ) {
-            QMessageBox::warning(this, i18nc("@title:window", "Krita"), i18n("No video stream could be found!"));
+            QMessageBox::warning(this, i18nc("@title:window", "IKriate"), i18n("No video stream could be found!"));
             return {};
         }
 
@@ -769,7 +769,7 @@ KisBasicVideoInfo KisDlgImportVideoAnimation::loadVideoInfo(const QString &input
             dbgFile << "ffmpeg probe2" << ffmpegJsonObj;
 
             if ( ffprobeJsonObj["error"].toInt() != FFProbeErrorCodes::NONE ) {
-                QMessageBox::warning(this, i18nc("@title:window", "Krita"), i18n("Failed to load video information"));
+                QMessageBox::warning(this, i18nc("@title:window", "IKriate"), i18n("Failed to load video information"));
                 return {};
             }
 

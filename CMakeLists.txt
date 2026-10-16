@@ -341,11 +341,26 @@ add_feature_info("Limit long tests" LIMIT_LONG_TESTS "Run long running unittests
 option(BUILD_KRITA_QT_DESIGNER_PLUGINS "Build Qt Designer plugins for Krita widgets" OFF)
 add_feature_info("Build Qt Designer plugins" BUILD_KRITA_QT_DESIGNER_PLUGINS "Builds Qt Designer plugins for Krita widgets (use -DBUILD_KRITA_QT_DESIGNER_PLUGINS=ON to enable).")
 
-option(ENABLE_UPDATERS "Enable updaters/update notifications" ON)
+option(ENABLE_UPDATERS "Enable updaters/update notifications (off in IKriate: upstream updaters point at krita.org releases)" OFF)
 configure_file(config-updaters.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config-updaters.h)
 add_feature_info("Enable updaters" ENABLE_UPDATERS "Enable updaters/update notifications.")
 
 option(KRITA_ENABLE_PCH "Enable precompiled headers support" OFF)
+
+# IKriate: link-time optimisation for release packages. Off by default until
+# it has been validated on all three targets (it lengthens link times a lot).
+option(IKRIATE_ENABLE_LTO "Enable link-time optimisation (IPO) for release builds" OFF)
+if (IKRIATE_ENABLE_LTO)
+    include(CheckIPOSupported)
+    check_ipo_supported(RESULT IKRIATE_IPO_SUPPORTED OUTPUT IKRIATE_IPO_ERROR LANGUAGES C CXX)
+    if (IKRIATE_IPO_SUPPORTED)
+        set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_RELEASE ON)
+        set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_RELWITHDEBINFO ON)
+    else()
+        message(WARNING "IKRIATE_ENABLE_LTO requested but not supported: ${IKRIATE_IPO_ERROR}")
+    endif()
+endif()
+add_feature_info("Link-time optimisation" IKRIATE_ENABLE_LTO "smaller, faster release binaries (IKriate)")
 add_feature_info("Precompiled Headers" KRITA_ENABLE_PCH "precompiled headers make build process faster on some systems")
 
 option(USE_EXTERNAL_RAQM "Fetch Raqm dependency online instead of the embedded one" OFF)
@@ -380,7 +395,11 @@ if(BUILD_WITH_QT6 AND NOT "QT6" IN_LIST ALLOW_UNSTABLE)
     )
 endif()
 
-# Branding. Available options: default, Beta, Plus, Next. Can be set from command line
+# Branding. Available options: IKriate, default, Beta, Plus, Next. Can be set from command line.
+# IKriate always ships its own branding; the upstream Krita artwork is kept only for reference.
+if ("${BRANDING}" STREQUAL "")
+    set(BRANDING "IKriate")
+endif()
 if ("${BRANDING}" STREQUAL "")
     if (DEFINED KRITA_STABLE)
         set(BRANDING "default")

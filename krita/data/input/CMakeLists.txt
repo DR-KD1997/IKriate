@@ -1,6 +1,7 @@
 install(FILES
     clipstudiopaintcompatible.profile
     kritadefault.profile
+    ikriatetablet.profile
     painttoolsaicompatible.profile
     photoshopcompatible.profile
     DESTINATION  ${KDE_INSTALL_DATADIR}/krita/input

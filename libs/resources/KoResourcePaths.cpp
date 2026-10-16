@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 #include "KoResourcePaths.h"
+#include "IkPaths.h"
 
 #include <QGlobalStatic>
 #include <QString>
@@ -217,6 +218,33 @@ QString KoResourcePaths::getApplicationRoot()
     return getInstallationPrefix();
 }
 
+QString IkPaths::userDataLocation()
+{
+    /**
+     * IKriate keeps its own user data (resources, resource cache database,
+     * skins) next to, but separate from, a regular Krita installation:
+     *
+     *   Linux:   ~/.local/share/ikriate        (Krita: ~/.local/share/krita)
+     *   Windows: %APPDATA%\ikriate             (Krita: %APPDATA%\krita)
+     *
+     * Because this differs from QStandardPaths::AppDataLocation, the existing
+     * "custom resource folder" logic also stops IKriate from picking up files
+     * from Krita's own user folder. On Android the app sandbox already
+     * isolates the data, so the standard location is used as-is.
+     */
+    const QString standard = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+#ifdef Q_OS_ANDROID
+    return standard;
+#else
+    return QFileInfo(standard).dir().absoluteFilePath(QStringLiteral("ikriate"));
+#endif
+}
+
+QString IkPaths::userSkinsLocation()
+{
+    return userDataLocation() + QStringLiteral("/skins");
+}
+
 QString KoResourcePaths::getAppDataLocation()
 {
     if (!s_overrideAppDataLocation.isEmpty()) {
@@ -226,7 +254,7 @@ QString KoResourcePaths::getAppDataLocation()
     QString path;
 
     KConfigGroup cfg(KSharedConfig::openConfig(), "");
-    path = cfg.readEntry(KisResourceLocator::resourceLocationKey, QStandardPaths::writableLocation(QStandardPaths::AppDataLocation));
+    path = cfg.readEntry(KisResourceLocator::resourceLocationKey, IkPaths::userDataLocation());
 
     QFileInfo fi(path);
 
@@ -239,8 +267,8 @@ QString KoResourcePaths::getAppDataLocation()
         warnResources << "WARNING: KoResourcePaths::getAppDataLocation(): path appears to be a Windows path! Resetting to default..."
             << path
             << "->"
-            << QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
-        path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+            << IkPaths::userDataLocation();
+        path = IkPaths::userDataLocation();
         fi.setFile(path);
         cfg.writeEntry(KisResourceLocator::resourceLocationKey, path);
     }
@@ -252,8 +280,8 @@ QString KoResourcePaths::getAppDataLocation()
         warnResources << "WARNING: KoResourcePaths::getAppDataLocation(): path appears to be a Unix path! Resetting to default..."
             << path
             << "->"
-            << QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
-        path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+            << IkPaths::userDataLocation();
+        path = IkPaths::userDataLocation();
         fi.setFile(path);
         cfg.writeEntry(KisResourceLocator::resourceLocationKey, path);
     }
@@ -272,12 +300,12 @@ QString KoResourcePaths::getAppDataLocation()
 
     // Check whether an existing location is writable
     if (fi.exists() && !fi.isWritable()) {
-        path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+        path = IkPaths::userDataLocation();
     }
     else if (!fi.exists()) {
         // Check whether a non-existing location can be created
         if (!QDir().mkpath(path)) {
-            path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+            path = IkPaths::userDataLocation();
         }
         QDir().rmpath(path);
     }

@@ -727,7 +727,7 @@ void KisWelcomePageWidget::slotSetUpdateStatus(KisUpdaterStatus updateStatus)
 
 void KisWelcomePageWidget::slotShowUpdaterErrorDetails()
 {
-    QMessageBox::warning(qApp->activeWindow(), i18nc("@title:window", "Krita"), m_updaterStatus.updaterOutput());
+    QMessageBox::warning(qApp->activeWindow(), i18nc("@title:window", "IKriate"), m_updaterStatus.updaterOutput());
 }
 
 void KisWelcomePageWidget::updateVersionUpdaterFrame()

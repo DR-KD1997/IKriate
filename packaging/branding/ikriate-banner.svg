@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  SPDX-FileCopyrightText: 2026 IKriate contributors
+  SPDX-License-Identifier: CC-BY-SA-4.0
+
+  IKriate wordmark used on the splash screen.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 140" width="600" height="140">
+  <g transform="translate(0 2)">
+    <g transform="translate(68 68) scale(1.2) translate(-54 -54)">
+      <circle cx="54" cy="54" r="50" fill="#17181B"/>
+      <circle cx="54" cy="28" r="7" fill="#F2A541"/>
+      <circle cx="72.4" cy="35.6" r="5" fill="#E2643E"/>
+      <circle cx="80" cy="54" r="5" fill="#E58FB0"/>
+      <circle cx="72.4" cy="72.4" r="5" fill="#7B6CF0"/>
+      <circle cx="54" cy="80" r="5" fill="#5BA8E8"/>
+      <circle cx="35.6" cy="72.4" r="5" fill="#5FB59A"/>
+      <circle cx="28" cy="54" r="5" fill="#9DB39A"/>
+      <circle cx="35.6" cy="35.6" r="5" fill="#EFE3CF"/>
+      <path d="M54 40 C61 47 62 58 54 68 C46 58 47 47 54 40Z" fill="#EFE3CF" transform="rotate(35 54 54)"/>
+    </g>
+    <text x="150" y="92" font-family="DejaVu Sans, Noto Sans, Segoe UI, sans-serif" font-size="78" font-weight="700" fill="#F7F4EE" letter-spacing="1">IKriate</text>
+  </g>
+</svg>

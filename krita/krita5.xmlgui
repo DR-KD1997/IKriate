@@ -379,17 +379,24 @@ xsi:schemaLocation="http://www.kde.org/standards/kxmlgui/1.0  http://www.kde.org
     </Menu>
     <Menu name="tools">
       <text>&amp;Tools</text>
+      <Action name="ikriate_brush_studio"/>
       <Menu name="scripts"><text>Scripts</text></Menu>
     </Menu>
     <Menu name="settings">
       <text>Setti&amp;ngs</text>
       <Action name="options_configure"/>
+      <Action name="ikriate_appearance"/>
+      <Menu name="ikriate_layouts">
+        <text>Interface &amp;Layout</text>
+        <Action name="ikriate_layout_classic"/>
+        <Action name="ikriate_layout_minimal"/>
+        <Action name="ikriate_layout_radial"/>
+        <Separator/>
+        <Action name="ikriate_layout_auto"/>
+      </Menu>
       <Action name="change_interface_scale"/>
       <Action name="manage_bundles"/>
       <Action name="manage_resources"/>
-      <Action name="manage_supporter_bundles"/>
-      <Action name="manage_donations"/>
-      <Action name="manage_subscriptions"/>
       <Separator/>
       <Action name="options_configure_toolbars"/>
       <Merge name="StandardToolBarMenuHandler" />
@@ -451,6 +458,7 @@ xsi:schemaLocation="http://www.kde.org/standards/kxmlgui/1.0  http://www.kde.org
     <Separator/>
     <Action name="paintops"/>
     <Action name="paintop_options"/>
+    <Action name="ikriate_brush_studio"/>
     <Action name="composite_actions"/>
     <Action name="brushslider1"/>
     <Action name="brushslider2"/>

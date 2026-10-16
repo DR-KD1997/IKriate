@@ -448,6 +448,12 @@ set(kritaui_LIB_SRCS
     KisImportExportAdditionalChecks.cpp
 
     thememanager.cpp
+    ikriate/IkAppearanceDialog.cpp
+    ikriate/IkBrushStudio.cpp
+    ikriate/IkChromeOverlays.cpp
+    ikriate/IkChromeWidgets.cpp
+    ikriate/IkInterfaceManager.cpp
+    ikriate/IkSkinManager.cpp
 
     kis_mainwindow_observer.cpp
     KisViewManager.cpp

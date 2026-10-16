@@ -1,0 +1,109 @@
+# SPDX-FileCopyrightText: 2026 IKriate contributors
+# SPDX-License-Identifier: CC0-1.0
+#
+# Linux build of IKriate, packaged as an AppImage.
+# Uses Ubuntu 24.04's Qt 5.15 and KDE Frameworks 5 (the same setup as the
+# reference build in packaging/README-IKRIATE.md).
+name: Linux (AppImage)
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: linux-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  IMMER_COMMIT: bd4fc749b97dfa2b66a8f3de00bbf234db4856ef
+  ZUG_COMMIT: 065b213d0d790fef2d8f410d61d0c0f1f01afddd
+  LAGER_COMMIT: ddf87b467dca57cb03fb5ff94dff9ca2c633a15e
+  CCACHE_DIR: ${{ github.workspace }}/.ccache
+  CCACHE_MAXSIZE: 4G
+
+jobs:
+  appimage:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 350
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Free disk space
+        run: sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+            ccache ninja-build cmake extra-cmake-modules gettext patchelf file desktop-file-utils libfuse2 \
+            qtbase5-dev qtbase5-private-dev qtdeclarative5-dev qtquickcontrols2-5-dev libqt5svg5-dev \
+            qttools5-dev qttools5-dev-tools libqt5x11extras5-dev qtmultimedia5-dev libqt5opengl5-dev \
+            qml-module-qtquick-controls2 qml-module-qtquick-layouts qml-module-qtquick-window2 \
+            libkf5config-dev libkf5coreaddons-dev libkf5widgetsaddons-dev libkf5completion-dev \
+            libkf5guiaddons-dev libkf5i18n-dev libkf5itemmodels-dev libkf5itemviews-dev \
+            libkf5windowsystem-dev libkf5crash-dev libkf5kdcraw-dev \
+            libboost-system-dev libeigen3-dev libexiv2-dev liblcms2-dev libfftw3-dev libgsl-dev \
+            libheif-dev libjxl-dev libopenexr-dev libopenjp2-7-dev libpng-dev libtiff-dev libwebp-dev \
+            libgif-dev libjpeg-dev libturbojpeg0-dev libpoppler-qt5-dev libraw-dev libquazip5-dev libmypaint-dev \
+            libopencolorio-dev libharfbuzz-dev libfreetype-dev libfontconfig-dev libunibreak-dev \
+            libxsimd-dev libsdl2-dev libfribidi-dev libx11-dev libxi-dev zlib1g-dev
+
+      - name: Build Immer, Zug and Lager
+        run: |
+          for spec in "immer $IMMER_COMMIT" "zug $ZUG_COMMIT" "lager $LAGER_COMMIT"; do
+            set -- $spec
+            git clone --quiet https://github.com/arximboldi/$1.git /tmp/$1
+            git -C /tmp/$1 checkout --quiet $2
+            cmake -S /tmp/$1 -B /tmp/build-$1 -G Ninja -DCMAKE_INSTALL_PREFIX=/opt/kdeps -DCMAKE_PREFIX_PATH=/opt/kdeps \
+              -Dimmer_BUILD_TESTS=OFF -Dimmer_BUILD_EXAMPLES=OFF -Dimmer_BUILD_DOCS=OFF -Dimmer_BUILD_EXTRAS=OFF \
+              -Dzug_BUILD_TESTS=OFF -Dzug_BUILD_EXAMPLES=OFF -Dzug_BUILD_DOCS=OFF \
+              -Dlager_BUILD_TESTS=OFF -Dlager_BUILD_EXAMPLES=OFF -Dlager_BUILD_DOCS=OFF \
+              -Dlager_BUILD_DEBUGGER_EXAMPLES=OFF -DENABLE_PYTHON=OFF -DENABLE_GUILE=OFF
+            cmake --build /tmp/build-$1
+            sudo cmake --install /tmp/build-$1
+          done
+
+      - name: Restore compiler cache
+        uses: actions/cache@v4
+        with:
+          path: .ccache
+          key: ccache-linux-${{ github.sha }}
+          restore-keys: ccache-linux-
+
+      - name: Configure
+        run: |
+          cmake -S . -B build -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_INSTALL_PREFIX=/usr \
+            -DCMAKE_PREFIX_PATH=/opt/kdeps \
+            -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
+            -DBUILD_TESTING=OFF -DFOUNDATION_BUILD=ON
+
+      - name: Build
+        run: cmake --build build --parallel 4
+
+      - name: Install into AppDir
+        run: DESTDIR="$PWD/AppDir" cmake --install build
+
+      - name: Package AppImage
+        run: |
+          wget -q https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
+          wget -q https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage
+          chmod +x linuxdeploy*.AppImage
+          export QMAKE=/usr/lib/qt5/bin/qmake
+          export EXTRA_QT_PLUGINS="svg;iconengines"
+          export LD_LIBRARY_PATH="$PWD/AppDir/usr/lib:$PWD/AppDir/usr/lib/x86_64-linux-gnu"
+          export OUTPUT="IKriate-${GITHUB_REF_NAME//\//-}-x86_64.AppImage"
+          ./linuxdeploy-x86_64.AppImage --appdir AppDir \
+            --desktop-file AppDir/usr/share/applications/org.kde.krita.desktop \
+            --icon-file krita/pics/branding/IKriate/256-apps-krita.png --icon-filename krita \
+            --plugin qt --output appimage
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ikriate-linux-x86_64
+          path: IKriate-*.AppImage
+          if-no-files-found: error

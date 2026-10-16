@@ -9,6 +9,7 @@
 #include <kis_config.h>
 
 #include <QGuiApplication>
+#include <QTimer>
 
 #include <qpa/qplatformscreen.h>
 
@@ -60,14 +61,18 @@ KisAndroidScaling::KisAndroidScaling(KisConfig &cfg, KisApplication *app)
             &KisAndroidScaling::slotJniScalingDialogActive,
             Qt::QueuedConnection);
 
+    // May be null in IKriate builds, where the donation flow is disabled.
     KisAndroidDonations *androidDonations = app->androidDonations();
-    KIS_SAFE_ASSERT_RECOVER_NOOP(androidDonations);
     if (androidDonations) {
         connect(androidDonations,
                 &KisAndroidDonations::sigSplashDialogDismissed,
                 this,
                 &KisAndroidScaling::slotSplashDialogDismissed,
                 Qt::QueuedConnection);
+    } else {
+        // No splash/donation dialog to wait for: offer interface scaling once
+        // the event loop is running and the main window is up.
+        QTimer::singleShot(1500, this, &KisAndroidScaling::slotSplashDialogDismissed);
     }
 }
 

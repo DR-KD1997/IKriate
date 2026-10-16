@@ -64,7 +64,7 @@ void DlgBugInfo::initialize()
 void DlgBugInfo::initializeText()
 {
     const QString configPath = QStandardPaths::writableLocation(QStandardPaths::GenericConfigLocation);
-    QSettings kritarc(configPath + QStringLiteral("/kritadisplayrc"), QSettings::IniFormat);
+    QSettings kritarc(configPath + QStringLiteral("/ikriatedisplayrc"), QSettings::IniFormat);
 
     QString info = infoText(kritarc);
 

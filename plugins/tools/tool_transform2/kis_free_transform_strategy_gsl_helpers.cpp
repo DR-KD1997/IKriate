@@ -434,7 +434,7 @@ namespace GSL
     void warnNoGSL()
     {
         QMessageBox::warning(qApp->activeWindow(),
-                             i18nc("@title:window", "Krita"),
+                             i18nc("@title:window", "IKriate"),
                              i18n("Krita was built without the support "
                                   "of GNU Scientific Library, so you cannot scale "
                                   "the selection with handles. Please compile "

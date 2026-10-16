@@ -462,14 +462,14 @@ KisOpenGL::OpenGLRenderers KisOpenGL::getSupportedOpenGLRenderers()
 KisOpenGL::OpenGLRenderer KisOpenGL::getUserPreferredOpenGLRendererConfig()
 {
     const QString configPath = QStandardPaths::writableLocation(QStandardPaths::GenericConfigLocation);
-    QSettings kritarc(configPath + QStringLiteral("/kritadisplayrc"), QSettings::IniFormat);
+    QSettings kritarc(configPath + QStringLiteral("/ikriatedisplayrc"), QSettings::IniFormat);
     return convertConfigToOpenGLRenderer(kritarc.value("OpenGLRenderer", "auto").toString());
 }
 
 void KisOpenGL::setUserPreferredOpenGLRendererConfig(KisOpenGL::OpenGLRenderer renderer)
 {
     const QString configPath = QStandardPaths::writableLocation(QStandardPaths::GenericConfigLocation);
-    QSettings kritarc(configPath + QStringLiteral("/kritadisplayrc"), QSettings::IniFormat);
+    QSettings kritarc(configPath + QStringLiteral("/ikriatedisplayrc"), QSettings::IniFormat);
     kritarc.setValue("OpenGLRenderer", KisOpenGL::convertOpenGLRendererToConfig(renderer));
 }
 

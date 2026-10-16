@@ -57,7 +57,7 @@ with open(os.path.join(buildPath, "libs/version/kritaversion.h"), "r") as fp:
 unstablePackageSuffix = '-{}'.format(os.environ['CI_COMMIT_SHORT_SHA']) \
     if not arguments.release_package_naming else ''
 
-packageName = 'krita-x64-{}{}'.format(kritaVersionString, unstablePackageSuffix)
+packageName = 'ikriate-x64-{}{}'.format(kritaVersionString, unstablePackageSuffix)
 hookFile = os.path.join(srcPath, 'build-tools', 'ci-scripts', 'sign-windows-package-at-notary-service.py')
 
 commandToRun = ' '.join([sys.executable,

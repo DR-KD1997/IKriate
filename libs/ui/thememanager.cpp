@@ -207,6 +207,13 @@ void ThemeManager::registerThemeActions(KisKActionCollection *actionCollection)
     actionCollection->addAction("theme_menu", d->themeMenuAction);
 }
 
+void ThemeManager::reloadThemes()
+{
+    d->themeMap.clear();
+    populateThemeMap();
+    populateThemeMenu();
+}
+
 void ThemeManager::populateThemeMenu()
 {
     if (!d->themeMenuAction) return;

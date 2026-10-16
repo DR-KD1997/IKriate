@@ -1,0 +1,121 @@
+# SPDX-FileCopyrightText: 2026 IKriate contributors
+# SPDX-License-Identifier: CC0-1.0
+#
+# Android (tablet) build of IKriate: arm64-v8a APK.
+#
+# Like the Windows job, this mirrors upstream Krita's CI
+# (build-tools/ci-scripts/android.yml) and downloads prebuilt dependency
+# packages from KDE's public registry (teams/ci-artifacts/krita-android-*).
+# SDK/NDK versions match packaging/android/apk/build.gradle.
+#
+# The APK is debug-signed. For a release build, add a keystore as repository
+# secrets and sign the output with apksigner (see packaging/README-IKRIATE.md).
+name: Android (APK)
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: android-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  DEPS_BRANCH: master
+  ANDROID_NDK_VERSION: '27.3.13750724'
+  ANDROID_PLATFORM: 'android-36'
+  ANDROID_BUILD_TOOLS: '36.0.0'
+
+jobs:
+  apk:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 350
+    strategy:
+      fail-fast: false
+      matrix:
+        abi: [arm64-v8a]
+    env:
+      KDECI_BUILD_TYPE: Release
+      KDECI_GITLAB_SERVER: https://invent.kde.org/
+      KDECI_PACKAGE_PROJECT: teams/ci-artifacts/krita-android-${{ matrix.abi }}
+      KDECI_ANDROID_ABI: ${{ matrix.abi }}
+      KDECI_CACHE_PATH: /home/runner/kdeci/artifacts/
+      KDECI_CC_CACHE: /home/runner/kdeci/caches/
+      KDECI_COMPRESS_PACKAGES_ON_DOWNLOAD: 'False'
+      KDECI_SKIP_ECM_ANDROID_TOOLCHAIN: 'True'
+      KDECI_EXTRA_CMAKE_ARGS: -DHIDE_SAFE_ASSERTS=ON -DBUILD_TESTING=OFF
+      # androiddeployqt skips QML modules if _install sits inside the source tree.
+      KDECI_WORKDIR_PATH: /tmp/wd
+      KRITACI_ANDROID_PACKAGE_TYPE: debug
+      KRITACI_SKIP_UPLOAD_NIGHTLY_PACKAGE: 'True'
+      CI_PROJECT_DIR: ${{ github.workspace }}
+      CI_COMMIT_SHA: ${{ github.sha }}
+      CI_REPOSITORY_URL: ${{ github.server_url }}/${{ github.repository }}.git
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Free disk space
+        run: sudo rm -rf /usr/share/dotnet /opt/ghc /opt/hostedtoolcache/CodeQL
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Install Android SDK components
+        run: |
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "ndk;$ANDROID_NDK_VERSION" "platforms;$ANDROID_PLATFORM" "build-tools;$ANDROID_BUILD_TOOLS" "platform-tools"
+          echo "KDECI_ANDROID_SDK_ROOT=$ANDROID_HOME" >> "$GITHUB_ENV"
+          echo "KDECI_ANDROID_NDK_ROOT=$ANDROID_HOME/ndk/$ANDROID_NDK_VERSION" >> "$GITHUB_ENV"
+          echo "ANDROID_NDK_ROOT=$ANDROID_HOME/ndk/$ANDROID_NDK_VERSION" >> "$GITHUB_ENV"
+          echo "CMAKE_TOOLCHAIN_FILE=$GITHUB_WORKSPACE/krita-deps-management/tools/android-toolchain-krita.cmake" >> "$GITHUB_ENV"
+          sudo apt-get update && sudo apt-get install -y --no-install-recommends ninja-build gettext ccache
+          mkdir -p "$KDECI_CACHE_PATH" "$KDECI_CC_CACHE"
+
+      - name: Restore dependency cache
+        uses: actions/cache@v4
+        with:
+          path: /home/runner/kdeci
+          key: kdeci-android-${{ matrix.abi }}-${{ env.DEPS_BRANCH }}-${{ github.sha }}
+          restore-keys: kdeci-android-${{ matrix.abi }}-${{ env.DEPS_BRANCH }}-
+
+      - name: Fetch Krita CI tooling
+        run: |
+          git clone --depth=1 -b "$DEPS_BRANCH" https://invent.kde.org/packaging/krita-deps-management.git
+          git clone --depth=1 https://invent.kde.org/packaging/krita-ci-utilities.git krita-deps-management/ci-utilities
+          python3 -m venv venv --upgrade-deps
+          . venv/bin/activate
+          pip install -r krita-deps-management/requirements.txt
+
+      - name: Build IKriate
+        run: |
+          . venv/bin/activate
+          unset VIRTUAL_ENV
+          git config --global --add safe.directory "$CI_PROJECT_DIR"
+          python3 -u krita-deps-management/tools/replace-branch-in-seed-file.py krita-deps-management/latest/krita-deps.yml -p -o branch-corrected-deps.yml -d "$DEPS_BRANCH"
+          python3 -u krita-deps-management/tools/generate-deps-file.py -s branch-corrected-deps.yml -o .kde-ci.yml
+          python3 -u krita-deps-management/ci-utilities/run-ci-build.py --project krita --branch "$DEPS_BRANCH" \
+            --platform "Android/$KDECI_ANDROID_ABI/Qt5/Shared" --only-build --skip-publishing 2>&1 | tee build-ikriate.log
+
+      - name: Package APK
+        run: |
+          . venv/bin/activate
+          python3 -u build-tools/ci-scripts/build-android-package.py 2>&1 | tee build-apk.log
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ikriate-android-${{ matrix.abi }}
+          path: /tmp/wd/krita/_packaging/**/*.apk
+          if-no-files-found: error
+
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: android-build-logs-${{ matrix.abi }}
+          path: '*.log'

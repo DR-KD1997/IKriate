@@ -51,6 +51,8 @@ public:
 
     void    setThemeMenuAction(KActionMenu* const action);
     void    registerThemeActions(KisKActionCollection *actionCollection);
+    /// Re-scan colour scheme files (IKriate regenerates its skin scheme at runtime).
+    void    reloadThemes();
 
 Q_SIGNALS:
 

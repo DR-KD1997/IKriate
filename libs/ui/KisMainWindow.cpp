@@ -106,6 +106,9 @@
 #endif
 
 #include <KisScopedPerformanceLogger.h>
+
+#include "ikriate/IkInterfaceManager.h"
+#include "ikriate/IkSkinManager.h"
 #include <KisUsageLogger.h>
 #include <brushengine/kis_paintop_settings.h>
 #include "dialogs/kis_about_application.h"
@@ -381,6 +384,17 @@ KisMainWindow::KisMainWindow(QUuid uuid)
 #endif
     d->windowStateConfig = KSharedConfig::openConfig()->group("MainWindow");
 
+#ifndef Q_OS_HAIKU
+    // IKriate skins are generated as a colour scheme; switch to it when ready.
+    connect(IkSkinManager::instance(), &IkSkinManager::sigActivateTheme, this,
+            [this](const QString &themeName, const QString &) {
+                d->themeManager->reloadThemes();
+                d->themeManager->setCurrentTheme(themeName);
+                KConfigGroup themeGroup(KSharedConfig::openConfig(), "theme");
+                themeGroup.writeEntry("Theme", themeName);
+            });
+#endif
+
     setStandardToolBarMenuEnabled(true);
     setTabPosition(Qt::AllDockWidgetAreas, QTabWidget::North);
     setDockNestingEnabled(true);
@@ -524,6 +538,11 @@ KisMainWindow::KisMainWindow(QUuid uuid)
     actionCollection()->addAssociatedWidget(d->canvasWindow);
 
     createActions();
+
+    // IKriate: selectable interface layouts (Classic / Minimal / Radial),
+    // Brush Studio and Interface & Skins. Creates its actions before the
+    // XMLGUI file is loaded below so they appear in the menus.
+    new IkInterfaceManager(this);
 
     // the welcome screen needs to grab actions...so make sure this line goes after the createAction() so they exist
     d->welcomePage->setMainWindow(this);
@@ -1045,7 +1064,7 @@ void KisMainWindow::setCanvasDetached(bool detach)
 {
 #ifdef Q_OS_ANDROID
     if (detach) {
-        QMessageBox::warning(this, i18nc("@title:window", "Krita"),
+        QMessageBox::warning(this, i18nc("@title:window", "IKriate"),
                              "Detach Canvas is unsupported on Android");
     }
 #else
@@ -1115,7 +1134,7 @@ bool KisMainWindow::openDocument(const QString &path, OpenFlags flags)
 
     if (!QFile(path).exists()) {
         if (!(flags & BatchMode)) {
-            QMessageBox::critical(qApp->activeWindow(), i18nc("@title:window", "Krita"), i18n("The file %1 does not exist.", path));
+            QMessageBox::critical(qApp->activeWindow(), i18nc("@title:window", "IKriate"), i18n("The file %1 does not exist.", path));
         }
         KisRecentFilesManager::instance()->remove(QUrl::fromLocalFile(path)); //remove the file from the recent-opened-file-list
         return false;
@@ -1259,7 +1278,7 @@ void KisMainWindow::slotSaveCanceled(const QString &errMsg)
 {
     if (!errMsg.isEmpty()) {   // empty when cancelled by user
         KisUsageLogger::log(QString("Saving cancelled. Error:").arg(errMsg));
-        QMessageBox::critical(this, i18nc("@title:window", "Krita"), errMsg);
+        QMessageBox::critical(this, i18nc("@title:window", "IKriate"), errMsg);
     }
     else {
         KisUsageLogger::log(QString("Saving cancelled by the user."));
@@ -1356,7 +1375,7 @@ bool KisMainWindow::saveDocument(KisDocument *document, bool saveas, bool isExpo
     }
     else if (dlg.result() == KisDelayedSaveDialog::Ignored) {
         QMessageBox::critical(qApp->activeWindow(),
-                              i18nc("@title:window", "Krita"),
+                              i18nc("@title:window", "IKriate"),
                               i18n("You are saving a file while the image is "
                                    "still rendering. The saved file may be "
                                    "incomplete or corrupted.\n\n"
@@ -2103,7 +2122,7 @@ void KisMainWindow::slotStoragesWarning(const QString &/*location*/)
 
     if (!checkPaintOpAvailable()) {
         warning += i18n("\nThere are no brush presets available. Please enable a bundle that has presets before continuing.\n");
-        QMessageBox::critical(this, i18nc("@title:window", "Krita"), warning);
+        QMessageBox::critical(this, i18nc("@title:window", "IKriate"), warning);
 
         QAction *action = actionCollection()->action("manage_bundles");
         if (action) {
@@ -2112,7 +2131,7 @@ void KisMainWindow::slotStoragesWarning(const QString &/*location*/)
     }
 
     if (!checkActiveBundlesAvailable()) {
-        QMessageBox::warning(this, i18nc("@title:window", "Krita"), warning + i18n("\nOnly your local resources are available."));
+        QMessageBox::warning(this, i18nc("@title:window", "IKriate"), warning + i18n("\nOnly your local resources are available."));
     }
 
 }
@@ -2251,7 +2270,7 @@ void KisMainWindow::importAnimation()
         if (!status.isOk() && !status.isInternalError()) {
             QString msg = status.errorMessage();
             if (!msg.isEmpty())
-                QMessageBox::critical(qApp->activeWindow(), i18nc("@title:window", "Krita"), i18n("Could not finish import animation:\n%1", msg));
+                QMessageBox::critical(qApp->activeWindow(), i18nc("@title:window", "IKriate"), i18n("Could not finish import animation:\n%1", msg));
         }
         activeView()->canvasBase()->refetchDataFromImage();
     }
@@ -2312,7 +2331,7 @@ void KisMainWindow::importVideoAnimation()
             KoColor bgColor(qc, cs);
 
             if (!document->newImage(name, width, height, cs, bgColor, KisConfig::RASTER_LAYER, 1, "", double(resolution / 72) )) {
-                QMessageBox::critical(qApp->activeWindow(), i18nc("@title:window", "Krita"), i18n("Failed to create new document. Animation import aborted."));
+                QMessageBox::critical(qApp->activeWindow(), i18nc("@title:window", "IKriate"), i18n("Failed to create new document. Animation import aborted."));
                 return;
             }
 
@@ -2331,7 +2350,7 @@ void KisMainWindow::importVideoAnimation()
         if (!status.isOk() && !status.isInternalError()) {
             QString msg = status.errorMessage();
             if (!msg.isEmpty())
-                QMessageBox::critical(qApp->activeWindow(), i18nc("@title:window", "Krita"), i18n("Could not finish import animation:\n%1", msg));
+                QMessageBox::critical(qApp->activeWindow(), i18nc("@title:window", "IKriate"), i18n("Could not finish import animation:\n%1", msg));
         }
 
         activeView()->canvasBase()->refetchDataFromImage();
@@ -2977,7 +2996,7 @@ void KisMainWindow::newWindow()
 #ifdef Q_OS_ANDROID
     // Check if current mainwindow exists, just to be sure.
     if (KisPart::instance()->currentMainwindow()) {
-        QMessageBox::warning(this, i18nc("@title:window", "Krita"),
+        QMessageBox::warning(this, i18nc("@title:window", "IKriate"),
                              "Creating a New Main Window is unsupported on Android");
         return;
     }

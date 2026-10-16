@@ -39,6 +39,7 @@
 #include <KisMainWindow.h>
 #include <KisSupportedArchitectures.h>
 #include <KisUsageLogger.h>
+#include <kconfig.h>
 #include <KoConfig.h>
 #include <KoResourcePaths.h>
 #include <kis_config.h>
@@ -120,8 +121,8 @@ void tryInitDrMingw()
         return;
     }
 
-    // Set the log file path to %LocalAppData%\kritacrash.log
-    const QString logFile = QDir(QStandardPaths::writableLocation(QStandardPaths::GenericConfigLocation)).absoluteFilePath("kritacrash.log");
+    // Set the log file path to %LocalAppData%\ikriatecrash.log
+    const QString logFile = QDir(QStandardPaths::writableLocation(QStandardPaths::GenericConfigLocation)).absoluteFilePath("ikriatecrash.log");
     const QByteArray logFilePath = QDir::toNativeSeparators(logFile).toLocal8Bit();
     myExcHndlSetLogFileNameA(logFilePath.data());
 }
@@ -174,7 +175,7 @@ Java_org_krita_android_JNIWrappers_saveState(JNIEnv* /*env*/,
     }
 
     const QString configPath = QStandardPaths::writableLocation(QStandardPaths::GenericConfigLocation);
-    QSettings kritarc(configPath + QStringLiteral("/kritadisplayrc"), QSettings::IniFormat);
+    QSettings kritarc(configPath + QStringLiteral("/ikriatedisplayrc"), QSettings::IniFormat);
     kritarc.setValue("canvasState", "OPENGL_SUCCESS");
 }
 
@@ -227,6 +228,10 @@ extern "C" MAIN_EXPORT int MAIN_FN(int argc, char **argv)
     }
 #endif
 
+    // IKriate keeps its configuration (ikriaterc) apart from Krita's (kritarc),
+    // so both can be installed side by side. Must run before any KConfig use.
+    KConfig::setMainConfigName(QStringLiteral("ikriaterc"));
+
     bool runningInKDE = !qgetenv("KDE_FULL_SESSION").isEmpty();
 
 #if defined HAVE_X11
@@ -243,7 +248,7 @@ extern "C" MAIN_EXPORT int MAIN_FN(int argc, char **argv)
     qputenv("QT_BEARER_POLL_TIMEOUT", QByteArray::number(-1));
 
     // A per-user unique string, without /, because QLocalServer cannot use names with a / in it
-    QString key = "Krita5" + QStandardPaths::writableLocation(QStandardPaths::HomeLocation).replace("/", "_");
+    QString key = "IKriate5" + QStandardPaths::writableLocation(QStandardPaths::HomeLocation).replace("/", "_");
     key = key.replace(":", "_").replace("\\","_");
 
     QCoreApplication::setAttribute(Qt::AA_ShareOpenGLContexts, true);
@@ -360,7 +365,7 @@ extern "C" MAIN_EXPORT int MAIN_FN(int argc, char **argv)
 #endif
 
     const QDir configPath(QStandardPaths::writableLocation(QStandardPaths::GenericConfigLocation));
-    QSettings kritarc(configPath.absoluteFilePath("kritadisplayrc"), QSettings::IniFormat);
+    QSettings kritarc(configPath.absoluteFilePath("ikriatedisplayrc"), QSettings::IniFormat);
 
     // KFI18N is broken on Android. See kswitchlanguagedialog_p.cpp for details.
     // If/when removing this, also remove the matching logic from there!
@@ -478,7 +483,7 @@ if (!qEnvironmentVariableIsEmpty("KRITA_OPENGL_DEBUG")) {
      */
     if (!qEnvironmentVariableIsSet("QT_DISABLE_ACCESSIBILITY")) {
         if (kritarc.value("DisableAccessibilityInQt", false).toBool()) {
-            qInfo() << "INFO: activating QT_DISABLE_ACCESSIBILITY via kritadisplayrc...";
+            qInfo() << "INFO: activating QT_DISABLE_ACCESSIBILITY via ikriatedisplayrc...";
             qputenv("QT_DISABLE_ACCESSIBILITY", "1");
         }
     } else {
@@ -715,13 +720,16 @@ if (!qEnvironmentVariableIsEmpty("KRITA_OPENGL_DEBUG")) {
 
     /// Initialize application info, it will be used by both, Qt and
     /// DrKonqi of the host system
+    // The component name stays "krita" so that installed data (share/krita),
+    // translations and plugins are found unchanged; only the visible name differs.
     KAboutData aboutData("krita",
-                            "Krita",
+                            "IKriate",
                             KritaVersionWrapper::versionString(true),
                             "", // TODO: "short description" needs new string exception
                             KAboutLicense::GPL,
-                            i18nc("@info:credit", "© 1999–2026 The Krita Developers"));
-    aboutData.setHomepage(QStringLiteral("https://krita.org"));
+                            i18nc("@info:credit", "IKriate is based on Krita. © 1999–2026 The Krita Developers"));
+    aboutData.setHomepage(QStringLiteral("https://github.com/ikriate/ikriate"));
+    aboutData.setBugAddress("https://github.com/ikriate/ikriate/issues");
     aboutData.setOrganizationDomain("krita.org");
 
     // this call sets corresponding fields of QApplication as well
@@ -874,7 +882,7 @@ if (!qEnvironmentVariableIsEmpty("KRITA_OPENGL_DEBUG")) {
     int state = KisApplication::exec();
 
     {
-        QSettings kritarc(configPath.absoluteFilePath("kritadisplayrc"), QSettings::IniFormat);
+        QSettings kritarc(configPath.absoluteFilePath("ikriatedisplayrc"), QSettings::IniFormat);
         kritarc.setValue("canvasState", "OPENGL_SUCCESS");
     }
 

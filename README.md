@@ -1,113 +1,46 @@
-![Picture](https://krita.org/images/krita-logo-light.svg)
+<p align="center"><img src="krita/pics/branding/IKriate/256-apps-krita.png" width="128" alt="IKriate icon"></p>
 
-| CI Name     | Master | Stable | Release |
-| ------------------- | ---------------- | ------ | ------- |
-| Pipeline | [![pipeline status](https://invent.kde.org/graphics/krita/badges/master/pipeline.svg)](https://invent.kde.org/graphics/krita/-/commits/master) | [![pipeline status](https://invent.kde.org/graphics/krita/badges/krita/5.2/pipeline.svg)](https://invent.kde.org/graphics/krita/-/commits/krita/5.2) | [![Latest Release](https://invent.kde.org/graphics/krita/-/badges/release.svg)](https://invent.kde.org/graphics/krita/-/releases) |
+# IKriate
 
-Note: Nightly builds are not covered by this table atm
+IKriate is a digital painting application for Windows, Linux and Android tablets, built on
+[Krita](https://krita.org) 5.3. It keeps Krita's painting engine, brushes, file formats and
+colour management, and adds an interface you can switch to suit the device in front of you.
 
-Krita is a free and open source digital painting application. It is for artists who want to create professional work from start to end. Krita is used by comic book artists, illustrators, concept artists, matte and texture painters and in the digital VFX industry.
+> IKriate is an independent project. It is not made, endorsed or supported by the Krita
+> Foundation or KDE. Please report IKriate problems here, not to Krita's bug tracker.
 
-If you are reading this on GitHub, be aware that this is just a mirror. Our real code repository is provided by KDE: https://invent.kde.org/graphics/krita.git
+## What IKriate adds
 
-![Picture](https://krita.org/images/hero-image-50.webp)
+| | |
+|---|---|
+| **Three interface layouts** | *Classic* (Krita's docked layout, default on computers), *Minimal* (full canvas, slim top bar and side bar) and *Radial* (touch-first, default on Android tablets). Every layout is available on every build: **Settings › Interface Layout**. |
+| **Radial palette on touch** | In Radial, hold one finger on the canvas for the radial palette. Two-finger tap undoes, three-finger tap redoes, four-finger tap hides the interface. |
+| **Brush Studio** | One sheet to browse tagged brush sets, search, pick a brush and set size, opacity, flow and smoothing (**Tools › Brush Studio**, `Ctrl+Alt+B`). |
+| **Skins and tinting** | Four bundled skins (Charcoal, Paper, Midnight, High Contrast), all of Krita's themes, your own skins, a custom accent colour and a tint with adjustable strength (**Settings › Interface & Skins**). |
+| **Side-by-side with Krita** | IKriate keeps its own settings (`ikriaterc`) and resource folder (`ikriate`), so it can be installed next to Krita without either touching the other's data. |
 
-### Repository Status
+## Custom skins
 
-For branch: `master`
+A skin is a KDE colour scheme file with an optional `[IKriate]` section, saved as `.ikskin`
+(any `.colors` file also works). Start by copying a bundled skin from
+`krita/data/ikriate/skins/` into your skins folder (**Interface & Skins › Open Folder**):
 
-| Freeze type    | Status                                                               |
-|----------------|----------------------------------------------------------------------|
-| Feature Freeze | freeze, features are not allowed                                     |
-| String Freeze  | freeze, strings are not allowed                                      |
+```ini
+[IKriate]
+Accent=242,165,65        ; selection and active-control colour
+ChromeRadius=14          ; corner radius of floating panels, px
+PanelOpacity=240         ; 120-255, opacity of panels over the canvas
+Stylesheet=my-skin.qss   ; optional Qt stylesheet next to the skin
+Description=One line shown in the skin picker
+```
 
+## Building
 
-### User Manual
-https://docs.krita.org/en/user_manual.html
+See [packaging/README-IKRIATE.md](packaging/README-IKRIATE.md) for Linux, Windows and Android
+builds, both locally and on GitHub Actions.
 
-### Development Notes and Build Instructions
+## Licence
 
-Please follow [the online documentation](https://docs.krita.org/en/untranslatable_pages/building_krita.html).
-
-Other developer guides, notes and wiki:
-
-https://docs.krita.org/en/untranslatable_pages.html
-
-Apidox:
-
-https://api.kde.org/legacy/krita/html/index.html
-
-### Bugs and Wishes
-
-https://bugs.kde.org/buglist.cgi?bug_status=UNCONFIRMED&bug_status=CONFIRMED&bug_status=ASSIGNED&bug_status=REOPENED&list_id=1315444&product=krita&query_format=advanced
-
-### Discussion Forum
-
-* https://krita-artists.org/
-
-### IRC channel
-
-Most of the developers hang out here. If you are interested in helping with the project this is a great place to start.
-
-libera.chat, #krita
-
-### Project Website
-
-https://www.krita.org
-
-### Nightly builds
-
-#### Unstable
-
-* https://cdn.kde.org/ci-builds/graphics/krita/master/
-
-#### Stable
-
-* https://cdn.kde.org/ci-builds/graphics/krita/krita-5.2/
-
-#### Developers builds
-
-##### Linux build with debug symbols in Qt and Krita
-
-1) Go to Jobs section of Krita's CI: https://invent.kde.org/graphics/krita/-/jobs
-2) Search for the latest `linux-debug-weekly` job
-3) Enter the job and click on Artifacts->Browse
-4) Download the AppImage
-
-##### Linux build with ASAN in Qt and Krita
-
-1) Go to Jobs section of Krita's CI: https://invent.kde.org/graphics/krita/-/jobs
-2) Search for the latest `linux-asan-weekly` job
-3) Enter the job and click on Artifacts->Browse
-4) Download the AppImage
-5) Set up environment variable for ASAN:
-    ```bash
-        export ASAN_OPTIONS=new_delete_type_mismatch=0:detect_leaks=0
-    ```
-6) Run the AppImage in the modified environment
-
-##### Windows build with ASAN in Qt and Krita
-
-1) Go to Jobs section of Krita's CI: https://invent.kde.org/graphics/krita/-/jobs
-2) Search for the latest `windows-asan-weekly` job
-3) Enter the job and click on Artifacts->Browse
-4) Download the .zip file
-5) Open terminal
-6) Set up environment variable for ASAN:
-    ```
-        set ASAN_OPTIONS=new_delete_type_mismatch=0:detect_leaks=0
-    ```
-7) Change working directory to `c:\path\where\you\downloaded\krita-5.3.0-prealpha-git12345\bin`.
-   That is important, otherwise ASAN will not be able to locate llvm-symbolizer.exe and the
-   backtraces generated by ASAN will not contain proper symbols.
-    ```
-        cd c:\path\where\you\downloaded\krita-5.3.0-prealpha-git12345\bin
-    ```
-8) Run krita
-    ```
-        krita.com
-    ```
-
-### License
-
-Krita as a whole is licensed under the GNU Public License, Version 3. Individual files may have a different, but compatible license.
+IKriate is free software under the GNU General Public License v3 (see `COPYING` and
+`LICENSES/`), like the Krita code it is based on. Krita's original README is kept in
+[README.krita.md](README.krita.md).

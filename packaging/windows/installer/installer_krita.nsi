@@ -25,9 +25,9 @@ ManifestDPIAware false
 #!define /ifndef KRITA_VERSION_GIT ""
 !define /ifndef KRITA_INSTALLER_OUTPUT_DIR ""
 !ifdef KRITA_INSTALLER_64
-	!define /ifndef KRITA_INSTALLER_OUTPUT_NAME "krita_x64_setup.exe"
+	!define /ifndef KRITA_INSTALLER_OUTPUT_NAME "ikriate_x64_setup.exe"
 !else
-	!define /ifndef KRITA_INSTALLER_OUTPUT_NAME "krita_x86_setup.exe"
+	!define /ifndef KRITA_INSTALLER_OUTPUT_NAME "ikriate_x86_setup.exe"
 !endif
 
 # Krita constants (fixed)
@@ -36,13 +36,13 @@ ManifestDPIAware false
 !else
 	!define KRITA_INSTALLER_OUTPUT "${KRITA_INSTALLER_OUTPUT_DIR}\${KRITA_INSTALLER_OUTPUT_NAME}"
 !endif
-!define KRTIA_PUBLISHER "Krita Foundation"
+!define KRTIA_PUBLISHER "IKriate contributors"
 !ifdef KRITA_INSTALLER_64
-	!define KRITA_PRODUCTNAME "Krita (x64)"
-	!define KRITA_UNINSTALL_REGKEY "Krita_x64"
+	!define KRITA_PRODUCTNAME "IKriate (x64)"
+	!define KRITA_UNINSTALL_REGKEY "IKriate_x64"
 !else
-	!define KRITA_PRODUCTNAME "Krita (x86)"
-	!define KRITA_UNINSTALL_REGKEY "Krita_x86"
+	!define KRITA_PRODUCTNAME "IKriate (x86)"
+	!define KRITA_UNINSTALL_REGKEY "IKriate_x86"
 !endif
 
 VIProductVersion "${KRITA_VERSION}"
@@ -60,9 +60,9 @@ BrandingText "[NSIS ${NSIS_VERSION}]  ${KRITA_PRODUCTNAME} ${KRITA_VERSION}"
 Name "${KRITA_PRODUCTNAME} ${KRITA_VERSION_DISPLAY}"
 OutFile ${KRITA_INSTALLER_OUTPUT}
 !ifdef KRITA_INSTALLER_64
-	InstallDir "$PROGRAMFILES64\Krita (x64)"
+	InstallDir "$PROGRAMFILES64\IKriate (x64)"
 !else
-	InstallDir "$PROGRAMFILES32\Krita (x86)"
+	InstallDir "$PROGRAMFILES32\IKriate (x86)"
 !endif
 XPstyle on
 
@@ -87,7 +87,7 @@ Var CreateDesktopIcon
 !insertmacro MUI_PAGE_LICENSE "license.rtf"
 !define MUI_STARTMENUPAGE_DEFAULTFOLDER "Krita"
 !define MUI_STARTMENUPAGE_REGISTRY_ROOT HKLM
-!define MUI_STARTMENUPAGE_REGISTRY_KEY "Software\Krita"
+!define MUI_STARTMENUPAGE_REGISTRY_KEY "Software\IKriate"
 !define MUI_STARTMENUPAGE_REGISTRY_VALUENAME "StartMenuFolder"
 !define MUI_STARTMENUPAGE_NODISABLE
 !insertmacro MUI_PAGE_STARTMENU Krita $KritaStartMenuFolder
@@ -207,23 +207,23 @@ Section "-Thing"
 	# Registry entries for version recognition
 	#   InstallLocation:
 	#     Where krita is installed
-	WriteRegStr HKLM "Software\Krita" \
+	WriteRegStr HKLM "Software\IKriate" \
 	                 "InstallLocation" "$INSTDIR"
 	#   Version:
 	#     Version of Krita
-	WriteRegStr HKLM "Software\Krita" \
+	WriteRegStr HKLM "Software\IKriate" \
 	                 "Version" "${KRITA_VERSION}"
 	#   x64:
 	#     Set to 1 for 64-bit Krita, can be missing for 32-bit Krita
 !ifdef KRITA_INSTALLER_64
-	WriteRegDWORD HKLM "Software\Krita" \
+	WriteRegDWORD HKLM "Software\IKriate" \
 	                   "x64" 1
 !else
-	DeleteRegValue HKLM "Software\Krita" "x64"
+	DeleteRegValue HKLM "Software\IKriate" "x64"
 !endif
 	#   InstallerLanguage:
 	#     Language used by the installer (to be re-used for the uninstaller)
-	WriteRegStr HKLM "Software\Krita" \
+	WriteRegStr HKLM "Software\IKriate" \
 	                 "InstallerLanguage" "$LANGUAGE"
 	#   StartMenuFolder:
 	#     Start Menu Folder
@@ -362,7 +362,7 @@ SectionEnd
 
 Section "un.Thing"
 	RMDir /REBOOTOK $INSTDIR\shellex
-	DeleteRegKey HKLM "Software\Krita"
+	DeleteRegKey HKLM "Software\IKriate"
 	DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${KRITA_UNINSTALL_REGKEY}"
 	Delete $INSTDIR\uninstall.exe
 	RMDir /REBOOTOK $INSTDIR
@@ -567,7 +567,7 @@ Function un.onInit
 
 	# Get and use installer language:
 	Push $0
-	ReadRegStr $0 HKLM "Software\Krita" "InstallerLanguage"
+	ReadRegStr $0 HKLM "Software\IKriate" "InstallerLanguage"
 	${If} $0 != ""
 		StrCpy $LANGUAGE $0
 	${EndIf}

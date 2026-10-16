@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  SPDX-FileCopyrightText: 2026 IKriate contributors
+  SPDX-License-Identifier: CC-BY-SA-4.0
+
+  IKriate app icon, concept D "Radial": a brush tip inside a ring of colour dots.
+  Master artwork on a 108-unit Android adaptive-icon grid (66-unit safe zone).
+  The desktop variant below clips the centre 72 units to a circle.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <clipPath id="badge"><circle cx="256" cy="256" r="244"/></clipPath>
+  </defs>
+  <g clip-path="url(#badge)">
+    <g transform="translate(256 256) scale(6.7778) translate(-54 -54)">
+      <rect width="108" height="108" fill="#17181B"/>
+      <circle cx="54" cy="28" r="7" fill="#F2A541"/>
+      <circle cx="72.4" cy="35.6" r="5" fill="#E2643E"/>
+      <circle cx="80" cy="54" r="5" fill="#E58FB0"/>
+      <circle cx="72.4" cy="72.4" r="5" fill="#7B6CF0"/>
+      <circle cx="54" cy="80" r="5" fill="#5BA8E8"/>
+      <circle cx="35.6" cy="72.4" r="5" fill="#5FB59A"/>
+      <circle cx="28" cy="54" r="5" fill="#9DB39A"/>
+      <circle cx="35.6" cy="35.6" r="5" fill="#EFE3CF"/>
+      <path d="M54 40 C61 47 62 58 54 68 C46 58 47 47 54 40Z" fill="#EFE3CF" transform="rotate(35 54 54)"/>
+    </g>
+  </g>
+</svg>
