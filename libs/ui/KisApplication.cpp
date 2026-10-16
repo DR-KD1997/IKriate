@@ -1284,7 +1284,7 @@ void KisApplication::resetConfig()
     
     // find user settings file
     const QString configPath = QStandardPaths::writableLocation(QStandardPaths::GenericConfigLocation);
-    QString kritarcPath = configPath + QStringLiteral("/kritarc");
+    QString kritarcPath = configPath + QStringLiteral("/ikriaterc");
     
     QFile kritarcFile(kritarcPath);
     
@@ -1300,9 +1300,9 @@ void KisApplication::resetConfig()
 
             QMessageBox::information(qApp->activeWindow(),
                                  i18nc("@title:window", "IKriate"),
-                                 i18n("Krita configurations reset!\n\n"
+                                 i18n("IKriate configurations reset!\n\n"
                                       "Backup file was created at: %1\n\n"
-                                      "Restart Krita for changes to take effect.",
+                                      "Restart IKriate for changes to take effect.",
                                       backupKritarcPath),
                                  QMessageBox::Ok, QMessageBox::Ok);
 

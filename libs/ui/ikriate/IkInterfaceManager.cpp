@@ -282,6 +282,10 @@ void IkInterfaceManager::slotDeferredInit()
     }
 
     IkSkinManager::instance()->applyStoredSettings();
+    // Reload action icons for the skin's light/dark variant; some were
+    // created before the palette settled during start-up.
+    QMetaObject::invokeMethod(d->mw, "updateTheme", Qt::QueuedConnection);
+    QMetaObject::invokeMethod(d->mw, "themeChanged", Qt::QueuedConnection);
     applyMode(true);
 }
 
@@ -380,9 +384,17 @@ void IkInterfaceManager::restoreDesktopChrome()
     if (!d->classicState.isEmpty()) {
         d->mw->restoreState(d->classicState);
     } else {
-        // Nothing saved: at least show the tool box and the default dockers.
-        for (const char *id : {"ToolBox", "sharedtooldocker", "KisLayerBox"}) {
+        // Nothing saved: bring back Krita's default set of dockers and toolbars.
+        for (const char *id : {"ToolBox", "sharedtooldocker", "KisLayerBox", "PresetDocker", "ColorSelectorNg"}) {
             if (QDockWidget *dock = d->mw->dockWidget(QString::fromLatin1(id))) dock->show();
+        }
+        const QList<QToolBar *> bars = d->mw->findChildren<QToolBar *>();
+        for (QToolBar *bar : bars) {
+            const QString n = bar->objectName();
+            if (n == QLatin1String("mainToolBar") || n == QLatin1String("editToolBar")
+                || n == QLatin1String("BrushesAndStuff")) {
+                bar->show();
+            }
         }
     }
     if (QDockWidget *layers = d->mw->dockWidget(QStringLiteral("KisLayerBox"))) {
@@ -429,9 +441,15 @@ void IkInterfaceManager::slotStackPageChanged()
     // floating layouts, put the canvas back in front.
     if (d->mode != Classic && d->onCanvasPage()) {
         hideDesktopChrome();
-    } else if (d->mode == Classic && d->restorePending && d->onCanvasPage()) {
-        d->restorePending = false;
-        restoreDesktopChrome();
+    } else if (d->mode == Classic && d->onCanvasPage() && !d->canvasOnly) {
+        // Also recover when the saved snapshot is gone but the window was left
+        // without chrome (e.g. settings copied from a Minimal/Radial session):
+        // Krita itself never hides the menu bar outside canvas-only mode.
+        const bool chromeMissing = d->mw->menuBar() && d->mw->menuBar()->isHidden();
+        if (d->restorePending || chromeMissing) {
+            d->restorePending = false;
+            restoreDesktopChrome();
+        }
     }
     updateOverlayVisibility();
 }

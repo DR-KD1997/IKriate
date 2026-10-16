@@ -359,7 +359,7 @@ ShowCustomDocumentWidgetByDefault=true
 LastReturnType=Custom Document
 
 [theme]
-Theme=Krita dark
+Theme=IKriate Active
 
 [python]
 enable_colorspace=true

@@ -200,7 +200,8 @@ void IkBrushStudio::slotSyncFromCanvas()
     m_syncing = true;
     if (KisPaintOpPresetSP preset = rp->currentPreset()) {
         m_presetName->setText(preset->name());
-        m_engine->setText(i18n("Engine: %1", preset->paintOp().name()));
+        const KoID op = preset->paintOp();
+        m_engine->setText(i18n("Engine: %1", op.name().isEmpty() ? op.id() : op.name()));
         m_chooser->setCurrentResource(preset);
     } else {
         m_presetName->setText(i18n("No brush selected"));

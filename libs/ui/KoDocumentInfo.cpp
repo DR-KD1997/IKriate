@@ -247,7 +247,7 @@ void KoDocumentInfo::updateParameters()
         return;
     }
 
-    KConfig config("kritarc");
+    KConfig config("ikriaterc");
     config.reparseConfiguration();
     KConfigGroup appAuthorGroup(&config, "Author");
     QString profile = appAuthorGroup.readEntry("active-profile", "");

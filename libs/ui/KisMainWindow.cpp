@@ -378,6 +378,8 @@ KisMainWindow::KisMainWindow(QUuid uuid)
     connect(d->workspacemodel, SIGNAL(rowsRemoved(QModelIndex,int,int)), this, SLOT(updateWindowMenu()));
 
     d->viewManager = new KisViewManager(this, actionCollection());
+    // IKriate: write the skin's colour scheme before the theme manager reads it.
+    IkSkinManager::instance()->prepareActiveScheme();
     KConfigGroup group( KSharedConfig::openConfig(), "theme");
 #ifndef Q_OS_HAIKU
     d->themeManager = new Digikam::ThemeManager(group.readEntry("Theme", "Krita dark"), this);
@@ -389,9 +391,11 @@ KisMainWindow::KisMainWindow(QUuid uuid)
     connect(IkSkinManager::instance(), &IkSkinManager::sigActivateTheme, this,
             [this](const QString &themeName, const QString &) {
                 d->themeManager->reloadThemes();
-                d->themeManager->setCurrentTheme(themeName);
+                // Force a full refresh even when the theme *name* is unchanged
+                // (the skin regenerates the same "IKriate Active" scheme).
                 KConfigGroup themeGroup(KSharedConfig::openConfig(), "theme");
-                themeGroup.writeEntry("Theme", themeName);
+                themeGroup.writeEntry("Theme", QString());
+                d->themeManager->setCurrentTheme(themeName);
             });
 #endif
 

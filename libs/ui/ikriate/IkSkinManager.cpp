@@ -191,11 +191,37 @@ void IkSkinManager::saveSettings() const
     cfg.sync();
 }
 
+void IkSkinManager::prepareActiveScheme()
+{
+    if (m_prepared) return;
+    const KConfigGroup theme(KSharedConfig::openConfig(), "theme");
+    const QString currentTheme = theme.readEntry("Theme", QString());
+    if (!currentTheme.isEmpty() && currentTheme != activeThemeName()) return;
+
+    const IkSkin s = skin(m_settings.skinId);
+    if (s.filePath.isEmpty()) return;
+    QString error;
+    if (generateScheme(s, m_settings, &error).isEmpty()) {
+        qWarning("IKriate: could not generate skin scheme: %s", qPrintable(error));
+        return;
+    }
+    m_chromeRadius = s.chromeRadius;
+    m_panelOpacity = s.panelOpacity;
+    m_prepared = true;
+}
+
 void IkSkinManager::applyStoredSettings()
 {
     static bool done = false;
     if (done) return;
     done = true;
+
+    if (m_prepared) {
+        // The scheme was written before the window was built and the theme
+        // manager loaded it directly; only the optional stylesheet remains.
+        applyStylesheet(skin(m_settings.skinId));
+        return;
+    }
 
     const KConfigGroup theme(KSharedConfig::openConfig(), "theme");
     const QString currentTheme = theme.readEntry("Theme", QString());

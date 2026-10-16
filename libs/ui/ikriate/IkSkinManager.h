@@ -67,6 +67,10 @@ public:
     Settings settings() const;
     void setSettings(const Settings &settings, bool apply = true);
 
+    /// Writes the active scheme for the stored settings without switching
+    /// themes. Call before the first window builds its widgets, so they start
+    /// in the right colours (some Krita widgets cache colours on creation).
+    void prepareActiveScheme();
     /// Applies the stored settings. Called once when the first window opens.
     void applyStoredSettings();
     /// Re-generates the active scheme from current settings and activates it.
@@ -102,6 +106,7 @@ private:
     Settings m_settings;
     int m_chromeRadius {14};
     int m_panelOpacity {240};
+    bool m_prepared {false};
 };
 
 #endif // IKSKINMANAGER_H
