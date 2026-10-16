@@ -47,11 +47,15 @@ for r in immer zug lager; do
 done
 
 cmake -S ikriate -B build -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo \
-  -DCMAKE_INSTALL_PREFIX=$HOME/ikriate-install -DCMAKE_PREFIX_PATH=/opt/kdeps \
+  -DCMAKE_INSTALL_PREFIX=$HOME/ikriate-install -DCMAKE_INSTALL_LIBDIR=lib -DCMAKE_PREFIX_PATH=/opt/kdeps \
   -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DBUILD_TESTING=OFF
 cmake --build build && cmake --install build
 $HOME/ikriate-install/bin/krita
 ```
+
+`CMAKE_INSTALL_LIBDIR=lib` matters on Debian/Ubuntu: Krita looks for its QML modules in
+`<prefix>/lib/qml`, and the multiarch default (`lib/x86_64-linux-gnu`) hides them from the
+Text tool's panels.
 
 A full build takes 3-4 hours on 2 cores and about 40 minutes on 8. Distribution Qt lacks a
 few tablet patches Krita carries; the AppImage/Windows/Android builds from KDE's dependency

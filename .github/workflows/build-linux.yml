@@ -46,6 +46,7 @@ jobs:
             qtbase5-dev qtbase5-private-dev qtdeclarative5-dev qtquickcontrols2-5-dev libqt5svg5-dev \
             qttools5-dev qttools5-dev-tools libqt5x11extras5-dev qtmultimedia5-dev libqt5opengl5-dev \
             qml-module-qtquick-controls2 qml-module-qtquick-layouts qml-module-qtquick-window2 \
+            qml-module-qtquick-shapes qml-module-qtqml qml-module-qtquick2 \
             libkf5config-dev libkf5coreaddons-dev libkf5widgetsaddons-dev libkf5completion-dev \
             libkf5guiaddons-dev libkf5i18n-dev libkf5itemmodels-dev libkf5itemviews-dev \
             libkf5windowsystem-dev libkf5crash-dev libkf5kdcraw-dev \
@@ -81,7 +82,7 @@ jobs:
         run: |
           cmake -S . -B build -G Ninja \
             -DCMAKE_BUILD_TYPE=Release \
-            -DCMAKE_INSTALL_PREFIX=/usr \
+            -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_INSTALL_LIBDIR=lib \
             -DCMAKE_PREFIX_PATH=/opt/kdeps \
             -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
             -DBUILD_TESTING=OFF -DFOUNDATION_BUILD=ON 2>&1 | tee configure.log
@@ -94,17 +95,23 @@ jobs:
 
       - name: Package AppImage
         run: |
-          wget -q https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
-          wget -q https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage
+          exec > >(tee appimage.log) 2>&1
+          set -x
+          wget -nv https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
+          wget -nv https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage
           chmod +x linuxdeploy*.AppImage
+          # Hosted runners may lack FUSE; unpack the tool AppImages instead of mounting them.
+          export APPIMAGE_EXTRACT_AND_RUN=1
           export QMAKE=/usr/lib/qt5/bin/qmake
           export EXTRA_QT_PLUGINS="svg;iconengines"
-          export LD_LIBRARY_PATH="$PWD/AppDir/usr/lib:$PWD/AppDir/usr/lib/x86_64-linux-gnu"
+          export QML_SOURCES_PATHS="$PWD/plugins:$PWD/libs"
+          export LD_LIBRARY_PATH="$PWD/AppDir/usr/lib:$PWD/AppDir/usr/lib/x86_64-linux-gnu:/opt/kdeps/lib"
           export OUTPUT="IKriate-${GITHUB_REF_NAME//\//-}-x86_64.AppImage"
           ./linuxdeploy-x86_64.AppImage --appdir AppDir \
             --desktop-file AppDir/usr/share/applications/org.kde.krita.desktop \
             --icon-file krita/pics/branding/IKriate/256-apps-krita.png --icon-filename krita \
-            --plugin qt --output appimage 2>&1 | tee appimage.log
+            --plugin qt --output appimage
+          ls -la *.AppImage
 
       - uses: actions/upload-artifact@v4
         with:
