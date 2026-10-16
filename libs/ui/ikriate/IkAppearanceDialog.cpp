@@ -12,7 +12,9 @@
 #include <QComboBox>
 #include <QDesktopServices>
 #include <QDialogButtonBox>
-#include <QFileDialog>
+#include <QFile>
+#include <QFileInfo>
+#include <QTemporaryDir>
 #include <QFormLayout>
 #include <QGroupBox>
 #include <QHBoxLayout>
@@ -28,6 +30,8 @@
 #include <KConfig>
 #include <KConfigGroup>
 #include <klocalizedstring.h>
+
+#include <KoFileDialog.h>
 
 #include "IkInterfaceManager.h"
 
@@ -287,9 +291,29 @@ void IkAppearanceDialog::slotUpdatePreview()
 
 void IkAppearanceDialog::slotImportSkin()
 {
-    const QString path = QFileDialog::getOpenFileName(this, i18n("Import Skin"), QString(),
-                                                      i18n("Skins (*.ikskin *.colors)"));
+    // KoFileDialog uses the platform picker, which on Android returns a
+    // content:// URI rather than a file path.
+    KoFileDialog dialog(this, KoFileDialog::OpenFile, "IKriateImportSkin");
+    dialog.setCaption(i18n("Import Skin"));
+    dialog.setNameFilter(i18n("Skins (*.ikskin *.colors)"));
+    QString path = dialog.filename();
     if (path.isEmpty()) return;
+
+    // Work on a local copy so the skin can be parsed even when it came from a
+    // document provider; the copy keeps the original file name.
+    QTemporaryDir tmp;
+    if (path.startsWith(QLatin1String("content:")) && tmp.isValid()) {
+        QString name = QUrl::fromPercentEncoding(QFileInfo(path).fileName().toUtf8()).section('/', -1);
+        if (!name.endsWith(QLatin1String(".ikskin")) && !name.endsWith(QLatin1String(".colors"))) {
+            name += QStringLiteral(".ikskin");
+        }
+        const QString local = tmp.filePath(name);
+        if (!QFile::copy(path, local)) {
+            QMessageBox::warning(this, i18n("Import Skin"), i18n("Could not read the selected file."));
+            return;
+        }
+        path = local;
+    }
     QString error;
     const QString id = IkSkinManager::instance()->importSkin(path, &error);
     if (id.isEmpty()) {
