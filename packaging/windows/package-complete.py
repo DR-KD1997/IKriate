@@ -532,11 +532,8 @@ MergeFolders.merge_folders(f"{KRITA_INSTALL_DIR}\\share\\locale", f"{pkg_root}\\
 MergeFolders.merge_folders(f"{DEPS_INSTALL_DIR}\\share\\locale", f"{pkg_root}\\bin\\locale")
 
 # Copy shortcut link from source (can't create it dynamically)
-shutil.copy(f"{KRITA_SRC_DIR}\\packaging\\windows\\krita.lnk", pkg_root)
-shutil.copy(
-    f"{KRITA_SRC_DIR}\\packaging\\windows\\krita-minimal.lnk", pkg_root)
-shutil.copy(
-    f"{KRITA_SRC_DIR}\\packaging\\windows\\krita-animation.lnk", pkg_root)
+# IKriate: one launcher named after the app (it starts bin\\krita.exe).
+shutil.copy(f"{KRITA_SRC_DIR}\\packaging\\windows\\krita.lnk", os.path.join(pkg_root, "IKriate.lnk"))
 
 # QML deployment:
 #

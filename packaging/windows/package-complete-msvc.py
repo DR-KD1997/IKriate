@@ -302,11 +302,8 @@ subprocess.run(["xcopy", "/S", "/Y", "/I", "{}\\share\\locale".format(
     DEPS_INSTALL_DIR), f"{pkg_root}\\bin\\locale"], check=True)
 
 # Copy shortcut link from source (can't create it dynamically)
-shutil.copy(f"{KRITA_SRC_DIR}\\packaging\\windows\\krita.lnk", pkg_root)
-shutil.copy(
-    f"{KRITA_SRC_DIR}\\packaging\\windows\\krita-minimal.lnk", pkg_root)
-shutil.copy(
-    f"{KRITA_SRC_DIR}\\packaging\\windows\\krita-animation.lnk", pkg_root)
+# IKriate: one launcher named after the app (it starts bin\\krita.exe).
+shutil.copy(f"{KRITA_SRC_DIR}\\packaging\\windows\\krita.lnk", os.path.join(pkg_root, "IKriate.lnk"))
 
 QMLDIR_ARGS = ["--qmldir", f"{DEPS_INSTALL_DIR}\\qml"]
 if os.path.isdir(f"{KRITA_INSTALL_DIR}\\lib\\qml"):
