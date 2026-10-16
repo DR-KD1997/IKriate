@@ -44,6 +44,7 @@ jobs:
       KDECI_BUILD_TYPE: Release
       KDECI_GITLAB_SERVER: https://invent.kde.org/
       KDECI_PACKAGE_PROJECT: teams/ci-artifacts/krita-android-${{ matrix.abi }}
+      KDECI_REPO_METADATA_PATH: ${{ github.workspace }}/krita-deps-management/repo-metadata
       KDECI_ANDROID_ABI: ${{ matrix.abi }}
       KDECI_CACHE_PATH: /home/runner/kdeci/artifacts/
       KDECI_CC_CACHE: /home/runner/kdeci/caches/
