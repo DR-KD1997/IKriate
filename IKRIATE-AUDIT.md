@@ -52,6 +52,15 @@ by expected value.
 
 ## Measurements
 
-| Metric | Value | Notes |
-|---|---|---|
-| Configure + full build, 2 cores | see `packaging/README-IKRIATE.md` | ccache cold |
+Reference build in a 2-core, 7 GB Linux workspace (Ubuntu 24.04, distro Qt 5.15.13):
+
+| Metric | Value |
+|---|---|
+| Build steps (Release, tests off) | 3,509 |
+| Full build, cold ccache | about 4.5 hours |
+| Rebuild after an IKriate UI change | 2-4 minutes (only `kritaui` and the executable relink) |
+| Install size (binaries, plugins, resources) | 231 MB |
+
+Verified by running the build headless (Xvfb, QPainter canvas): first-run defaults,
+Classic → Radial → Classic round trip, all four bundled skins, tint, runtime layout and skin
+switching from Interface & Skins, the radial palette, Brush Studio.
