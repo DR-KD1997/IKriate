@@ -47,6 +47,8 @@ jobs:
       # which is not reliably on PATH for its subprocesses on hosted Windows runners.
       KDECI_COMPRESS_PACKAGES_ON_DOWNLOAD: 'False'
       KDECI_EXTRA_CMAKE_ARGS: -DHIDE_SAFE_ASSERTS=ON -DBUILD_TESTING=OFF
+      # Tests are not built (BUILD_TESTING=OFF); skip the test-runner phase.
+      KDECI_ONLY_BUILD: 'True'
       KRITACI_SKIP_DEBUG_PACKAGE: 'True'
       KRITACI_BUILD_INSTALLERS: 'False'
       KRITACI_SKIP_UPLOAD_NIGHTLY_PACKAGE: 'True'
@@ -89,6 +91,8 @@ jobs:
           ./venv/Scripts/Activate.ps1
           pip install -r krita-deps-management/requirements.txt
           pip install -r build-tools/ci-scripts/requirements-windows.txt
+          # Needed when the Python scripting plugins are built after install.
+          pip install setuptools
 
       - name: Build IKriate
         run: |
