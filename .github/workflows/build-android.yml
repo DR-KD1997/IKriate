@@ -102,6 +102,8 @@ jobs:
           . venv/bin/activate
           unset VIRTUAL_ENV
           git config --global --add safe.directory "$CI_PROJECT_DIR"
+          # Krita's runner fetches +refs/heads/* like GitLab CI does, which needs a detached HEAD.
+          git checkout --quiet --detach
           python3 -u krita-deps-management/tools/replace-branch-in-seed-file.py krita-deps-management/latest/krita-deps.yml -p -o branch-corrected-deps.yml -d "$DEPS_BRANCH"
           python3 -u krita-deps-management/tools/generate-deps-file.py -s branch-corrected-deps.yml -o .kde-ci.yml
           python3 -u krita-deps-management/ci-utilities/run-ci-build.py --project krita --branch "$DEPS_BRANCH" \
