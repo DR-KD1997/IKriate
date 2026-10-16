@@ -69,6 +69,7 @@ jobs:
           "C:\tools\$name\bin" | Out-File -Append $env:GITHUB_PATH
           "C:\tools\$name\x86_64-w64-mingw32\bin" | Out-File -Append $env:GITHUB_PATH
           New-Item -ItemType Directory -Force $env:KDECI_CACHE_PATH, $env:KDECI_CC_CACHE | Out-Null
+          choco install ccache ninja -y --no-progress
 
       - name: Restore dependency cache
         uses: actions/cache@v4
