@@ -22,7 +22,8 @@ on:
 
 concurrency:
   group: windows-${{ github.ref }}
-  cancel-in-progress: true
+  # Let long builds on main finish; only superseded pull-request runs are cancelled.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 env:
   LLVM_MINGW_VERSION: '20251216'

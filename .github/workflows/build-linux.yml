@@ -15,7 +15,8 @@ on:
 
 concurrency:
   group: linux-${{ github.ref }}
-  cancel-in-progress: true
+  # Let long builds on main finish; only superseded pull-request runs are cancelled.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 env:
   IMMER_COMMIT: bd4fc749b97dfa2b66a8f3de00bbf234db4856ef
