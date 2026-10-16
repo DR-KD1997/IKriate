@@ -122,7 +122,7 @@ jobs:
 
       - name: Report failure
         if: failure()
-        run: python .github/scripts/report-log.py build-ikriate.log build-package.log
+        run: python .github/scripts/report-log.py build-package.log build-ikriate.log
 
       - uses: actions/upload-artifact@v4
         if: failure()

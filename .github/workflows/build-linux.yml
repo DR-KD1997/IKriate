@@ -121,4 +121,4 @@ jobs:
 
       - name: Report failure
         if: failure()
-        run: python3 .github/scripts/report-log.py configure.log build.log appimage.log
+        run: python3 .github/scripts/report-log.py appimage.log build.log configure.log

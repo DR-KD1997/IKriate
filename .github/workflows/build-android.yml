@@ -125,7 +125,7 @@ jobs:
 
       - name: Report failure
         if: failure()
-        run: python3 .github/scripts/report-log.py build-ikriate.log build-apk.log
+        run: python3 .github/scripts/report-log.py build-apk.log build-ikriate.log
 
       - uses: actions/upload-artifact@v4
         if: failure()
