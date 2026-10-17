@@ -46,7 +46,14 @@ by expected value.
    does) or disable DrKonqi integration.
 8. **Translations.** New IKriate strings use `i18n()` but are not in the `po/` catalogs yet,
    so they show in English everywhere. Add them to the translation template.
-9. **Android scripting.** Python plugins are unavailable in the Android build (no embedded
+9. **Windows Python scripting.** The Windows CI build configures without Python scripting
+   (the Python in KDE's dependency packages is missing `setuptools`/`sipconfig` at configure
+   time), so Krita's Python plugins are not in the zip. Bootstrap `setuptools` into that
+   Python before configuring, as upstream's VM image does.
+10. **AppStream metainfo.** `org.kde.krita.appdata.xml` still carries Krita's description and
+    translated paragraphs; current `appstreamcli` rejects them, so the AppImage is built with
+    `NO_APPSTREAM=1`. Write an IKriate description and drop the inherited translations.
+11. **Android scripting.** Python plugins are unavailable in the Android build (no embedded
    interpreter). This matters for IKriate because tablet users can't use script-based
    add-ons; it is a large upstream change, so track it rather than fork it.
 

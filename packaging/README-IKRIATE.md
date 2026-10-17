@@ -5,6 +5,9 @@ tracks Krita's `krita/6.0` branch, which is the 5.3 release built with Qt 5 by d
 
 ## GitHub Actions (all three platforms)
 
+All three produced working packages on 17 Oct 2026 (Linux AppImage 156 MB, Windows zip
+219 MB, Android APK 180 MB). Download them from the run's **Artifacts** section.
+
 | Workflow | Output | Dependencies |
 |---|---|---|
 | `build-linux.yml` | `IKriate-*-x86_64.AppImage` | Ubuntu 24.04 packages + Immer/Zug/Lager |
