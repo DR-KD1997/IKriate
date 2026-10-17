@@ -6,7 +6,9 @@ tracks Krita's `krita/6.0` branch, which is the 5.3 release built with Qt 5 by d
 ## GitHub Actions (all three platforms)
 
 All three produced working packages on 17 Oct 2026 (Linux AppImage 156 MB, Windows zip
-219 MB, Android APK 180 MB). Download them from the run's **Artifacts** section.
+219 MB, Android APK 180 MB). Download them from the run's **Artifacts** section. Each run's
+summary page lists the package size and its largest parts; `IKRIATE-OPTIMISATION.md` has the
+size and memory study.
 
 | Workflow | Output | Dependencies |
 |---|---|---|
@@ -52,7 +54,7 @@ done
 cmake -S ikriate -B build -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo \
   -DCMAKE_INSTALL_PREFIX=$HOME/ikriate-install -DCMAKE_INSTALL_LIBDIR=lib -DCMAKE_PREFIX_PATH=/opt/kdeps \
   -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DBUILD_TESTING=OFF
-cmake --build build && cmake --install build
+cmake --build build && cmake --install build --strip
 $HOME/ikriate-install/bin/krita
 ```
 
@@ -70,6 +72,8 @@ packages include them.
 |---|---|---|
 | `BRANDING` | `IKriate` | Icons and splash. Krita's own artwork stays under `krita/pics/branding/{default,Beta,Plus,Next}`. |
 | `IKRIATE_ENABLE_LTO` | `OFF` | Link-time optimisation for Release/RelWithDebInfo. |
+| `IKRIATE_ICF` | `OFF` | Identical code folding at link time (`safe` or `all`; uses gold with GCC). See `IKRIATE-OPTIMISATION.md`. |
+| `IKRIATE_INSTALL_KRITA3_BUNDLE` | `OFF` | Krita 3's legacy resource bundle (16 MB, disabled by default in Krita; never installed on Android). |
 | `ENABLE_UPDATERS` | `OFF` (was `ON`) | Krita's updater checks krita.org for *Krita* releases, so it is off. |
 | `IKRIATE_ENABLE_KRITA_DONATIONS` (define) | unset | Krita Foundation's Android supporter/donation flow. Off: it sells the Foundation's Play Store products. |
 

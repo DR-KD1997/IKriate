@@ -361,6 +361,32 @@ if (IKRIATE_ENABLE_LTO)
     endif()
 endif()
 add_feature_info("Link-time optimisation" IKRIATE_ENABLE_LTO "smaller, faster release binaries (IKriate)")
+
+# IKriate: identical code folding. Krita's colour engines instantiate thousands
+# of near-identical blend-mode templates; folding them shrank kritalcmsengine
+# by 11% (safe) to 26% (all) with bit-identical output and unchanged speed.
+# Needs a linker with --icf (lld, or gold on Linux). Off until measured on all
+# three CI targets.
+set(IKRIATE_ICF "OFF" CACHE STRING "Identical code folding at link time: OFF, safe or all")
+set_property(CACHE IKRIATE_ICF PROPERTY STRINGS OFF safe all)
+if (NOT IKRIATE_ICF STREQUAL "OFF" AND NOT MSVC)
+    set(_ik_icf_flags "-Wl,--icf=${IKRIATE_ICF}")
+    if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND NOT CMAKE_CXX_FLAGS MATCHES "-fuse-ld=")
+        # GNU ld has no --icf; gold does.
+        list(PREPEND _ik_icf_flags "-fuse-ld=gold")
+    endif()
+    include(CheckCXXSourceCompiles)
+    set(CMAKE_REQUIRED_LINK_OPTIONS ${_ik_icf_flags})
+    check_cxx_source_compiles("int main() { return 0; }" IKRIATE_ICF_SUPPORTED)
+    unset(CMAKE_REQUIRED_LINK_OPTIONS)
+    if (IKRIATE_ICF_SUPPORTED)
+        add_compile_options(-ffunction-sections)
+        add_link_options(${_ik_icf_flags})
+    else()
+        message(WARNING "IKRIATE_ICF=${IKRIATE_ICF} requested but the linker does not support it")
+    endif()
+endif()
+add_feature_info("Identical code folding" IKRIATE_ICF_SUPPORTED "smaller binaries (IKriate)")
 add_feature_info("Precompiled Headers" KRITA_ENABLE_PCH "precompiled headers make build process faster on some systems")
 
 option(USE_EXTERNAL_RAQM "Fetch Raqm dependency online instead of the embedded one" OFF)

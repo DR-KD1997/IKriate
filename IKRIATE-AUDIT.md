@@ -57,6 +57,11 @@ by expected value.
    interpreter). This matters for IKriate because tablet users can't use script-based
    add-ons; it is a large upstream change, so track it rather than fork it.
 
+12. **Package size and memory.** See `IKRIATE-OPTIMISATION.md`: stripped plugins, a
+    smaller AppImage, Windows debug-info splitting, the Krita 3 bundle and the OpenGL
+    tile pool are done; LTO/identical code folding and KDE dependency packages on Linux
+    are next.
+
 ## Measurements
 
 Reference build in a 2-core, 7 GB Linux workspace (Ubuntu 24.04, distro Qt 5.15.13):

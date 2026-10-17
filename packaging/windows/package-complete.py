@@ -655,6 +655,14 @@ if not os.environ.get('KRITACI_SKIP_SPLIT_DEBUG', '0').lower() in ['true', '1', 
     def split_debug(arg1, arg2):
         logger.debug(f"Splitting debug info of {arg2}")
 
+        # IKriate: some listed binaries are optional (kritarunner.exe is only
+        # built with Python scripting; ffmpeg.exe only when bundled). Skip them
+        # instead of failing, so the debug info of everything else still gets
+        # split off rather than shipped in the package.
+        if not os.path.isfile(arg1):
+            logger.info(f"Skip stripping {arg2}: not in this package")
+            return 0
+
         # The objcopy implementation included in llvm-21 and later has some weird
         # implementation of --only-keep-debug, it manages to strip binaries, even
         # when they have no .debug sections, which makes these binaries invalid for

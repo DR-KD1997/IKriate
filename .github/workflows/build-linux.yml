@@ -92,7 +92,9 @@ jobs:
         run: cmake --build build --parallel 4 2>&1 | tee build.log
 
       - name: Install into AppDir
-        run: DESTDIR="$PWD/AppDir" cmake --install build
+        # --strip: linuxdeploy only strips libraries it deploys itself, so
+        # Krita's ~170 plugin modules would otherwise ship with symbol tables.
+        run: DESTDIR="$PWD/AppDir" cmake --install build --strip
 
       - name: Package AppImage
         run: |
@@ -114,8 +116,27 @@ jobs:
           ./linuxdeploy-x86_64.AppImage --appdir AppDir \
             --desktop-file AppDir/usr/share/applications/org.kde.krita.desktop \
             --icon-file krita/pics/branding/IKriate/256-apps-krita.png --icon-filename krita \
-            --plugin qt --output appimage
+            --plugin qt
+          # Pack with zstd at its highest level and 1 MiB blocks instead of the
+          # default (level 15, 128 KiB): about 7% smaller, same decompression speed.
+          ./linuxdeploy-x86_64.AppImage --appimage-extract >/dev/null   # unpacks into squashfs-root/
+          ARCH=x86_64 squashfs-root/plugins/linuxdeploy-plugin-appimage/usr/bin/appimagetool \
+            --comp zstd --mksquashfs-opt -Xcompression-level --mksquashfs-opt 22 \
+            --mksquashfs-opt -b --mksquashfs-opt 1M -n AppDir "$OUTPUT"
           ls -la *.AppImage
+
+      - name: Size report
+        continue-on-error: true
+        run: |
+          {
+            echo "### Linux package size"
+            echo '```'
+            ls -la IKriate-*.AppImage
+            for d in usr usr/lib usr/lib/kritaplugins usr/share usr/share/krita usr/share/locale; do du -sh "AppDir/$d"; done
+            echo "-- largest files"
+            find AppDir -type f -printf '%s %P\n' | sort -rn | head -25 | numfmt --to=iec --field=1
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - uses: actions/upload-artifact@v4
         with:

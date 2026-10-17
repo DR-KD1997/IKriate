@@ -25,7 +25,11 @@
 
 const int minPoolChunk = 32; // 8 MiB (default, with tilesize 256)
 const int maxPoolChunk = 128; // 32 MiB (default, with tilesize 256)
-const int freeThreshold = 64; // 16 MiB (default, with tilesize 256)
+// IKriate: Krita only purges pools that once held more than 64 tiles, so the
+// chunks used for a small or medium canvas (up to ~40 MiB) were kept for the
+// whole session. Purge any idle pool; the 1 s compressor still avoids
+// purge/allocate churn while painting.
+const int freeThreshold = 0;
 
 
 /**

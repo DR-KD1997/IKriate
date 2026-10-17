@@ -51,9 +51,8 @@ jobs:
       KDECI_ONLY_BUILD: 'True'
       KRITACI_SKIP_DEBUG_PACKAGE: 'True'
       KRITACI_BUILD_INSTALLERS: 'False'
-      # Release build: nothing worth splitting, and the step fails on binaries
-      # that are absent (e.g. kritarunner.exe when Python scripting is off).
-      KRITACI_SKIP_SPLIT_DEBUG: 'True'
+      # Debug info is split off (not shipped): KDE's prebuilt dependency DLLs
+      # carry DWARF sections. KRITACI_SKIP_DEBUG_PACKAGE drops the .debug files.
       KRITACI_SKIP_UPLOAD_NIGHTLY_PACKAGE: 'True'
       # Krita's scripts read GitLab CI variables; map the GitHub equivalents.
       CI_PROJECT_DIR: ${{ github.workspace }}
@@ -111,6 +110,24 @@ jobs:
         run: |
           ./venv/Scripts/Activate.ps1
           python -u build-tools/ci-scripts/build-windows-package.py 2>&1 | Tee-Object -FilePath build-package.log
+
+      - name: Size report
+        continue-on-error: true
+        run: |
+          $zip = Get-ChildItem ikriate-x64-*.zip | Select-Object -First 1
+          Add-Type -AssemblyName System.IO.Compression.FileSystem
+          $entries = [System.IO.Compression.ZipFile]::OpenRead($zip.FullName).Entries
+          $lines = @("### Windows package size", '```', "$($zip.Name): $([math]::Round($zip.Length/1MB,1)) MB")
+          $lines += "-- by folder (uncompressed / compressed MB)"
+          $entries | Group-Object { ($_.FullName -split '/')[1..2] -join '/' } |
+            ForEach-Object { [pscustomobject]@{ n=$_.Name; u=($_.Group | Measure-Object Length -Sum).Sum; c=($_.Group | Measure-Object CompressedLength -Sum).Sum } } |
+            Sort-Object c -Descending | Select-Object -First 15 |
+            ForEach-Object { $lines += ("{0,8:N1} {1,8:N1}  {2}" -f ($_.u/1MB), ($_.c/1MB), $_.n) }
+          $lines += "-- largest files (compressed MB)"
+          $entries | Sort-Object CompressedLength -Descending | Select-Object -First 20 |
+            ForEach-Object { $lines += ("{0,8:N1}  {1}" -f ($_.CompressedLength/1MB), $_.FullName) }
+          $lines += '```'
+          $lines | Out-File -Append -Encoding utf8 $env:GITHUB_STEP_SUMMARY
 
       - uses: actions/upload-artifact@v4
         with:

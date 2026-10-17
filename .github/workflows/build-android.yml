@@ -117,6 +117,32 @@ jobs:
           . venv/bin/activate
           python3 -u build-tools/ci-scripts/build-android-package.py 2>&1 | tee build-apk.log
 
+      - name: Size report
+        continue-on-error: true
+        run: |
+          apk=$(find /tmp/wd/krita/_packaging -name '*.apk' | head -1)
+          {
+            echo "### Android package size"
+            echo '```'
+            ls -la "$apk"
+            python3 - "$apk" <<'PY'
+          import sys, zipfile, collections
+          z = zipfile.ZipFile(sys.argv[1])
+          u, c = collections.Counter(), collections.Counter()
+          for i in z.infolist():
+              parts = i.filename.split('/')
+              key = '/'.join(parts[:3] if parts[0] == 'assets' else parts[:2])
+              u[key] += i.file_size; c[key] += i.compress_size
+          print("-- by folder (uncompressed / compressed MB)")
+          for k, v in c.most_common(20):
+              print(f"{u[k]/1e6:8.1f} {v/1e6:8.1f}  {k}")
+          print("-- largest files (compressed MB)")
+          for i in sorted(z.infolist(), key=lambda i: -i.compress_size)[:20]:
+              print(f"{i.compress_size/1e6:8.1f}  {i.filename}")
+          PY
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
       - uses: actions/upload-artifact@v4
         with:
           name: ikriate-android-${{ matrix.abi }}
