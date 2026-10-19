@@ -352,7 +352,14 @@ public:
         const bool transparent = m_bg->color.alpha() == 0;
         doc->newImage(i18n("Untitled"), w, h, cs, bg, transparent ? KisConfig::CANVAS_COLOR : KisConfig::RASTER_LAYER,
                       transparent ? 1 : qMax(1, cfg.numDefaultLayers()), QString(), ppi / 72.0);
-        if (m_preset->currentIndex() == m_clipboardIndex && m_clipboardIndex >= 0) {
+        const bool fromClipboard = m_preset->currentIndex() == m_clipboardIndex && m_clipboardIndex >= 0;
+        // Close the sheet first: opening the document restores the window
+        // layout, which must not find focus inside a sheet that is going away.
+        if (QWidget *f = QApplication::focusWidget()) {
+            if (m_popover->isAncestorOf(f)) f->clearFocus();
+        }
+        m_popover->dismiss();
+        if (fromClipboard) {
             // Clipboard preset: paste the clipboard into the new canvas.
             QPointer<KisMainWindow> mw = m_mw;
             KisPart::instance()->startCustomDocument(doc);
@@ -362,7 +369,6 @@ public:
         } else {
             KisPart::instance()->startCustomDocument(doc);
         }
-        m_popover->dismiss();
     }
 
 private:

@@ -19,7 +19,7 @@ by expected value.
 
 | Area | Change |
 |---|---|
-| Qt 6 | Windows and Linux CI build with Qt 6 (`BUILD_WITH_QT6=ON`): Windows from KDE's `transition.now/qt6` packages, Linux in an Ubuntu 26.04 container (Qt 6.10, KF6). Android stays on Qt 5 until KDE ships Qt 6 Android packages. Verified with a full local Qt 6 build. |
+| Qt 6 | Windows and Linux CI build with Qt 6 (`BUILD_WITH_QT6=ON`): Windows from KDE's `transition.now/qt6` packages, Linux in an Ubuntu 26.04 container (Qt 6.10, KF6). Android stays on Qt 5 until KDE ships Qt 6 Android packages. Verified with a full local Qt 6.10 build: start-up, New Canvas, painting, layers and the brush library. |
 | Interface | New home screen, gallery, New Canvas and Template sheets, settings page, and the Desktop, Kriate and Minimal layouts, built from palette-derived styles and Lucide line icons. Menus, toolbars, dockers and the status bar are hidden in all three layouts; the docker interface is opt-in under Settings › Advanced. |
 | Erasing | Eraser presets removed; erase is a mode applied to any brush (and to the pen's eraser end). |
 | Touch | Touch painting is off by default: one finger pans, only the pen draws. |

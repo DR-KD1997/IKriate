@@ -23,6 +23,7 @@
 #include "ktoolbar.h"
 
 #include <QApplication>
+#include <QPointer>
 #include <QList>
 #include <QObject>
 #include <QTimer>
@@ -564,7 +565,9 @@ void KisKMainWindow::applyMainWindowSettings(const KConfigGroup &cg)
     K_D(KisKMainWindow);
     //qDebug(200) << "KisKMainWindow::applyMainWindowSettings " << cg.name();
 
-    QWidget *focusedWidget = QApplication::focusWidget();
+    // IKriate: the focused widget may be deleted while the state is restored
+    // (e.g. a sheet that closes when its document opens); don't keep a raw pointer.
+    QPointer<QWidget> focusedWidget = QApplication::focusWidget();
 
     const bool oldLetDirtySettings = d->letDirtySettings;
     d->letDirtySettings = false;
