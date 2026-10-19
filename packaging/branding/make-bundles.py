@@ -17,6 +17,10 @@ What it does, compared with upstream:
 - every preset is tagged with an IKriate brush category (Pencils, Pens, ...), which the
   brush panel shows as its category list;
 - bundle metadata no longer names or links to Krita; author credits and licences stay.
+
+It also writes IKriate_Brushes_Tablet.bundle, the smaller set installed on Android:
+the presets in TABLET_PRESETS (the most distinct and versatile ones) plus every brush
+tip and pattern they use, so the tablet build can leave out most loose patterns.
 """
 import hashlib
 import io
@@ -57,6 +61,30 @@ CATEGORIES = [
 ]
 
 ERASER_RE = re.compile(r"eraser", re.I)
+
+# Android keeps these presets: per category, the ones that look and behave
+# clearly differently from each other and cover the most ground.
+TABLET_PRESETS = {
+    "Basic": ["b)_Basic-1", "b)_Basic-5_Size_Opacity", "b)_Basic-6_Details"],
+    "Pencils": ["c)_Pencil-2", "c)_Pencil-4_Soft", "c)_Pencil-5_Tilted", "h)_Charcoal_Pencil_Medium",
+                "v)_Sketching-1_Chrome_Thin"],
+    "Pens": ["d)_Ink-1_Precision", "d)_Ink-2_Fineliner", "d)_Ink-3_Gpen", "d)_Ink-4_Pen_Rough"],
+    "Calligraphy": ["d)_Ink-7_Brush_Rough", "d)_Ink-8_Sumi-e", "e)_Marker_Chisel_Smooth"],
+    "Markers": ["e)_Marker_Details", "e)_Marker_Dry"],
+    "Paint": ["f)_Bristles-1_Details", "f)_Bristles-2_Flat_Rough", "f)_Bristles-4_Glaze", "g)_Dry_Bristles",
+              "g)_Dry_Brushing", "i)_Wet_Bristles", "i)_Wet_Paint", "i)_Wet_Circle"],
+    "Watercolor": ["j)_WaterC_Basic_Lines-Wet", "j)_WaterC_Basic_Round-Grain", "j)_WaterC_Flat_Big-Grain_Tilt",
+                   "j)_WaterC_Spread", "j)_WaterC_Special_Splats", "j)_Watercolor_Texture", "j)_Waterpaint_Soft_Edges"],
+    "Charcoal & Chalk": ["f)_Charcoal_Rock_Soft", "h)_Chalk_Grainy", "h)_Chalk_Soft"],
+    "Blenders": ["k)_Blender_Basic", "k)_Blender_Blur", "k)_Blender_Rake", "k)_Blender_Textured_Soft", "i)_Wet_Smear"],
+    "Sprayers": ["y)_Texture_Spray", "y)_Texture_Splat", "y)_Texture_Random_Particles"],
+    "Textures": ["v)_Texture_Impressionism", "y)_Screentones_Regular", "y)_Texture_Noise", "y)_Texture_Hair",
+                 "y)_Texture_Wood_Fiber"],
+    "Stamps": ["z)_Stamp_Bokeh", "z)_Stamp_Grass", "z)_Stamp_Leaves", "z)_Stamp_Sparkles", "z)_Stamp_Water"],
+    "Shapes": ["t)_Shapes_Fill", "t)_Shapes_Rounded"],
+    "Pixel Art": ["u)_Pixel_Art", "u)_Pixel_Art_Dithering"],
+    "Effects": ["l)_Adjust_Dodge", "l)_Adjust_Overlay_Burn", "v)_Clone_Tool", "v)_Distort_Move", "x)_Filter_Blur"],
+}
 
 
 def category_of(name):
@@ -161,7 +189,7 @@ def read_tags(manifest):
     return tags
 
 
-def build_brushes():
+def build_brushes(tablet_only=False):
     src = zipfile.ZipFile(UPSTREAM / "Krita_4_Default_Resources.bundle")
     old_tags = read_tags(src.read("META-INF/manifest.xml").decode())
     dupes = loose_hashes()
@@ -189,6 +217,9 @@ def build_brushes():
             name = Path(path).stem
             favourite = [t for t in old_tags.get(path, []) if "Favorite" in t]
             tags[path] = [category_of(name)] + (["★ My Favorites"] if favourite else [])
+    build_tablet_bundle(src, files, tags)
+    if tablet_only:
+        return
     write_bundle(BUNDLES / "IKriate_Brushes.bundle", files, tags,
                  meta_xml("David Revoy (Deevad), with brushes derived from Ramon Miranda, Razvanc, Radian, "
                           "Wolthera van Hövell, Storm, Scottyp and others",
@@ -196,6 +227,37 @@ def build_brushes():
                  src.read("preview.png"))
     print("  dropped eraser presets:", ", ".join(Path(p).stem for p in dropped["eraser"]))
     print("  dropped duplicate tips/patterns:", dropped["duplicate"])
+
+
+def build_tablet_bundle(src, files, tags):
+    keep = {f"paintoppresets/{n}.kpp" for names in TABLET_PRESETS.values() for n in names}
+    missing = sorted(k for k in keep if k not in files)
+    if missing:
+        raise SystemExit("TABLET_PRESETS names not found: " + ", ".join(missing))
+    # Tips and patterns from the upstream bundle and the loose folders, by file name.
+    pool = {}
+    for info in src.infolist():
+        kind = info.filename.split("/")[0]
+        if kind in ("brushes", "patterns") and not info.is_dir():
+            pool[info.filename] = optimise(info.filename, src.read(info))
+    for sub in ("brushes", "patterns"):
+        for f in sorted((DATA / sub).rglob("*")):
+            if f.is_file() and f.suffix.lower() in (".gbr", ".gih", ".png", ".pat", ".svg", ".abr", ".jpg"):
+                pool.setdefault(f"{sub}/{f.name}", f.read_bytes())
+    xml = "\n".join(preset_xml(files[k]) for k in keep)
+    used = {}
+    for path, data in pool.items():
+        base = path.split("/", 1)[1]
+        if base in xml or base.replace(" ", "%20") in xml or md5(data) in xml:
+            used[path] = data
+    out = {k: files[k] for k in keep}
+    out.update(used)
+    write_bundle(BUNDLES / "IKriate_Brushes_Tablet.bundle", out, {k: tags[k] for k in keep},
+                 meta_xml("David Revoy (Deevad), with brushes derived from Ramon Miranda, Razvanc, Radian, "
+                          "Wolthera van Hövell, Storm, Scottyp and others",
+                          "The IKriate brushes for tablets: a smaller, curated set.", "CC-0", "2026-10-19"),
+                 src.read("preview.png"))
+    print(f"  tablet set: {len(keep)} presets, {len(used)} tips and patterns")
 
 
 def rewrite_meta(upstream_name, new_name, author, description, license_):
@@ -233,6 +295,10 @@ def write_category_tags():
 
 
 if __name__ == "__main__":
+    import sys
+    if "--tablet-only" in sys.argv:
+        build_brushes(tablet_only=True)
+        raise SystemExit
     write_category_tags()
     build_brushes()
     rewrite_meta("RGBA_brushes.bundle", "RGBA_Brushes.bundle", "Ramon Miranda",

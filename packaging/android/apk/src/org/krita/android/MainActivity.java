@@ -32,7 +32,6 @@ import androidx.annotation.RequiresApi;
 import java.util.List;
 
 import org.krita.R;
-import org.libsdl.app.SDLAudioManager;
 import org.qtproject.qt5.android.QtNative;
 import org.qtproject.qt5.android.bindings.QtActivity;
 
@@ -61,14 +60,30 @@ public class MainActivity extends QtActivity {
             i.putExtra("applicationArguments", uri);
         }
 
-        SDLAudioManager.initialize();
-        SDLAudioManager.setContext(this);
-        SDLAudioManager.nativeSetupJNI();
+        initAudio();
 
         super.onCreate(savedInstanceState);
         Log.i(TAG, "TouchSlop: " + ViewConfiguration.get(this).getScaledTouchSlop());
         Log.i(TAG, "LibsLoaded");
         haveLibsLoaded = true;
+    }
+
+    /**
+     * SDL drives audio playback in animations (through MLT). The IKriate tablet
+     * package is built without MLT, so SDL may be absent; it is set up only
+     * when its Java and native parts are both packaged.
+     */
+    private void initAudio() {
+        try {
+            Class<?> sdl = Class.forName("org.libsdl.app.SDLAudioManager");
+            sdl.getMethod("initialize").invoke(null);
+            sdl.getMethod("setContext", android.content.Context.class).invoke(null, this);
+            sdl.getMethod("nativeSetupJNI").invoke(null);
+        } catch (ClassNotFoundException e) {
+            Log.i(TAG, "Built without SDL audio");
+        } catch (Throwable e) {
+            Log.i(TAG, "SDL audio unavailable: " + e);
+        }
     }
 
     @Override

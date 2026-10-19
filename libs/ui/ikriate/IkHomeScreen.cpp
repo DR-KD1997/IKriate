@@ -6,6 +6,9 @@
 
 #include "IkHomeScreen.h"
 
+#include "KisTemplateTree.h"
+#include "KisTemplateGroup.h"
+#include "KisTemplate.h"
 #include <QDateTime>
 #include <QDesktopServices>
 #include <QDir>
@@ -598,7 +601,15 @@ void IkHomeScreen::setCreateMenuOpen(bool open)
     d->menuOpen = open;
     d->glow->setVisible(open);
     d->newItem->setVisible(open);
-    d->templateItem->setVisible(open);
+    // The tablet package ships without document templates.
+    static const bool hasTemplates = [] {
+        KisTemplateTree tree(QStringLiteral("templates/"), true);
+        for (KisTemplateGroup *g : tree.groups()) {
+            if (!g->isHidden() && !g->templates().isEmpty()) return true;
+        }
+        return false;
+    }();
+    d->templateItem->setVisible(open && hasTemplates);
     d->openItem->setVisible(open);
     d->fab->setIconName(open ? QStringLiteral("close") : QStringLiteral("plus"));
     layoutFloatingButtons();

@@ -1,5 +1,20 @@
 ########### install files ###############
 
+if (IKRIATE_TABLET_PACKAGE)
+    # Curated tablet set: papers, canvas, hatching, screentones and a few
+    # geometric and dither patterns. Brushes carry the patterns they use in
+    # IKriate_Brushes_Tablet.bundle.
+    install(FILES
+        01_canvas.png 02_rough-canvas.png 03_default-paper.png 04_paper-C-grain.png
+        05_paper-torchon.png 06_hard-grain.png Rough_Paper.png Crumpled_Paper.pat
+        generic_paper1.pat 09_drawed_crosshatched.png 10_drawed_dotted.png 12_drawed_vertical.png
+        23-dynamic-screentone-A.png 24-dynamic-screentone-B.png 25-dynamic-screentone-C.png
+        Stripes02.pat Grid01.pat Squares01.pat Cross01.pat Zigzag01.pat
+        DITH_0404_BL22.pat DITH_0808_BL22.pat DITH_0808_CLUS.pat dith_license.txt
+        DESTINATION ${KDE_INSTALL_DATADIR}/krita/patterns)
+    return()
+endif()
+
 install(FILES
 Abstract_lines.png
 01_canvas.png

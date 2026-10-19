@@ -362,6 +362,35 @@ if (IKRIATE_ENABLE_LTO)
 endif()
 add_feature_info("Link-time optimisation" IKRIATE_ENABLE_LTO "smaller, faster release binaries (IKriate)")
 
+# IKriate: the tablet package (Android) ships a curated subset of resources and
+# leaves out features that are rarely used on a tablet. See
+# packaging/README-IKRIATE.md, "Android package contents". Off everywhere else,
+# so the Windows and Linux builds keep everything.
+if (ANDROID)
+    set(_ik_tablet_default ON)
+else()
+    set(_ik_tablet_default OFF)
+endif()
+option(IKRIATE_TABLET_PACKAGE "Curated resources and a reduced feature set for the tablet (Android) package" ${_ik_tablet_default})
+add_feature_info("IKriate tablet package" IKRIATE_TABLET_PACKAGE "curated brushes, patterns and plugins for Android")
+if (IKRIATE_TABLET_PACKAGE)
+    # Left out of the tablet package (each can be re-enabled with
+    # -DCMAKE_DISABLE_FIND_PACKAGE_<name>=OFF):
+    #   Mlt7      - audio in animations (video rendering itself uses FFmpeg)
+    #   HEIF      - HEIF/AVIF import and export
+    #   JPEGXL    - JPEG XL import and export
+    #   KF5KDcraw / KDcrawQt6 - camera RAW import
+    #   OpenColorIO - LUT management
+    #   KSeExpr   - SeExpr procedural fill layer
+    # OpenEXR stays: its Imath half type provides the 16-bit float colour
+    # spaces; only the .exr import/export plugin is left out (plugins/impex).
+    foreach(_ik_pkg Mlt7 HEIF JPEGXL KF5KDcraw KDcrawQt6 OpenColorIO KSeExpr)
+        if (NOT DEFINED CMAKE_DISABLE_FIND_PACKAGE_${_ik_pkg})
+            set(CMAKE_DISABLE_FIND_PACKAGE_${_ik_pkg} ON)
+        endif()
+    endforeach()
+endif()
+
 # IKriate: identical code folding. Krita's colour engines instantiate thousands
 # of near-identical blend-mode templates; folding them shrank kritalcmsengine
 # by 11% (safe) to 26% (all) with bit-identical output and unchanged speed.

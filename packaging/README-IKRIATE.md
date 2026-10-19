@@ -69,6 +69,24 @@ A full build takes 3-4 hours on 2 cores and about 40 minutes on 8. Distribution 
 few tablet patches Krita carries; the AppImage/Windows/Android builds from KDE's dependency
 packages include them.
 
+## Android package contents
+
+The Android build is a *tablet package* (`IKRIATE_TABLET_PACKAGE`, on by default only when
+building for Android). Windows and Linux are unaffected, and `.kra` files stay compatible:
+
+| Kept on Android | Left out on Android |
+|---|---|
+| Animation, onion skins, image-sequence export, MP4/GIF/WebM rendering (FFmpeg and Android's encoder, no sound) | Audio in animations (MLT, SDL); video import (already absent upstream on Android) |
+| English plus Arabic, Chinese (simplified and traditional), French, German, Indonesian, Italian, Japanese, Korean, Polish, Portuguese (Portugal and Brazil), Russian, Spanish, Turkish, Ukrainian (`-PikriateLanguages=…` in Gradle) | Other interface languages |
+| PDF import | HEIF/AVIF, JPEG XL, OpenEXR and camera RAW import/export; SeExpr fill layers; OpenColorIO LUT management (already absent upstream) |
+| Storyboard and compositions panels; layers, colour, brushes, history, overview, palettes, patterns, grids, animation, recorder | Histogram, channels, task sets, log, snapshots, touch docker, digital mixer, specific and artistic colour selectors, preset history, arrange, vector libraries, gamut masks; the image split, clones array, separate channels, metadata editor, wavelet decompose, G'MIC and database explorer tools |
+| 62 curated brushes (`IKriate_Brushes_Tablet.bundle`, see `TABLET_PRESETS` in `make-bundles.py`) with the tips and patterns they use, three MyPaint brushes, RGBA brushes, 24 patterns | The rest of the brush set, most patterns, document templates (New Canvas presets remain), Krita's donation banners |
+
+`packaging/android/prune-tablet-libs.py` runs before packaging and deletes the dependency
+libraries of the features left out, but only those that nothing links any more. Its log is
+in the CI job. Bundled fonts are dropped only when the packaged fontconfig also reads
+`/system/fonts`. Identical code folding (`IKRIATE_ICF=safe`) is on for Android too.
+
 ## Build options added by IKriate
 
 | Option | Default | Effect |
@@ -76,6 +94,7 @@ packages include them.
 | `BRANDING` | `IKriate` | Icons and splash. Krita's own artwork stays under `krita/pics/branding/{default,Beta,Plus,Next}`. |
 | `IKRIATE_ENABLE_LTO` | `OFF` | Link-time optimisation for Release/RelWithDebInfo. |
 | `IKRIATE_ICF` | `OFF` (`safe` in CI) | Identical code folding at link time (`safe` or `all`; uses lld, or gold, with GCC). See `IKRIATE-OPTIMISATION.md`. |
+| `IKRIATE_TABLET_PACKAGE` | `ON` for Android, `OFF` otherwise | Curated resources and a reduced feature set for tablets (see above). |
 | `IKRIATE_INSTALL_KRITA3_BUNDLE` | `OFF` | Krita 3's legacy resource bundle (16 MB, disabled by default in Krita; never installed on Android). |
 | `ENABLE_UPDATERS` | `OFF` (was `ON`) | Krita's updater checks krita.org for *Krita* releases, so it is off. |
 | `IKRIATE_ENABLE_KRITA_DONATIONS` (define) | unset | Menu entries of Krita's Android supporter flow. The flow itself (Google Play billing for the Krita Foundation's products) has been removed from IKriate. |

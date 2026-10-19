@@ -15,7 +15,7 @@ if(PNG_FOUND)
     add_subdirectory(csv)
 endif()
 
-if(OpenEXR_FOUND)
+if(OpenEXR_FOUND AND NOT IKRIATE_TABLET_PACKAGE)
     add_subdirectory(exr)
 endif()
 

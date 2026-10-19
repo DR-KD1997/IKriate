@@ -1,11 +1,15 @@
 # IKriate: generated from the upstream bundles in upstream/ by
 # packaging/branding/make-bundles.py.
-set (krita_BUNDLE_FILES
-     README
-     IKriate_Brushes.bundle
-     SeExpr_Examples.bundle
-     RGBA_Brushes.bundle
-)
+if (IKRIATE_TABLET_PACKAGE)
+    # Curated tablet set: the most distinct presets plus the tips and patterns
+    # they use (make-bundles.py, TABLET_PRESETS).
+    set (krita_BUNDLE_FILES README IKriate_Brushes_Tablet.bundle RGBA_Brushes.bundle)
+else()
+    set (krita_BUNDLE_FILES README IKriate_Brushes.bundle RGBA_Brushes.bundle)
+endif()
+if (HAVE_SEEXPR AND NOT IKRIATE_TABLET_PACKAGE)
+    list(APPEND krita_BUNDLE_FILES SeExpr_Examples.bundle)
+endif()
 
 # IKriate: Krita 3's resource bundle (16 MB) ships disabled and is already left
 # out of upstream's Android build. Leaving it out everywhere saves 16 MB of

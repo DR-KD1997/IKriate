@@ -105,14 +105,33 @@ tasks.register('copyAssets', Copy) {
     from "$installPrefix/share/"
     into 'assets/'
     include '**'
+    exclude 'locale/**'   // copied by copyLocaleFiles, limited to ikriateLanguages
 }
+
+/*
+ * IKriate: the tablet package carries the interface languages most likely to
+ * be used by its audience instead of all ~75. English is built in. Pass
+ * -PikriateLanguages=all to package every language.
+ */
+def ikriateLanguages = (project.findProperty('ikriateLanguages') ?:
+        'ar,de,es,fr,id,it,ja,ko,pl,pt,pt_BR,ru,tr,uk,zh_CN,zh_TW').split(',')*.trim()
 
 tasks.register('copyLocaleFiles', Copy) {
     dependsOn('configure', 'copyAssets')
-    from "$installPrefix/share/locale"
-    from "$installPrefix/translations"
     into 'assets/locale/'
-    include '**'
+    from("$installPrefix/share/locale") {
+        if (!ikriateLanguages.contains('all')) {
+            ikriateLanguages.each { lang -> include "${lang}/**" }
+        }
+    }
+    from("$installPrefix/translations") {
+        if (!ikriateLanguages.contains('all')) {
+            ikriateLanguages.each { lang ->
+                include "*_${lang}.qm"
+                include "*_${lang.tokenize('_')[0]}.qm"
+            }
+        }
+    }
 }
 
 tasks.register('copyExtraMltFiles', Copy) {
@@ -253,5 +272,5 @@ android {
 
 dependencies {
     implementation 'androidx.annotation:annotation:1.10.0'
-    implementation files("libs/SDL2Android.jar")
+    // SDL2Android.jar, when packaged, comes in through the libs/ file tree above.
 }

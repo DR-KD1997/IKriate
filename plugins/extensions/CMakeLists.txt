@@ -1,22 +1,36 @@
-add_subdirectory( imagesplit )
-add_subdirectory( clonesarray )
+if(NOT IKRIATE_TABLET_PACKAGE)  # IKriate: desktop-only on tablets
+    add_subdirectory( imagesplit )
+endif()
+if(NOT IKRIATE_TABLET_PACKAGE)  # IKriate: desktop-only on tablets
+    add_subdirectory( clonesarray )
+endif()
 add_subdirectory( colorrange )
 add_subdirectory( colorspaceconversion )
-add_subdirectory( metadataeditor )
+if(NOT IKRIATE_TABLET_PACKAGE)  # IKriate: desktop-only on tablets
+    add_subdirectory( metadataeditor )
+endif()
 add_subdirectory( modify_selection )
 add_subdirectory( offsetimage )
 add_subdirectory( rotateimage )
-add_subdirectory( separate_channels )
+if(NOT IKRIATE_TABLET_PACKAGE)  # IKriate: desktop-only on tablets
+    add_subdirectory( separate_channels )
+endif()
 add_subdirectory( shearimage )
 add_subdirectory( layergroupswitcher )
 add_subdirectory( resourcemanager )
 add_subdirectory( layersplit )
-add_subdirectory( waveletdecompose )
+if(NOT IKRIATE_TABLET_PACKAGE)  # IKriate: desktop-only on tablets
+    add_subdirectory( waveletdecompose )
+endif()
 add_subdirectory( pykrita )
-add_subdirectory( qmic )
+if(NOT IKRIATE_TABLET_PACKAGE)  # IKriate: desktop-only on tablets
+    add_subdirectory( qmic )
+endif()
 add_subdirectory( buginfo )
 add_subdirectory( samplescreencolor )
-add_subdirectory( dbexplorer )
+if(NOT IKRIATE_TABLET_PACKAGE)  # IKriate: desktop-only on tablets
+    add_subdirectory( dbexplorer )
+endif()
 
 if (ANDROID)
     add_subdirectory( spensettings )

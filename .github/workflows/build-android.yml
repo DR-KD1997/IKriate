@@ -51,7 +51,9 @@ jobs:
       KDECI_CC_CACHE: /home/runner/kdeci/caches/
       KDECI_COMPRESS_PACKAGES_ON_DOWNLOAD: 'False'
       KDECI_SKIP_ECM_ANDROID_TOOLCHAIN: 'True'
-      KDECI_EXTRA_CMAKE_ARGS: -DHIDE_SAFE_ASSERTS=ON -DBUILD_TESTING=OFF
+      # IKRIATE_TABLET_PACKAGE is on by default for Android (curated resources,
+      # no audio/HEIF/JPEG XL/RAW/OCIO/SeExpr); see packaging/README-IKRIATE.md.
+      KDECI_EXTRA_CMAKE_ARGS: -DHIDE_SAFE_ASSERTS=ON -DBUILD_TESTING=OFF -DIKRIATE_ICF=safe
       # androiddeployqt skips QML modules if _install sits inside the source tree.
       KDECI_WORKDIR_PATH: /tmp/wd
       KRITACI_ANDROID_PACKAGE_TYPE: debug
@@ -111,6 +113,11 @@ jobs:
           python3 -u krita-deps-management/tools/generate-deps-file.py -s branch-corrected-deps.yml -o .kde-ci.yml
           python3 -u krita-deps-management/ci-utilities/run-ci-build.py --project krita --branch "$DEPS_BRANCH" \
             --platform "Android/$KDECI_ANDROID_ABI/Qt5/Shared" --only-build --skip-publishing 2>&1 | tee build-ikriate.log
+
+      - name: Remove unused dependency libraries
+        # KDE's dependency packages are installed whole; drop the libraries of
+        # features the tablet package does not build (only if nothing links them).
+        run: python3 packaging/android/prune-tablet-libs.py /tmp/wd/krita/_install 2>&1 | tee prune.log
 
       - name: Package APK
         run: |
