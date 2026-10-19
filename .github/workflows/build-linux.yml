@@ -44,7 +44,7 @@ jobs:
             qt6-base-dev qt6-base-private-dev qt6-declarative-dev qt6-declarative-private-dev qt6-svg-dev \
             qt6-tools-dev qt6-tools-dev-tools qt6-l10n-tools qt6-5compat-dev qt6-multimedia-dev qt6-wayland-dev \
             qml6-module-qtqml-workerscript qml6-module-qtquick-controls qml6-module-qtquick-layouts \
-            qml6-module-qtquick-shapes qml6-module-qtquick-templates qml6-module-qtquick-window libqt6svgwidgets6 \
+            qml6-module-qtquick-shapes qml6-module-qtquick-templates qml6-module-qtquick-window libqt6svgwidgets6 qt6-svg-plugins \
             libkf6colorscheme-dev libkf6completion-dev libkf6config-dev libkf6coreaddons-dev libkf6crash-dev \
             libkf6guiaddons-dev libkf6i18n-dev libkf6itemmodels-dev libkf6itemviews-dev libkf6widgetsaddons-dev \
             libkf6windowsystem-dev libkdcrawqt6-dev libimmer-dev libzug-dev liblager-dev libkseexpr-dev \
@@ -93,7 +93,7 @@ jobs:
           export NO_APPSTREAM=1
           export QMAKE=/usr/lib/qt6/bin/qmake6
           export EXTRA_QT_MODULES="svgwidgets"
-          export EXTRA_PLATFORM_PLUGINS="libqwayland-generic.so"
+          export EXTRA_PLATFORM_PLUGINS="libqwayland.so"   # Qt 6.8+ name
           export EXTRA_QT_PLUGINS="svg;iconengines;wayland-shell-integration;wayland-decoration-client;wayland-graphics-integration-client"
           export QML_SOURCES_PATHS="$PWD/plugins:$PWD/libs"
           export LD_LIBRARY_PATH="$PWD/AppDir/usr/lib:$PWD/AppDir/usr/lib/x86_64-linux-gnu"
