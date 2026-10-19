@@ -27,7 +27,10 @@ using QJniObject = QAndroidJniObject;
 #include <KisAndroidUtils.h>
 #include <kis_debug.h>
 
+#include <config-mlt.h>
+#ifdef HAVE_MLT
 #include <mlt++/Mlt.h>
+#endif
 
 extern "C" {
 #include <libavutil/imgutils.h>
@@ -430,6 +433,7 @@ private:
     AVPixelFormat m_imageFormat = AV_PIX_FMT_NONE;
 };
 
+#ifdef HAVE_MLT
 class KisAndroidMediaEncoderRunnable::Audio
 {
 public:
@@ -617,6 +621,27 @@ private:
     int m_samplePos = 0;
     bool m_finished = false;
 };
+#else
+// IKriate tablet package: built without MLT, so animations are rendered
+// without sound. This stand-in keeps the encoder code unchanged.
+class KisAndroidMediaEncoderRunnable::Audio
+{
+public:
+    static constexpr int PULL_FRAME_OK = 0;
+    static constexpr int PULL_FRAME_END_OF_STREAM = 1;
+    static constexpr int PULL_FRAME_ERROR = 2;
+    QString formatName() const { return QString(); }
+    int sampleRate() const { return 0; }
+    int channelCount() const { return 0; }
+    bool isFinished() const { return true; }
+    bool open(Context &, const KisMediaEncoderWrapperSettings &) { return false; }
+    int pullFrame(Context &) { return PULL_FRAME_END_OF_STREAM; }
+    bool pushSamples(Context &) { return false; }
+    bool isSampleDataRemaining() const { return false; }
+    void finishFrame() {}
+    bool finish(Context &) { return true; }
+};
+#endif
 
 KisAndroidMediaEncoderRunnable *KisAndroidMediaEncoderRunnable::create(const KisMediaEncoderWrapperSettings &settings,
                                                                        QObject *parent)
@@ -663,6 +688,7 @@ KisMediaEncoderRunnable::EncodeResult KisAndroidMediaEncoderRunnable::encode(QSt
 
     // Set up audio if we were given some.
     std::unique_ptr<Audio> audio;
+#ifdef HAVE_MLT
     if (!settings().audioFile.isEmpty()) {
         // We always use these fixed parameters: 16 bit PCM, 2 channels and a
         // sample rate according to the format. The Android media encoder makes
@@ -687,6 +713,7 @@ KisMediaEncoderRunnable::EncodeResult KisAndroidMediaEncoderRunnable::encode(QSt
             return EncodeResult::Failed;
         }
     }
+#endif
 
     // Set up the encoder.
     {
