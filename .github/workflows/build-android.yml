@@ -128,27 +128,25 @@ jobs:
         continue-on-error: true
         run: |
           apk=$(find /tmp/wd/krita/_packaging -name '*.apk' | head -1)
-          {
-            echo "### Android package size"
-            echo '```'
-            ls -la "$apk"
-            python3 - "$apk" <<'PY'
-          import sys, zipfile, collections
+          python3 - "$apk" > size.txt <<'PY'
+          import sys, os, zipfile, collections
           z = zipfile.ZipFile(sys.argv[1])
+          print(f"{os.path.basename(sys.argv[1])}: {os.path.getsize(sys.argv[1])/1e6:.1f} MB")
           u, c = collections.Counter(), collections.Counter()
           for i in z.infolist():
               parts = i.filename.split('/')
               key = '/'.join(parts[:3] if parts[0] == 'assets' else parts[:2])
               u[key] += i.file_size; c[key] += i.compress_size
           print("-- by folder (uncompressed / compressed MB)")
-          for k, v in c.most_common(20):
+          for k, v in c.most_common(30):
               print(f"{u[k]/1e6:8.1f} {v/1e6:8.1f}  {k}")
-          print("-- largest files (compressed MB)")
-          for i in sorted(z.infolist(), key=lambda i: -i.compress_size)[:20]:
-              print(f"{i.compress_size/1e6:8.1f}  {i.filename}")
+          print("-- largest files (uncompressed / compressed MB)")
+          for i in sorted(z.infolist(), key=lambda i: -i.compress_size)[:70]:
+              print(f"{i.file_size/1e6:8.1f} {i.compress_size/1e6:8.1f}  {i.filename}")
           PY
-            echo '```'
-          } >> "$GITHUB_STEP_SUMMARY"
+          { echo "### Android package size"; echo '```'; cat size.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          python3 .github/scripts/annotate.py "APK size" size.txt
+          python3 .github/scripts/annotate.py "Pruned libraries" prune.log
 
       - uses: actions/upload-artifact@v4
         with:
