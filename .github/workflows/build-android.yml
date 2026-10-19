@@ -53,7 +53,7 @@ jobs:
       KDECI_SKIP_ECM_ANDROID_TOOLCHAIN: 'True'
       # IKRIATE_TABLET_PACKAGE is on by default for Android (curated resources,
       # no audio/HEIF/JPEG XL/RAW/OCIO/SeExpr); see packaging/README-IKRIATE.md.
-      KDECI_EXTRA_CMAKE_ARGS: -DHIDE_SAFE_ASSERTS=ON -DBUILD_TESTING=OFF -DIKRIATE_ICF=safe
+      KDECI_EXTRA_CMAKE_ARGS: -DHIDE_SAFE_ASSERTS=ON -DBUILD_TESTING=OFF -DIKRIATE_ICF=safe -DIKRIATE_ENABLE_LTO=ON
       # androiddeployqt skips QML modules if _install sits inside the source tree.
       KDECI_WORKDIR_PATH: /tmp/wd
       KRITACI_ANDROID_PACKAGE_TYPE: debug
@@ -141,12 +141,14 @@ jobs:
           for k, v in c.most_common(30):
               print(f"{u[k]/1e6:8.1f} {v/1e6:8.1f}  {k}")
           print("-- largest files (uncompressed / compressed MB)")
-          for i in sorted(z.infolist(), key=lambda i: -i.compress_size)[:70]:
+          for i in sorted(z.infolist(), key=lambda i: -i.compress_size)[:150]:
               print(f"{i.file_size/1e6:8.1f} {i.compress_size/1e6:8.1f}  {i.filename}")
           PY
           { echo "### Android package size"; echo '```'; cat size.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
           python3 .github/scripts/annotate.py "APK size" size.txt
           python3 .github/scripts/annotate.py "Pruned libraries" prune.log
+          grep -E "^(IKRIATE_[A-Z_]+|CMAKE_INTERPROCEDURAL_OPTIMIZATION[A-Z_]*)[:=]" /tmp/wd/krita/_build/CMakeCache.txt > facts.txt || true
+          python3 .github/scripts/annotate.py "Build options" facts.txt
 
       - uses: actions/upload-artifact@v4
         with:

@@ -207,6 +207,47 @@ def main():
         else:
             print(f"keep {len(fonts)} bundled font files ({human(size)}): fontconfig does not read /system/fonts")
 
+    # Documentation, headers and build metadata the dependency packages install;
+    # share/ ends up in the APK's assets.
+    for sub in ("share/doc", "share/info", "share/man", "share/gtk-doc", "share/gettext",
+                "share/aclocal", "share/bash-completion", "share/cmake", "share/pkgconfig",
+                "include", "lib/pkgconfig", "lib/cmake"):
+        d = os.path.join(prefix, sub)
+        if os.path.isdir(d):
+            size = sum(os.path.getsize(os.path.join(r, f)) for r, _, fs in os.walk(d) for f in fs
+                       if not os.path.islink(os.path.join(r, f)))
+            total += size
+            print(f"remove {sub}/ ({human(size)})")
+            if not dry:
+                shutil.rmtree(d)
+
+    # Byte-identical copies of a library under a second name (versioned
+    # aliases that were installed as files rather than symlinks), when no
+    # library links against that second name.
+    import hashlib
+    by_hash = {}
+    for p in sorted(elves):
+        # OpenSSL is loaded by name at run time (Qt looks for the _1_1 names).
+        if os.path.dirname(p) == libdir and not re.match(r"lib(crypto|ssl)", os.path.basename(p)):
+            with open(p, "rb") as f:
+                by_hash.setdefault(hashlib.md5(f.read()).hexdigest(), []).append(p)
+    wanted = set()
+    for needs in elves.values():
+        wanted.update(needs)
+    for paths in by_hash.values():
+        if len(paths) < 2:
+            continue
+        linked = [p for p in paths if os.path.basename(p) in wanted]
+        keep = linked or [min(paths, key=lambda p: len(os.path.basename(p)))]
+        for p in paths:
+            if p in keep or p in linked:
+                continue
+            size = os.path.getsize(p)
+            total += size
+            print(f"remove duplicate {os.path.relpath(p, prefix)} ({human(size)}) of {os.path.basename(keep[0])}")
+            if not dry:
+                os.remove(p)
+
     print(f"{'would free' if dry else 'freed'} {human(total)} (uncompressed)")
 
 
