@@ -1,7 +1,9 @@
-DO NOT REPORT ISSUES on GITHUB
+<!-- Please report IKriate problems here, not to Krita's bug tracker. -->
 
-GitHub is only a mirror. Our real development happens on
-the KDE infrastructure. Report bugs against Krita here:
+**What happened:**
 
-https://bugs.kde.org
+**What you expected:**
 
+**Steps to reproduce:**
+
+**Device and IKriate version:** <!-- e.g. Samsung Galaxy Tab S9, Android 14, IKriate 5.3.5 (from About) -->

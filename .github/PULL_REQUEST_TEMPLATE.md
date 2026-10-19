@@ -1,7 +1,3 @@
-DO NOT ISSUE PULL REQUESTS ON GITHUB
+<!-- Describe what this pull request changes and why. -->
 
-GitHub is only a mirror. Our real development happens on
-the KDE infrastructure. Post diffs and Merge requests
-against Krita here:
-
-https://invent.kde.org/graphics/krita
+**Tested on:** <!-- Windows / Linux / Android tablet, and how -->

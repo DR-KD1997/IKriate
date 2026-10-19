@@ -1,14 +1,12 @@
-The Krita project is part of the KDE community. Krita is 
-developed on KDE's infrastructure, not GitHub's. Krita on
-GitHub is just a mirror. Do not create pull requests on
-GitHub.
+# Contributing to IKriate
 
-Please join our GitLab instance to start contributing. 
+IKriate is developed here on GitHub. Issues and pull requests are welcome.
 
-https://invent.kde.org/graphics/krita
+IKriate is derived from Krita but is a separate project: please do not send
+IKriate problems or patches to the Krita developers. Changes that are not
+specific to IKriate (painting engine, file formats) are best proposed upstream
+to Krita as well, so both projects benefit.
 
-Please see the HACKING file for coding guidelines. The Krita
-API documentation is here:
-
-https://api.kde.org/extragear-api/graphics-apidocs/krita/html/index.html
-
+- Build instructions: `packaging/README-IKRIATE.md`
+- IKriate's own code: `libs/ui/ikriate/`
+- Keep changes to upstream files small and mark them with an `IKriate` comment.
