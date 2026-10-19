@@ -76,7 +76,7 @@ void QMic::slotQMic(bool again)
     }
 
     if (!plugin) {
-        QMessageBox::warning(qApp->activeWindow(), i18nc("@title:window", "IKriate"), i18n("Krita cannot launch the gmic-qt plugin. No bundled library found."));
+        QMessageBox::warning(qApp->activeWindow(), i18nc("@title:window", "IKriate"), i18n("IKriate cannot launch the gmic-qt plugin. No bundled library found."));
         return;
     }
 

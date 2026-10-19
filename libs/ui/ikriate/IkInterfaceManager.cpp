@@ -12,11 +12,15 @@
 #include <QCursor>
 #include <QDockWidget>
 #include <QEvent>
+#include <QLayout>
+#include <QMdiArea>
+#include <QMdiSubWindow>
 #include <QMenu>
 #include <QMenuBar>
-#include <QScreen>
+#include <QResizeEvent>
 #include <QStackedWidget>
 #include <QStatusBar>
+#include <QTabBar>
 #include <QTimer>
 #include <QToolBar>
 
@@ -28,8 +32,11 @@
 
 #include <KisResourceModel.h>
 #include <KisResourceTypes.h>
+#include <KoCanvasResourceProvider.h>
+#include <KoCanvasResourcesIds.h>
 #include <KoResource.h>
-#include <kis_icon_utils.h>
+#include <KoToolManager.h>
+#include <brushengine/kis_paintop_preset.h>
 
 #include "KisMainWindow.h"
 #include "KisViewManager.h"
@@ -37,35 +44,45 @@
 #include "input/kis_input_manager.h"
 #include "input/kis_input_profile.h"
 #include "input/kis_input_profile_manager.h"
+#include "kis_canvas_resource_provider.h"
 #include "kis_config.h"
+#include "kis_config_notifier.h"
 #include "kis_paintop_box.h"
 #include "kis_popup_palette.h"
 
-#include "IkAppearanceDialog.h"
-#include "IkBrushStudio.h"
-#include "IkChromeOverlays.h"
+#include "IkBrushLibrary.h"
+#include "IkHomeScreen.h"
+#include "IkLayouts.h"
+#include "IkSettingsPage.h"
 #include "IkSkinManager.h"
+#include "IkStyle.h"
+#include "IkWidgets.h"
 
 namespace
 {
 const char *const kGroup = "IKriate";
 const char *const kModeKey = "InterfaceMode";
 const char *const kClassicStateKey = "ClassicWindowState";
-const char *const kChromeHiddenKey = "DesktopChromeHidden";
 const char *const kPrevProfileKey = "PreviousInputProfile";
 const char *const kTabletProfile = "IKriate Tablet";
 const char *const kAutoId = "auto";
+const char *const kBrushTool = "KritaShape/KisToolBrush";
 
 KConfigGroup ikConfig()
 {
     return KConfigGroup(KSharedConfig::openConfig(), kGroup);
+}
+
+bool classicOffered()
+{
+    return ikConfig().readEntry("OfferClassicLayout", false);
 }
 }
 
 struct IkInterfaceManager::Private
 {
     KisMainWindow *mw {nullptr};
-    Mode mode {Classic};
+    Mode mode {Desktop};
     bool followDefault {true};
 
     QActionGroup *modeGroup {nullptr};
@@ -73,27 +90,38 @@ struct IkInterfaceManager::Private
     QAction *followDefaultAction {nullptr};
 
     QPointer<QStackedWidget> stack;
-    QScopedPointer<IkMinimalChrome> minimal;
-    QScopedPointer<IkRadialChrome> radial;
-    QPointer<IkBrushStudio> studio;
-    QPointer<IkAppearanceDialog> appearance;
+    QPointer<IkHomeScreen> home;
+    QScopedPointer<IkDesktopLayout> desktop;
+    QScopedPointer<IkKriateLayout> kriate;
+    QScopedPointer<IkMinimalLayout> minimal;
+    QPointer<IkPopover> settings;
+    QPointer<IkPopover> brushes;
 
     QByteArray classicState;
     bool chromeHidden {false};
-    bool restorePending {false};
     bool initialized {false};
     bool canvasOnly {false};
+
+    PaintMode paintMode {Draw};
+    bool settingMode {false};
+    QString drawPreset;
+    QPointer<QWidget> toolOptions;
+    QPointer<QWidget> toolOptionsHost;
+    bool resourcesConnected {false};
 
     bool onCanvasPage() const
     {
         return stack && stack->currentIndex() != 0;
     }
 
-    IkOverlayChrome *activeOverlay() const
+    IkLayout *layout(Mode m) const
     {
-        if (mode == Minimal) return minimal.data();
-        if (mode == Radial) return radial.data();
-        return nullptr;
+        switch (m) {
+        case Desktop: return desktop.data();
+        case Kriate: return kriate.data();
+        case Minimal: return minimal.data();
+        default: return nullptr;
+        }
     }
 };
 
@@ -108,10 +136,8 @@ IkInterfaceManager::IkInterfaceManager(KisMainWindow *mainWindow)
     const QString stored = cfg.readEntry(kModeKey, QString::fromLatin1(kAutoId));
     d->followDefault = stored.isEmpty() || stored == QLatin1String(kAutoId);
     d->mode = d->followDefault ? platformDefaultMode() : modeFromId(stored, platformDefaultMode());
+    if (d->mode == Classic && !classicOffered()) d->mode = platformDefaultMode();
     d->classicState = QByteArray::fromBase64(cfg.readEntry(kClassicStateKey, QByteArray()));
-    // If the floating layouts hid the dockers last session, Krita's own saved
-    // window state has them hidden too; the docked layout lives in classicState.
-    d->chromeHidden = cfg.readEntry(kChromeHiddenKey, false) && !d->classicState.isEmpty();
 
     createActions();
     QTimer::singleShot(0, this, &IkInterfaceManager::slotDeferredInit);
@@ -119,6 +145,7 @@ IkInterfaceManager::IkInterfaceManager(KisMainWindow *mainWindow)
 
 IkInterfaceManager::~IkInterfaceManager()
 {
+    releaseToolOptions();
 }
 
 // ------------------------------------------------------------------ statics
@@ -126,86 +153,87 @@ IkInterfaceManager::~IkInterfaceManager()
 IkInterfaceManager::Mode IkInterfaceManager::platformDefaultMode()
 {
 #ifdef Q_OS_ANDROID
-    return Radial;
+    return Kriate;
 #else
-    return Classic;
+    return IkStyle::touchFirst() ? Kriate : Desktop;
 #endif
 }
 
 QString IkInterfaceManager::modeId(Mode mode)
 {
     switch (mode) {
+    case Kriate: return QStringLiteral("kriate");
     case Minimal: return QStringLiteral("minimal");
-    case Radial: return QStringLiteral("radial");
-    case Classic:
-    default: return QStringLiteral("classic");
+    case Classic: return QStringLiteral("classic-docker");
+    case Desktop:
+    default: return QStringLiteral("desktop");
     }
 }
 
 IkInterfaceManager::Mode IkInterfaceManager::modeFromId(const QString &id, Mode fallback)
 {
-    if (id == QLatin1String("classic")) return Classic;
+    if (id == QLatin1String("desktop")) return Desktop;
+    if (id == QLatin1String("kriate")) return Kriate;
     if (id == QLatin1String("minimal")) return Minimal;
-    if (id == QLatin1String("radial")) return Radial;
+    if (id == QLatin1String("classic-docker")) return Classic;
+    // Layout names from earlier IKriate builds.
+    if (id == QLatin1String("classic")) return Desktop;
+    if (id == QLatin1String("radial")) return Kriate;
     return fallback;
 }
 
 QString IkInterfaceManager::modeDisplayName(Mode mode)
 {
     switch (mode) {
+    case Kriate: return i18nc("IKriate interface layout", "Kriate");
     case Minimal: return i18nc("IKriate interface layout", "Minimal");
-    case Radial: return i18nc("IKriate interface layout", "Radial");
-    case Classic:
-    default: return i18nc("IKriate interface layout", "Classic");
+    case Classic: return i18nc("IKriate interface layout", "Classic");
+    case Desktop:
+    default: return i18nc("IKriate interface layout", "Desktop");
     }
 }
 
 QString IkInterfaceManager::modeDescription(Mode mode)
 {
     switch (mode) {
+    case Kriate:
+        return i18n("Built for tablets: tools along the top, your brushes docked on the right and size and opacity "
+                    "at your thumb. Default on Android tablets.");
     case Minimal:
-        return i18n("Full canvas with a thin top bar and a side bar for size, opacity, undo and redo.");
-    case Radial:
-        return i18n("Full canvas built for touch: hold a finger for the radial palette, "
-                    "quick brushes and colours in a bottom dock. Default on Android tablets.");
+        return i18n("Almost nothing but the canvas: a few floating buttons, size and opacity, brush and eraser.");
     case Classic:
+        return i18n("Movable dockers, tool box and text menus.");
+    case Desktop:
     default:
-        return i18n("Krita's docked interface: tool box, dockers and tool options. Default on computers.");
+        return i18n("Tools on the left, colour and layers on the right, brush size and opacity along the bottom. "
+                    "Default on computers.");
     }
 }
 
 IkInterfaceManager *IkInterfaceManager::forWindow(QWidget *window)
 {
-    return window ? window->findChild<IkInterfaceManager *>(QStringLiteral("IkInterfaceManager"),
-                                                             Qt::FindDirectChildrenOnly)
+    return window ? window->findChild<IkInterfaceManager *>(QStringLiteral("IkInterfaceManager"), Qt::FindDirectChildrenOnly)
                   : nullptr;
 }
 
 // ---------------------------------------------------------------- accessors
 
-IkInterfaceManager::Mode IkInterfaceManager::mode() const
-{
-    return d->mode;
-}
-
-bool IkInterfaceManager::followsPlatformDefault() const
-{
-    return d->followDefault;
-}
-
-KisMainWindow *IkInterfaceManager::mainWindow() const
-{
-    return d->mw;
-}
-
-KisViewManager *IkInterfaceManager::viewManager() const
-{
-    return d->mw ? d->mw->viewManager() : nullptr;
-}
+IkInterfaceManager::Mode IkInterfaceManager::mode() const { return d->mode; }
+IkInterfaceManager::Mode IkInterfaceManager::preferredMode() const { return d->mode; }
+bool IkInterfaceManager::followsPlatformDefault() const { return d->followDefault; }
+KisMainWindow *IkInterfaceManager::mainWindow() const { return d->mw; }
+KisViewManager *IkInterfaceManager::viewManager() const { return d->mw ? d->mw->viewManager() : nullptr; }
+IkHomeScreen *IkInterfaceManager::homeScreen() const { return d->home; }
+IkInterfaceManager::PaintMode IkInterfaceManager::paintMode() const { return d->paintMode; }
 
 QAction *IkInterfaceManager::action(const QString &name) const
 {
     return d->mw ? d->mw->actionCollection()->action(name) : nullptr;
+}
+
+bool IkInterfaceManager::isBrushToolActive() const
+{
+    return KoToolManager::instance()->activeToolId() == QLatin1String(kBrushTool);
 }
 
 // ------------------------------------------------------------------ actions
@@ -216,14 +244,14 @@ void IkInterfaceManager::createActions()
 
     d->modeGroup = new QActionGroup(this);
     d->modeGroup->setExclusive(true);
-    for (Mode m : {Classic, Minimal, Radial}) {
+    for (Mode m : {Desktop, Kriate, Minimal, Classic}) {
         QAction *a = new QAction(modeDisplayName(m), this);
         a->setCheckable(true);
         a->setToolTip(modeDescription(m));
         a->setStatusTip(modeDescription(m));
         a->setData(int(m));
         d->modeGroup->addAction(a);
-        ac->addAction(QStringLiteral("ikriate_layout_") + modeId(m), a);
+        ac->addAction(QStringLiteral("ikriate_layout_") + modeId(m).replace(QLatin1Char('-'), QLatin1Char('_')), a);
         connect(a, &QAction::triggered, this, [this, m]() { setMode(m); });
         d->modeActions.insert(int(m), a);
     }
@@ -233,29 +261,32 @@ void IkInterfaceManager::createActions()
     ac->addAction(QStringLiteral("ikriate_layout_auto"), d->followDefaultAction);
     connect(d->followDefaultAction, &QAction::triggered, this, &IkInterfaceManager::setFollowPlatformDefault);
 
-    QAction *studio = new QAction(KisIconUtils::loadIcon("paintop_settings_01"), i18n("Brush Studio..."), this);
-    studio->setToolTip(i18n("Browse, search and tune brushes"));
-    ac->addAction(QStringLiteral("ikriate_brush_studio"), studio);
-    ac->setDefaultShortcut(studio, QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key_B));
-    connect(studio, &QAction::triggered, this, &IkInterfaceManager::showBrushStudio);
+    QAction *library = new QAction(IkStyle::icon(QStringLiteral("brush")), i18n("Brush Library..."), this);
+    library->setToolTip(i18n("Browse brushes by category"));
+    ac->addAction(QStringLiteral("ikriate_brush_studio"), library);
+    ac->setDefaultShortcut(library, QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key_B));
+    connect(library, &QAction::triggered, this, &IkInterfaceManager::showBrushLibrary);
 
-    QAction *appearance = new QAction(KisIconUtils::loadIcon("preferences-desktop-color"),
-                                      i18n("Interface && Skins..."), this);
-    appearance->setToolTip(i18n("Choose the interface layout, skin, accent colour and tint"));
-    ac->addAction(QStringLiteral("ikriate_appearance"), appearance);
-    connect(appearance, &QAction::triggered, this, &IkInterfaceManager::showAppearanceDialog);
+    QAction *settings = new QAction(IkStyle::icon(QStringLiteral("settings")), i18n("Interface && Skins..."), this);
+    settings->setToolTip(i18n("Theme, layout, interface scale, language and more"));
+    ac->addAction(QStringLiteral("ikriate_appearance"), settings);
+    connect(settings, &QAction::triggered, this, &IkInterfaceManager::showSettings);
+
+    QAction *home = new QAction(IkStyle::icon(QStringLiteral("home")), i18n("Gallery"), this);
+    ac->addAction(QStringLiteral("ikriate_home"), home);
+    connect(home, &QAction::triggered, this, &IkInterfaceManager::goHome);
 
     syncModeActions();
 }
 
 void IkInterfaceManager::syncModeActions()
 {
-    if (QAction *a = d->modeActions.value(int(d->mode))) {
-        a->setChecked(true);
+    if (QAction *a = d->modeActions.value(int(d->mode))) a->setChecked(true);
+    if (QAction *classic = d->modeActions.value(int(Classic))) {
+        classic->setVisible(classicOffered());
+        if (!classicOffered() && d->mode == Classic) setMode(platformDefaultMode());
     }
-    if (d->followDefaultAction) {
-        d->followDefaultAction->setChecked(d->followDefault);
-    }
+    if (d->followDefaultAction) d->followDefaultAction->setChecked(d->followDefault);
 }
 
 // ------------------------------------------------------------- mode handling
@@ -267,33 +298,63 @@ void IkInterfaceManager::slotDeferredInit()
 
     d->stack = qobject_cast<QStackedWidget *>(d->mw->centralWidget());
     if (d->stack) {
-        connect(d->stack.data(), &QStackedWidget::currentChanged, this,
-                &IkInterfaceManager::slotStackPageChanged, Qt::QueuedConnection);
+        connect(d->stack.data(), &QStackedWidget::currentChanged, this, &IkInterfaceManager::slotStackPageChanged,
+                Qt::QueuedConnection);
         d->stack->installEventFilter(this);
     }
+    d->home = d->mw->findChild<IkHomeScreen *>();
+    if (d->home) d->home->setManager(this);
     d->mw->installEventFilter(this);
 
-    if (QAction *canvasOnly = action("view_show_canvas_only")) {
+    if (QAction *canvasOnly = action(QStringLiteral("view_show_canvas_only"))) {
         connect(canvasOnly, &QAction::toggled, this, &IkInterfaceManager::slotCanvasOnlyToggled);
         d->canvasOnly = canvasOnly->isChecked();
     }
     if (KisViewManager *vm = viewManager()) {
-        connect(vm, &KisViewManager::viewChanged, this, &IkInterfaceManager::slotLayoutOverlays, Qt::QueuedConnection);
+        connect(vm, &KisViewManager::viewChanged, this, &IkInterfaceManager::slotLayoutPanels, Qt::QueuedConnection);
+        connect(vm, &KisViewManager::viewChanged, this, [this]() {
+            if (!d->resourcesConnected && viewManager() && viewManager()->canvasResourceProvider()
+                && viewManager()->canvasResourceProvider()->resourceManager()) {
+                d->resourcesConnected = true;
+                connect(viewManager()->canvasResourceProvider()->resourceManager(),
+                        &KoCanvasResourceProvider::canvasResourceChanged, this, [this](int key, const QVariant &) {
+                            if (key == KoCanvasResource::EraserMode) slotEraserModeChanged();
+                            if (key == KoCanvasResource::CurrentPaintOpPreset) slotPresetChanged();
+                        });
+            }
+        });
     }
 
     IkSkinManager::instance()->applyStoredSettings();
-    // Reload action icons for the skin's light/dark variant; some were
-    // created before the palette settled during start-up.
     QMetaObject::invokeMethod(d->mw, "updateTheme", Qt::QueuedConnection);
     QMetaObject::invokeMethod(d->mw, "themeChanged", Qt::QueuedConnection);
-    applyMode(true);
+    // The area around the canvas follows the skin unless the user picked a
+    // colour in the canvas preferences.
+    auto syncCanvasSurround = []() {
+        KConfigGroup ik = KSharedConfig::openConfig()->group("IKriate");
+        KisConfig cfg(false);
+        const QColor previous = ik.readEntry("AutoCanvasBorder", QColor());
+        const QColor current = cfg.canvasBorderColor();
+        if (current != cfg.canvasBorderColor(true) && current != previous) return; // user's own choice
+        const QColor surround = IkStyle::color(IkStyle::CanvasSurround);
+        if (surround == current) return;
+        cfg.setCanvasBorderColor(surround);
+        ik.writeEntry("AutoCanvasBorder", surround);
+        KisConfigNotifier::instance()->notifyConfigChanged();
+    };
+    connect(IkSkinManager::instance(), &IkSkinManager::sigSkinChanged, this, [syncCanvasSurround]() {
+        IkStyle::clearCache();
+        // The palette is applied after the signal; read it on the next turn.
+        QTimer::singleShot(0, qApp, syncCanvasSurround);
+    });
+    QTimer::singleShot(0, qApp, syncCanvasSurround);
+    applyMode();
 }
 
 void IkInterfaceManager::setFollowPlatformDefault(bool follow)
 {
     d->followDefault = follow;
     if (follow) {
-        ikConfig().writeEntry(kModeKey, QString::fromLatin1(kAutoId));
         setMode(platformDefaultMode());
         d->followDefault = true;
         ikConfig().writeEntry(kModeKey, QString::fromLatin1(kAutoId));
@@ -305,71 +366,65 @@ void IkInterfaceManager::setFollowPlatformDefault(bool follow)
 
 void IkInterfaceManager::setMode(Mode mode)
 {
+    if (mode == Classic && !classicOffered()) mode = platformDefaultMode();
     const bool changed = mode != d->mode;
+    if (changed && d->onCanvasPage() && d->mode == Classic) {
+        // Remember the docked layout so Classic can bring it back exactly.
+        d->classicState = d->mw->saveState();
+        ikConfig().writeEntry(kClassicStateKey, d->classicState.toBase64());
+    }
     d->mode = mode;
-    // Picking a layout explicitly stops following the platform default,
-    // unless it *is* the default.
     d->followDefault = d->followDefault && mode == platformDefaultMode();
     ikConfig().writeEntry(kModeKey, d->followDefault ? QString::fromLatin1(kAutoId) : modeId(mode));
-    if (d->initialized) {
-        applyMode(false);
-    }
+    ikConfig().sync();
+    if (d->initialized) applyMode();
     syncModeActions();
-    if (changed) {
-        Q_EMIT modeChanged(mode);
+    if (changed) Q_EMIT modeChanged(mode);
+}
+
+static IkLayout *ensureLayout(IkInterfaceManager *self, IkInterfaceManager::Mode m,
+                       QScopedPointer<IkDesktopLayout> &desktop, QScopedPointer<IkKriateLayout> &kriate,
+                       QScopedPointer<IkMinimalLayout> &minimal)
+{
+    switch (m) {
+    case IkInterfaceManager::Desktop:
+        if (!desktop) desktop.reset(new IkDesktopLayout(self));
+        return desktop.data();
+    case IkInterfaceManager::Kriate:
+        if (!kriate) kriate.reset(new IkKriateLayout(self));
+        return kriate.data();
+    case IkInterfaceManager::Minimal:
+        if (!minimal) minimal.reset(new IkMinimalLayout(self));
+        return minimal.data();
+    default:
+        return nullptr;
     }
 }
 
-void IkInterfaceManager::applyMode(bool startup)
+void IkInterfaceManager::applyMode()
 {
-    Q_UNUSED(startup);
-    if (d->mode == Classic) {
-        if (d->minimal) d->minimal->setVisible(false);
-        if (d->radial) d->radial->setVisible(false);
-        if (d->chromeHidden) {
-            // The welcome page hides dockers by itself and Krita re-applies its
-            // saved layout when a document opens, so restore on the canvas page.
-            if (d->onCanvasPage()) {
-                restoreDesktopChrome();
-            } else {
-                d->restorePending = true;
-            }
-        }
+    if (d->onCanvasPage() && d->mode == Classic && !d->canvasOnly) {
+        restoreDesktopChrome();
     } else {
-        d->restorePending = false;
-        if (d->mode == Minimal) {
-            if (d->radial) d->radial->setVisible(false);
-            if (!d->minimal) d->minimal.reset(new IkMinimalChrome(this));
-        } else {
-            if (d->minimal) d->minimal->setVisible(false);
-            if (!d->radial) d->radial.reset(new IkRadialChrome(this));
-        }
-        if (d->onCanvasPage()) {
-            hideDesktopChrome();
-        }
+        hideDesktopChrome();
+    }
+    if (d->mode != Classic && d->onCanvasPage()) {
+        ensureLayout(this, d->mode, d->desktop, d->kriate, d->minimal);
     }
     applyInputProfile();
-    updateOverlayVisibility();
+    updateLayoutVisibility();
 }
 
 void IkInterfaceManager::hideDesktopChrome()
 {
-    if (!d->chromeHidden) {
-        // Remember the docked layout so Classic can bring it back exactly.
+    if (!d->chromeHidden && d->onCanvasPage() && d->mode == Classic) {
         d->classicState = d->mw->saveState();
-        KConfigGroup cfg = ikConfig();
-        cfg.writeEntry(kClassicStateKey, d->classicState.toBase64());
-        cfg.writeEntry(kChromeHiddenKey, true);
-        cfg.sync();
+        ikConfig().writeEntry(kClassicStateKey, d->classicState.toBase64());
     }
     d->chromeHidden = true;
-
     const QList<QDockWidget *> docks = d->mw->dockWidgets();
     for (QDockWidget *dock : docks) {
-        // A floating layers panel opened from the overlay stays as it is.
-        if (dock->isVisible() && !dock->property("ikOverlayPanel").toBool()) {
-            dock->hide();
-        }
+        if (dock->isVisible()) dock->hide();
     }
     const QList<QToolBar *> bars = d->mw->findChildren<QToolBar *>();
     for (QToolBar *bar : bars) {
@@ -381,31 +436,22 @@ void IkInterfaceManager::hideDesktopChrome()
 
 void IkInterfaceManager::restoreDesktopChrome()
 {
+    releaseToolOptions();
     if (!d->classicState.isEmpty()) {
         d->mw->restoreState(d->classicState);
     } else {
-        // Nothing saved: bring back Krita's default set of dockers and toolbars.
         for (const char *id : {"ToolBox", "sharedtooldocker", "KisLayerBox", "PresetDocker", "ColorSelectorNg"}) {
             if (QDockWidget *dock = d->mw->dockWidget(QString::fromLatin1(id))) dock->show();
         }
         const QList<QToolBar *> bars = d->mw->findChildren<QToolBar *>();
         for (QToolBar *bar : bars) {
             const QString n = bar->objectName();
-            if (n == QLatin1String("mainToolBar") || n == QLatin1String("editToolBar")
-                || n == QLatin1String("BrushesAndStuff")) {
-                bar->show();
-            }
+            if (n == QLatin1String("mainToolBar") || n == QLatin1String("BrushesAndStuff")) bar->show();
         }
-    }
-    if (QDockWidget *layers = d->mw->dockWidget(QStringLiteral("KisLayerBox"))) {
-        layers->setProperty("ikOverlayPanel", false);
     }
     if (d->mw->menuBar()) d->mw->menuBar()->show();
     if (d->mw->statusBar()) d->mw->statusBar()->setVisible(KisConfig(true).showStatusBar());
     d->chromeHidden = false;
-    KConfigGroup cfg = ikConfig();
-    cfg.writeEntry(kChromeHiddenKey, false);
-    cfg.sync();
 }
 
 void IkInterfaceManager::applyInputProfile()
@@ -413,69 +459,111 @@ void IkInterfaceManager::applyInputProfile()
     KisInputProfileManager *pm = KisInputProfileManager::instance();
     KisInputProfile *current = pm->currentProfile();
     KConfigGroup cfg = ikConfig();
-    if (d->mode == Radial) {
+    const bool touchLayout = d->mode == Kriate || d->mode == Minimal;
+    if (touchLayout) {
         KisInputProfile *tablet = pm->profile(QString::fromLatin1(kTabletProfile));
         if (tablet && current != tablet) {
             if (current) cfg.writeEntry(kPrevProfileKey, current->name());
             pm->setCurrentProfile(tablet);
         }
     } else if (current && current->name() == QLatin1String(kTabletProfile)) {
-        const QString prev = cfg.readEntry(kPrevProfileKey, QStringLiteral("Krita Default"));
-        if (KisInputProfile *p = pm->profile(prev)) {
-            pm->setCurrentProfile(p);
+        const QString prev = cfg.readEntry(kPrevProfileKey, QString());
+        KisInputProfile *p = prev.isEmpty() ? nullptr : pm->profile(prev);
+        if (!p) {
+            const QList<KisInputProfile *> all = pm->profiles();
+            for (KisInputProfile *candidate : all) {
+                if (candidate->name() != QLatin1String(kTabletProfile)) { p = candidate; break; }
+            }
         }
+        if (p) pm->setCurrentProfile(p);
     }
 }
 
-void IkInterfaceManager::updateOverlayVisibility()
+void IkInterfaceManager::setDocumentTabsVisible(bool visible)
 {
-    const bool show = d->onCanvasPage() && !d->canvasOnly && d->mw->activeView();
-    if (d->minimal) d->minimal->setVisible(show && d->mode == Minimal);
-    if (d->radial) d->radial->setVisible(show && d->mode == Radial);
-    slotLayoutOverlays();
+    if (!d->stack) return;
+    QMdiArea *mdi = d->stack->findChild<QMdiArea *>();
+    if (!mdi) return;
+    // QMdiArea reserves the tab bar's size hint even while the bar is hidden,
+    // so hidden tabs are also collapsed to zero height.
+    static const QString collapse = QStringLiteral(
+        "\nQTabBar::tab { height: 0px; min-height: 0px; max-height: 0px; padding: 0px; margin: 0px; border: none; }");
+    const QList<QTabBar *> tabs = mdi->findChildren<QTabBar *>(QString(), Qt::FindDirectChildrenOnly);
+    for (QTabBar *t : tabs) {
+        QString sheet = t->styleSheet();
+        const bool collapsed = sheet.endsWith(collapse);
+        if (visible && collapsed) {
+            sheet.chop(collapse.size());
+            t->setStyleSheet(sheet);
+        } else if (!visible && !collapsed) {
+            t->setStyleSheet(sheet + collapse);
+        }
+        t->setVisible(visible);
+    }
+    // QMdiArea only re-reads the size hint on some events; set the margin now.
+    if (mdi->viewMode() == QMdiArea::TabbedView) {
+        struct MarginAccess : public QMdiArea {
+            using QAbstractScrollArea::setViewportMargins;
+        };
+        void (QAbstractScrollArea::*setMargins)(int, int, int, int) = &MarginAccess::setViewportMargins;
+        const int top = visible && !tabs.isEmpty() ? tabs.first()->sizeHint().height() : 0;
+        (mdi->*setMargins)(0, top, 0, 0);
+    }
+}
+
+void IkInterfaceManager::updateLayoutVisibility()
+{
+    const bool canvas = d->onCanvasPage() && d->mw->activeView();
+    const bool show = canvas && !d->canvasOnly;
+    for (Mode m : {Desktop, Kriate, Minimal}) {
+        if (IkLayout *l = d->layout(m)) {
+            const bool vis = show && d->mode == m;
+            if (l->isVisible() != vis) l->setVisible(vis);
+        }
+    }
+    setDocumentTabsVisible(d->mode == Classic || !canvas);
+    slotLayoutPanels();
 }
 
 void IkInterfaceManager::slotStackPageChanged()
 {
-    // Krita re-applies its saved docker layout when a document opens; in the
-    // floating layouts, put the canvas back in front.
-    if (d->mode != Classic && d->onCanvasPage()) {
-        hideDesktopChrome();
-    } else if (d->mode == Classic && d->onCanvasPage() && !d->canvasOnly) {
-        // Also recover when the saved snapshot is gone but the window was left
-        // without chrome (e.g. settings copied from a Minimal/Radial session):
-        // Krita itself never hides the menu bar outside canvas-only mode.
-        const bool chromeMissing = d->mw->menuBar() && d->mw->menuBar()->isHidden();
-        if (d->restorePending || chromeMissing) {
-            d->restorePending = false;
-            restoreDesktopChrome();
-        }
-    }
-    updateOverlayVisibility();
+    applyMode();
 }
 
 void IkInterfaceManager::slotCanvasOnlyToggled(bool on)
 {
     d->canvasOnly = on;
-    updateOverlayVisibility();
+    updateLayoutVisibility();
 }
 
-void IkInterfaceManager::slotLayoutOverlays()
+void IkInterfaceManager::slotLayoutPanels()
 {
-    IkOverlayChrome *overlay = d->activeOverlay();
-    if (!overlay || !overlay->isVisible()) return;
-
-    QRect area;
-    KisViewManager *vm = viewManager();
-    QWidget *canvas = vm ? vm->canvas() : nullptr;
-    if (canvas && canvas->isVisible()) {
-        area = QRect(canvas->mapTo(d->mw, QPoint(0, 0)), canvas->size());
-    } else if (d->mw->centralWidget()) {
-        area = d->mw->centralWidget()->geometry();
-    } else {
-        area = d->mw->rect();
+    if (!d->stack) return;
+    IkLayout *l = d->layout(d->mode);
+    const bool active = l && l->isVisible();
+    const QRect area = d->stack->geometry();
+    if (active) l->layoutPanels(area);
+    // Panels of the Desktop layout sit beside the canvas, not over it.
+    const QMargins margins = (active && d->onCanvasPage()) ? l->reservedMargins() : QMargins();
+    if (d->stack->contentsMargins() != margins) d->stack->setContentsMargins(margins);
+    if (qEnvironmentVariableIsSet("IKRIATE_DEBUG_WIDGETS")) {
+        for (const QPoint &pt : {QPoint(800, 15), QPoint(800, 300)}) {
+            QWidget *w = d->mw->childAt(pt);
+            QString chain;
+            for (QWidget *p = w; p && p != d->mw; p = p->parentWidget()) {
+                chain += QStringLiteral(" < %1(%2) [%3,%4 %5x%6]").arg(QString::fromLatin1(p->metaObject()->className()), p->objectName())
+                             .arg(p->geometry().x()).arg(p->geometry().y()).arg(p->width()).arg(p->height());
+            }
+            qDebug("IKriate widget at %d,%d:%s", pt.x(), pt.y(), qPrintable(chain));
+        }
+        if (QMdiArea *mdi = d->stack->findChild<QMdiArea *>()) {
+            for (QTabBar *t : mdi->findChildren<QTabBar *>()) {
+                qDebug("IKriate tabbar parent=%s hint=%dx%d hidden=%d count=%d sheet=%s", t->parentWidget()->metaObject()->className(),
+                       t->sizeHint().width(), t->sizeHint().height(), t->isHidden(), t->count(), qPrintable(t->styleSheet().right(140)));
+            }
+            qDebug("IKriate mdi viewMode=%d", int(mdi->viewMode()));
+        }
     }
-    overlay->layoutPanels(area);
 }
 
 bool IkInterfaceManager::eventFilter(QObject *watched, QEvent *event)
@@ -484,9 +572,7 @@ bool IkInterfaceManager::eventFilter(QObject *watched, QEvent *event)
     case QEvent::Resize:
     case QEvent::LayoutRequest:
     case QEvent::WindowStateChange:
-        if (d->mode != Classic) {
-            QTimer::singleShot(0, this, &IkInterfaceManager::slotLayoutOverlays);
-        }
+        if (d->mode != Classic) QTimer::singleShot(0, this, &IkInterfaceManager::slotLayoutPanels);
         break;
     case QEvent::Show:
         if (watched == d->mw && d->initialized) {
@@ -500,32 +586,142 @@ bool IkInterfaceManager::eventFilter(QObject *watched, QEvent *event)
     return QObject::eventFilter(watched, event);
 }
 
+// -------------------------------------------------------------- paint modes
+
+void IkInterfaceManager::setPaintMode(PaintMode mode)
+{
+    KisViewManager *vm = viewManager();
+    const PaintMode old = d->paintMode;
+    d->settingMode = true;
+    if (mode == Smudge && old != Smudge) {
+        if (vm && vm->canvasResourceProvider() && vm->canvasResourceProvider()->currentPreset()) {
+            d->drawPreset = vm->canvasResourceProvider()->currentPreset()->name();
+        }
+        const QString smudge = ikConfig().readEntry("SmudgePreset", QString());
+        ensureBrushTool();
+        if (smudge.isEmpty() || !activatePresetMatching({smudge})) {
+            activatePresetMatching({QStringLiteral("Blender_Basic"), QStringLiteral("Blender Basic"),
+                                    QStringLiteral("Blender"), QStringLiteral("Smear")});
+        }
+    } else if (old == Smudge && mode != Smudge && !d->drawPreset.isEmpty()) {
+        activatePresetMatching({d->drawPreset});
+    }
+    if (QAction *erase = action(QStringLiteral("erase_action"))) {
+        if (erase->isChecked() != (mode == Erase)) erase->setChecked(mode == Erase);
+    }
+    d->paintMode = mode;
+    d->settingMode = false;
+    if (mode != Draw || old != Draw) Q_EMIT paintModeChanged(mode);
+}
+
+void IkInterfaceManager::slotEraserModeChanged()
+{
+    if (d->settingMode) return;
+    KisViewManager *vm = viewManager();
+    if (!vm || !vm->canvasResourceProvider()) return;
+    const bool erasing = vm->canvasResourceProvider()->eraserMode();
+    if (erasing && d->paintMode != Erase) {
+        d->paintMode = Erase;
+        Q_EMIT paintModeChanged(Erase);
+    } else if (!erasing && d->paintMode == Erase) {
+        d->paintMode = Draw;
+        Q_EMIT paintModeChanged(Draw);
+    }
+}
+
+void IkInterfaceManager::slotPresetChanged()
+{
+    KisViewManager *vm = viewManager();
+    if (!vm || !vm->canvasResourceProvider() || !vm->canvasResourceProvider()->currentPreset()) return;
+    const QString name = vm->canvasResourceProvider()->currentPreset()->name();
+    IkBrushLibrary::noteRecent(name);
+    if (d->settingMode) return;
+    if (d->paintMode == Smudge) {
+        ikConfig().writeEntry("SmudgePreset", name);
+    } else {
+        d->drawPreset = name;
+    }
+}
+
+void IkInterfaceManager::activateTool(const QString &toolId)
+{
+    KoToolManager::instance()->switchToolRequested(toolId);
+}
+
+void IkInterfaceManager::ensureBrushTool()
+{
+    if (!isBrushToolActive()) activateTool(QString::fromLatin1(kBrushTool));
+}
+
+// -------------------------------------------------------------- tool options
+
+void IkInterfaceManager::takeToolOptions(QWidget *host)
+{
+    if (!host) return;
+    QDockWidget *dock = d->mw->dockWidget(QStringLiteral("sharedtooldocker"));
+    if (!d->toolOptions && dock) d->toolOptions = dock->widget();
+    if (!d->toolOptions) return;
+    if (d->toolOptions->parentWidget() != host) {
+        d->toolOptions->setParent(host);
+        if (host->layout()) host->layout()->addWidget(d->toolOptions);
+        d->toolOptions->show();
+    }
+    d->toolOptionsHost = host;
+}
+
+void IkInterfaceManager::releaseToolOptions()
+{
+    if (!d->toolOptions || !d->mw) return;
+    QDockWidget *dock = d->mw->dockWidget(QStringLiteral("sharedtooldocker"));
+    if (dock && dock->widget() != d->toolOptions) {
+        dock->setWidget(d->toolOptions);
+    }
+    d->toolOptionsHost = nullptr;
+}
+
 // ----------------------------------------------------------------- commands
 
 void IkInterfaceManager::triggerAction(const QString &name)
 {
     if (QAction *a = action(name)) {
         a->trigger();
+    } else if (name.contains(QLatin1Char('/')) || name.startsWith(QLatin1String("KisTool")) || name.endsWith(QLatin1String("Tool"))) {
+        activateTool(name);
+    }
+}
+
+void IkInterfaceManager::goHome()
+{
+    if (d->mw->activeView()) {
+        triggerAction(QStringLiteral("file_close"));
+    } else if (d->home) {
+        d->home->showPage(IkHomeScreen::GalleryPage);
     }
 }
 
 void IkInterfaceManager::showMainMenu(QWidget *anchor)
 {
     QMenu menu(d->mw);
+    QAction *gallery = menu.addAction(IkStyle::icon(QStringLiteral("home")), i18n("Gallery"));
+    connect(gallery, &QAction::triggered, this, &IkInterfaceManager::goHome);
+    menu.addSeparator();
     if (d->mw->menuBar()) {
         const QList<QAction *> top = d->mw->menuBar()->actions();
         for (QAction *a : top) {
-            if (a->isVisible()) menu.addAction(a);
+            if (a->isVisible() && a->menu()) menu.addAction(a);
         }
     }
     menu.addSeparator();
-    QMenu *layouts = menu.addMenu(i18n("Interface Layout"));
-    for (Mode m : {Classic, Minimal, Radial}) layouts->addAction(d->modeActions.value(int(m)));
+    QMenu *layouts = menu.addMenu(IkStyle::icon(QStringLiteral("grid")), i18n("Interface Layout"));
+    for (Mode m : {Desktop, Kriate, Minimal, Classic}) {
+        if (QAction *a = d->modeActions.value(int(m))) {
+            if (a->isVisible()) layouts->addAction(a);
+        }
+    }
     layouts->addSeparator();
     layouts->addAction(d->followDefaultAction);
-    menu.addAction(action("ikriate_brush_studio"));
-    menu.addAction(action("ikriate_appearance"));
-
+    menu.addAction(action(QStringLiteral("ikriate_brush_studio")));
+    menu.addAction(action(QStringLiteral("ikriate_appearance")));
     const QPoint pos = anchor ? anchor->mapToGlobal(QPoint(0, anchor->height() + 4)) : QCursor::pos();
     menu.exec(pos);
 }
@@ -533,9 +729,7 @@ void IkInterfaceManager::showMainMenu(QWidget *anchor)
 void IkInterfaceManager::showNamedMenu(const QString &menuName, QWidget *anchor)
 {
     QMenu *menu = nullptr;
-    if (d->mw->guiFactory()) {
-        menu = qobject_cast<QMenu *>(d->mw->guiFactory()->container(menuName, d->mw));
-    }
+    if (d->mw->guiFactory()) menu = qobject_cast<QMenu *>(d->mw->guiFactory()->container(menuName, d->mw));
     if (!menu) {
         showMainMenu(anchor);
         return;
@@ -549,7 +743,6 @@ void IkInterfaceManager::showRadialPalette(const QPoint &globalPos)
     KisViewManager *vm = viewManager();
     KisCanvas2 *canvas = vm ? vm->canvasBase() : nullptr;
     if (!canvas || !canvas->popupPalette() || !canvas->canvasWidget()) return;
-
     KisPopupPalette *palette = canvas->popupPalette();
     if (palette->onScreen()) {
         palette->dismiss();
@@ -557,36 +750,8 @@ void IkInterfaceManager::showRadialPalette(const QPoint &globalPos)
     }
     QWidget *cw = canvas->canvasWidget();
     const QPoint pos = globalPos.isNull() ? cw->rect().center() : cw->mapFromGlobal(globalPos);
-    if (vm->inputManager()) {
-        vm->inputManager()->registerPopupWidget(palette);
-    }
+    if (vm->inputManager()) vm->inputManager()->registerPopupWidget(palette);
     palette->popup(pos);
-}
-
-void IkInterfaceManager::toggleLayersPanel(QWidget *anchor)
-{
-    QDockWidget *dock = d->mw->dockWidget(QStringLiteral("KisLayerBox"));
-    if (!dock) return;
-
-    if (d->mode == Classic) {
-        dock->setVisible(!dock->isVisible());
-        return;
-    }
-    if (dock->isVisible()) {
-        dock->hide();
-        return;
-    }
-    dock->setProperty("ikOverlayPanel", true);
-    dock->setFloating(true);
-    const QRect avail = d->mw->geometry();
-    const QSize size(qMin(360, avail.width() / 2), qMin(560, avail.height() * 2 / 3));
-    dock->resize(size);
-    if (anchor) {
-        const QPoint g = anchor->mapToGlobal(QPoint(anchor->width(), anchor->height() + 8));
-        dock->move(qMax(avail.left(), g.x() - size.width()), g.y());
-    }
-    dock->show();
-    dock->raise();
 }
 
 bool IkInterfaceManager::activatePresetMatching(const QStringList &fragments)
@@ -594,15 +759,18 @@ bool IkInterfaceManager::activatePresetMatching(const QStringList &fragments)
     KisViewManager *vm = viewManager();
     if (!vm || !vm->paintOpBox()) return false;
     KisResourceModel model(ResourceType::PaintOpPresets);
-    for (const QString &fragment : fragments) {
-        for (int row = 0; row < model.rowCount(); ++row) {
-            const QModelIndex idx = model.index(row, 0);
-            const QString name = model.data(idx, Qt::UserRole + KisAbstractResourceModel::Name).toString();
-            if (name.contains(fragment, Qt::CaseInsensitive)) {
-                KoResourceSP res = model.resourceForIndex(idx);
-                if (res) {
-                    vm->paintOpBox()->resourceSelected(res);
-                    return true;
+    // Exact names first, then partial matches.
+    for (int pass = 0; pass < 2; ++pass) {
+        for (const QString &fragment : fragments) {
+            for (int row = 0; row < model.rowCount(); ++row) {
+                const QModelIndex idx = model.index(row, 0);
+                const QString name = model.data(idx, Qt::UserRole + KisAbstractResourceModel::Name).toString();
+                const bool match = pass == 0 ? name == fragment : name.contains(fragment, Qt::CaseInsensitive);
+                if (match) {
+                    if (KoResourceSP res = model.resourceForIndex(idx)) {
+                        vm->paintOpBox()->resourceSelected(res);
+                        return true;
+                    }
                 }
             }
         }
@@ -610,21 +778,78 @@ bool IkInterfaceManager::activatePresetMatching(const QStringList &fragments)
     return false;
 }
 
-void IkInterfaceManager::showBrushStudio()
+void IkInterfaceManager::showBrushEditor()
 {
-    if (!d->studio) {
-        d->studio = new IkBrushStudio(this, d->mw);
-    }
-    d->studio->showStudio();
+    ensureBrushTool();
+    QAction *editor = action(QStringLiteral("show_brush_editor"));
+    if (!editor) return;
+    editor->trigger();
+    // The editor normally hangs off a tool bar button that the IKriate layouts
+    // hide; centre it in the window instead.
+    QTimer::singleShot(0, this, [this]() {
+        const QList<QWidget *> tops = QApplication::topLevelWidgets();
+        for (QWidget *w : tops) {
+            if (w->isVisible() && w->inherits("KisPaintOpPresetsEditor")) {
+                const QRect g = d->mw->geometry();
+                const QSize s = w->size().boundedTo(g.size() - QSize(40, 40));
+                w->resize(s);
+                w->move(g.center() - QPoint(s.width() / 2, s.height() / 2));
+            }
+        }
+        const QList<QWidget *> kids = d->mw->findChildren<QWidget *>();
+        for (QWidget *w : kids) {
+            if (w->isVisible() && w->inherits("KisPaintOpPresetsEditor") && w->isWindow()) {
+                const QRect g = d->mw->geometry();
+                const QSize s = w->size().boundedTo(g.size() - QSize(40, 40));
+                w->resize(s);
+                w->move(g.center() - QPoint(s.width() / 2, s.height() / 2));
+            }
+        }
+    });
 }
 
-void IkInterfaceManager::showAppearanceDialog()
+void IkInterfaceManager::createBrushFromCurrent()
 {
-    if (!d->appearance) {
-        d->appearance = new IkAppearanceDialog(this, d->mw);
+    KisViewManager *vm = viewManager();
+    if (!vm || !vm->canvasResourceProvider() || !vm->canvasResourceProvider()->currentPreset()) return;
+    KisPaintOpPresetSP current = vm->canvasResourceProvider()->currentPreset();
+    KoResourceSP copy = current->clone();
+    copy->setName(current->name() + i18nc("suffix for a new brush based on another", " (new)"));
+    copy->setFilename(QString());
+    KisResourceModel model(ResourceType::PaintOpPresets);
+    if (model.addResourceDeduplicateFileName(copy)) {
+        vm->paintOpBox()->resourceSelected(copy);
+        showBrushEditor();
     }
-    d->appearance->reload();
-    d->appearance->show();
-    d->appearance->raise();
-    d->appearance->activateWindow();
+}
+
+void IkInterfaceManager::showBrushLibrary()
+{
+    if (!d->brushes) {
+        d->brushes = new IkPopover(d->mw);
+        d->brushes->setRadius(16);
+        IkBrushLibrary *lib = new IkBrushLibrary(this, d->brushes);
+        d->brushes->setContent(lib);
+    }
+    if (IkBrushLibrary *lib = qobject_cast<IkBrushLibrary *>(d->brushes->content())) lib->reload();
+    d->brushes->popup(nullptr, IkPopover::Center, QSize(600, qMin(760, d->mw->height() - 80)));
+}
+
+void IkInterfaceManager::showSettings()
+{
+    if (d->home && !d->mw->activeView()) {
+        d->home->showPage(IkHomeScreen::SettingsPage);
+        return;
+    }
+    if (!d->settings) {
+        d->settings = new IkPopover(d->mw);
+        d->settings->setRole(IkStyle::Background);
+        d->settings->setRadius(18);
+        d->settings->setDimBackground(true);
+        IkSettingsPage *page = new IkSettingsPage(d->mw, d->settings);
+        page->setManager(this);
+        d->settings->setContent(page);
+    }
+    if (IkSettingsPage *page = qobject_cast<IkSettingsPage *>(d->settings->content())) page->reload();
+    d->settings->popup(nullptr, IkPopover::Center, d->mw->size() * 0.92);
 }

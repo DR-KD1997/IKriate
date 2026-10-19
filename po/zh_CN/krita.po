@@ -1011,8 +1011,8 @@ msgstr "Pepper & Carrot 对话气泡"
 #. i18n: Display name of resource, see context: [path-to-resources]/[resource-type]/[resource-filename]
 #, kde-format
 msgctxt "./krita/data/symbols/preset_icons.svg"
-msgid "Krita Brush Preset Icon Library"
-msgstr "Krita 笔刷预设图标库"
+msgid "IKriate Brush Preset Icon Library"
+msgstr "IKriate 笔刷预设图标库"
 
 #. i18n: Display name of resource, see context: [path-to-resources]/[resource-type]/[resource-filename]
 #, kde-format
@@ -8249,9 +8249,9 @@ msgstr "打开资源文件夹"
 #, kde-format
 msgctxt "action"
 msgid ""
-"Opens a file browser at the location Krita saves resources such as brushes "
+"Opens a file browser at the location IKriate saves resources such as brushes "
 "to."
-msgstr "在文件管理器里打开 Krita 保存笔刷等资源的位置。"
+msgstr "在文件管理器里打开 IKriate 保存笔刷等资源的位置。"
 
 #. i18n: context: text @ Action (windows_cascade), Actions (General), ActionCollection (Krita)
 #: krita/krita.action:19
@@ -8463,8 +8463,8 @@ msgstr "打开/关闭数位板调试器"
 #: krita/krita.action:167 krita/krita.action:169 krita/krita.action:170
 #, kde-format
 msgctxt "action"
-msgid "Show Krita log for bug reports."
-msgstr "显示 Krita 使用日志"
+msgid "Show IKriate log for bug reports."
+msgstr "显示 IKriate 使用日志"
 
 #. i18n: context: text @ Action (sysinfo), Actions (General), ActionCollection (Krita)
 #. i18n: context: toolTip @ Action (sysinfo), Actions (General), ActionCollection (Krita)
@@ -8509,7 +8509,7 @@ msgstr "显示用于程序缺陷报告的系统信息"
 #, kde-format
 msgctxt "action"
 msgid "Show Android log for bug reports."
-msgstr "显示 Krita 安卓日志"
+msgstr "显示 IKriate 安卓日志"
 
 #. i18n: context: text @ Action (crashlog), Actions (General), ActionCollection (Krita)
 #. i18n: context: toolTip @ Action (crashlog), Actions (General), ActionCollection (Krita)
@@ -8521,7 +8521,7 @@ msgstr "显示 Krita 安卓日志"
 #, kde-format
 msgctxt "action"
 msgid "Show crash log for bug reports."
-msgstr "显示 Krita 崩溃日志"
+msgstr "显示 IKriate 崩溃日志"
 
 #. i18n: context: text @ Action (command_bar_open), Actions (General), ActionCollection (Krita)
 #. i18n: context: iconText @ Action (command_bar_open), Actions (General), ActionCollection (Krita)
@@ -15747,8 +15747,8 @@ msgstr "设置"
 #: krita/kritamenu.action:1775
 #, kde-format
 msgctxt "action"
-msgid "&Configure Krita..."
-msgstr "配置 Krita(&C)..."
+msgid "&Configure IKriate..."
+msgstr "配置 IKriate(&C)..."
 
 #. i18n: context: toolTip @ Action (options_configure), Actions (Settings), ActionCollection (Menu)
 #. i18n: context: iconText @ Action (options_configure), Actions (Settings), ActionCollection (Menu)
@@ -15757,8 +15757,8 @@ msgstr "配置 Krita(&C)..."
 #: krita/kritamenu.action:1777 krita/kritamenu.action:1778
 #, kde-format
 msgctxt "action"
-msgid "Configure Krita"
-msgstr "配置 Krita"
+msgid "Configure IKriate"
+msgstr "配置 IKriate"
 
 #. i18n: context: text @ Action (manage_bundles), Actions (Settings), ActionCollection (Menu)
 #: krita/kritamenu.action:1787
@@ -15982,8 +15982,8 @@ msgstr "帮助"
 #: krita/kritamenu.action:1933
 #, kde-format
 msgctxt "action"
-msgid "Krita &Handbook"
-msgstr "Krita 使用手册(&H)"
+msgid "IKriate &Handbook"
+msgstr "IKriate 使用手册(&H)"
 
 #. i18n: context: toolTip @ Action (help_contents), Actions (Help), ActionCollection (Menu)
 #. i18n: context: iconText @ Action (help_contents), Actions (Help), ActionCollection (Menu)
@@ -15992,8 +15992,8 @@ msgstr "Krita 使用手册(&H)"
 #: krita/kritamenu.action:1935 krita/kritamenu.action:1936
 #, kde-format
 msgctxt "action"
-msgid "Krita Handbook"
-msgstr "Krita 使用手册"
+msgid "IKriate Handbook"
+msgstr "IKriate 使用手册"
 
 #. i18n: context: text @ Action (help_report_bug), Actions (Help), ActionCollection (Menu)
 #: krita/kritamenu.action:1943
@@ -16016,8 +16016,8 @@ msgstr "报告程序缺陷"
 #: krita/kritamenu.action:1953
 #, kde-format
 msgctxt "action"
-msgid "&About Krita"
-msgstr "关于 Krita(&A)"
+msgid "&About IKriate"
+msgstr "关于 IKriate(&A)"
 
 #. i18n: context: toolTip @ Action (help_about_app), Actions (Help), ActionCollection (Menu)
 #. i18n: context: iconText @ Action (help_about_app), Actions (Help), ActionCollection (Menu)
@@ -16026,8 +16026,8 @@ msgstr "关于 Krita(&A)"
 #: krita/kritamenu.action:1955 krita/kritamenu.action:1956
 #, kde-format
 msgctxt "action"
-msgid "About Krita"
-msgstr "关于 Krita"
+msgid "About IKriate"
+msgstr "关于 IKriate"
 
 #. i18n: context: text @ Action (help_about_kde), Actions (Help), ActionCollection (Menu)
 #: krita/kritamenu.action:1963
@@ -16335,15 +16335,15 @@ msgstr "更改界面缩放比例"
 #: krita/main.cc:723
 #, kde-format
 msgctxt "@info:credit"
-msgid "© 1999–2026 The Krita Developers"
-msgstr "© 1999–2026 The Krita Developers"
+msgid "© 1999–2026 The IKriate Developers"
+msgstr "© 1999–2026 The IKriate Developers"
 
 #: krita/main.cc:820 libs/ui/KisApplication.cpp:523
 #: libs/ui/KisApplication.cpp:848
 #, kde-format
 msgctxt "@title:window"
-msgid "Krita: Warning"
-msgstr "Krita：警告"
+msgid "IKriate: Warning"
+msgstr "IKriate：警告"
 
 #: krita/main.cc:821
 #, kde-format
@@ -19014,7 +19014,7 @@ msgstr "光学边界"
 msgctxt "@tooltip"
 msgid ""
 "Adjusts glyphs so they align by their optical bounds. Doesn't do anything in "
-"Krita."
+"IKriate."
 msgstr "调整字形的光学边界，用于优化文本块的视觉对齐，特别是边缘对齐。"
 
 #: libs/flake/text/KoOpenTypeFeatureInfoFactory.cpp:77
@@ -19179,9 +19179,9 @@ msgstr "光学尺寸"
 msgctxt "@tooltip"
 msgid ""
 "Indicates how much the font is suitable for its current size. Does nothing "
-"in Krita."
+"in IKriate."
 msgstr ""
-"允许字体根据其应用的字号大小，自动选择或调整最合适字形设计的功能。在 Krita 中"
+"允许字体根据其应用的字号大小，自动选择或调整最合适字形设计的功能。在 IKriate 中"
 "不起作用。"
 
 #: libs/flake/text/KoOpenTypeFeatureInfoFactory.cpp:131
@@ -20745,8 +20745,8 @@ msgstr "转换为路径"
 #: libs/global/kis_assert.cpp:82
 #, kde-format
 msgctxt "@title:window"
-msgid "Krita: Internal Error"
-msgstr "Krita：内部错误"
+msgid "IKriate: Internal Error"
+msgstr "IKriate：内部错误"
 
 #: libs/global/kis_dom_utils.cpp:128
 #, kde-format
@@ -22054,7 +22054,7 @@ msgid ""
 "The image contains a Fill Layer of type <b>%1</b>, which is not supported, "
 "the layer will be converted to a paintlayer"
 msgstr ""
-"图像包含 <b>%1</b> 类型的填充图层，Krita 不支持这种图层，它将被转换为颜料图层"
+"图像包含 <b>%1</b> 类型的填充图层，IKriate 不支持这种图层，它将被转换为颜料图层"
 
 #: libs/impex/IntegralFrameDuration.h:32
 #, kde-format
@@ -22221,8 +22221,8 @@ msgstr "Adobe 笔刷库"
 #: libs/koplugin/KisMimeDatabase.cpp:184
 #, kde-format
 msgctxt "description of a file type"
-msgid "Krita Brush Preset"
-msgstr "Krita 笔刷预设"
+msgid "IKriate Brush Preset"
+msgstr "IKriate 笔刷预设"
 
 #: libs/koplugin/KisMimeDatabase.cpp:189
 #, kde-format
@@ -22233,8 +22233,8 @@ msgstr "MyPaint 笔刷文件"
 #: libs/koplugin/KisMimeDatabase.cpp:194
 #, kde-format
 msgctxt "description of a file type"
-msgid "Krita Assistant"
-msgstr "Krita 辅助尺文件"
+msgid "IKriate Assistant"
+msgstr "IKriate 辅助尺文件"
 
 #: libs/koplugin/KisMimeDatabase.cpp:199
 #, kde-format
@@ -22287,8 +22287,8 @@ msgstr "色板"
 #: libs/koplugin/KisMimeDatabase.cpp:239
 #, kde-format
 msgctxt "description of a file type"
-msgid "Krita Color Palette"
-msgstr "Krita 色板"
+msgid "IKriate Color Palette"
+msgstr "IKriate 色板"
 
 #: libs/koplugin/KisMimeDatabase.cpp:244
 #, kde-format
@@ -22311,50 +22311,50 @@ msgstr "GIMP 图案"
 #: libs/koplugin/KisMimeDatabase.cpp:259
 #, kde-format
 msgctxt "description of a file type"
-msgid "Krita Resource Bundle"
-msgstr "Krita 资源包"
+msgid "IKriate Resource Bundle"
+msgstr "IKriate 资源包"
 
 #: libs/koplugin/KisMimeDatabase.cpp:264
 #, kde-format
 msgctxt "description of a file type"
-msgid "Krita Workspace"
-msgstr "Krita 工作区"
+msgid "IKriate Workspace"
+msgstr "IKriate 工作区"
 
 #: libs/koplugin/KisMimeDatabase.cpp:269
 #, kde-format
 msgctxt "description of a file type"
-msgid "Krita Window Layout"
-msgstr "Krita 窗口布局"
+msgid "IKriate Window Layout"
+msgstr "IKriate 窗口布局"
 
 #: libs/koplugin/KisMimeDatabase.cpp:274
 #, kde-format
 msgctxt "description of a file type"
-msgid "Krita Session"
-msgstr "Krita 会话"
+msgid "IKriate Session"
+msgstr "IKriate 会话"
 
 #: libs/koplugin/KisMimeDatabase.cpp:279
 #, kde-format
 msgctxt "description of a file type"
-msgid "Krita Taskset"
-msgstr "Krita 操作流程"
+msgid "IKriate Taskset"
+msgstr "IKriate 操作流程"
 
 #: libs/koplugin/KisMimeDatabase.cpp:284
 #, kde-format
 msgctxt "description of a file type"
-msgid "Krita Reference Image Collection"
-msgstr "Krita 参考图像集合"
+msgid "IKriate Reference Image Collection"
+msgstr "IKriate 参考图像集合"
 
 #: libs/koplugin/KisMimeDatabase.cpp:289
 #, kde-format
 msgctxt "description of a file type"
-msgid "Krita Gamut Mask"
-msgstr "Krita 色域蒙版"
+msgid "IKriate Gamut Mask"
+msgstr "IKriate 色域蒙版"
 
 #: libs/koplugin/KisMimeDatabase.cpp:294
 #, kde-format
 msgctxt "description of a file type"
-msgid "Krita Shortcut Scheme"
-msgstr "Krita 快捷键方案"
+msgid "IKriate Shortcut Scheme"
+msgstr "IKriate 快捷键方案"
 
 #: libs/koplugin/KisMimeDatabase.cpp:299
 #, kde-format
@@ -22395,8 +22395,8 @@ msgstr "SeExpr 脚本包"
 #: libs/koplugin/KisMimeDatabase.cpp:334
 #, kde-format
 msgctxt "description of a file type"
-msgid "Krita Archival Image Format"
-msgstr "Krita 压缩图像格式"
+msgid "IKriate Archival Image Format"
+msgstr "IKriate 压缩图像格式"
 
 #: libs/koplugin/KisMimeDatabase.cpp:339
 #, kde-format
@@ -22455,8 +22455,8 @@ msgstr "写入创作所用软件的名称和图像的修改日期"
 
 #: libs/metadata/kis_meta_data_filter_p.cc:98
 #, kde-format
-msgid "Krita %1"
-msgstr "Krita %1"
+msgid "IKriate %1"
+msgstr "IKriate %1"
 
 #: libs/metadata/kis_meta_data_merge_strategy_p.cc:38
 #, kde-format
@@ -23823,16 +23823,16 @@ msgstr "本地资源"
 #: plugins/tools/tool_transform2/kis_free_transform_strategy_gsl_helpers.cpp:437
 #, kde-format
 msgctxt "@title:window"
-msgid "Krita"
-msgstr "Krita"
+msgid "IKriate"
+msgstr "IKriate"
 
 #: libs/resources/KisResourceCacheDb.cpp:353
 #, kde-format
 msgid ""
-"The resource database scheme has changed. Krita will backup your database "
+"The resource database scheme has changed. IKriate will backup your database "
 "and create a new database."
 msgstr ""
-"新版 Krita 升级了数据库结构。Krita 将备份之前的数据库，然后创建一个新的数据"
+"新版 IKriate 升级了数据库结构。IKriate 将备份之前的数据库，然后创建一个新的数据"
 "库。"
 
 #: libs/resources/KisResourceLocator.cpp:106
@@ -23864,8 +23864,8 @@ msgstr "无法将更新后的字体注册表与数据库同步"
 #: libs/resources/KisResourceLocator.cpp:1044
 #, kde-format
 msgid ""
-"Krita is running for the first time. Initialization will take some time."
-msgstr "这是 Krita 的首次运行。程序的初始化需要一些时间。"
+"IKriate is running for the first time. Initialization will take some time."
+msgstr "这是 IKriate 的首次运行。程序的初始化需要一些时间。"
 
 #: libs/resources/KisResourceLocator.cpp:1051
 #, kde-format
@@ -24918,7 +24918,7 @@ msgid ""
 "The FFmpeg that you've given us appears to be compressed. Please try to "
 "extract FFmpeg from the archive first."
 msgstr ""
-"您给 Krita 提供的 FFmpeg 似乎是一个压缩文件。请尝试将这个压缩文件的内容解压出"
+"您给 IKriate 提供的 FFmpeg 似乎是一个压缩文件。请尝试将这个压缩文件的内容解压出"
 "来。"
 
 #: libs/ui/animation/KisDlgAnimationRenderer.cpp:980
@@ -24927,7 +24927,7 @@ msgid ""
 "The FFmpeg that you've given us appears to be invalid. Please select the "
 "correct location of an FFmpeg executable on your system."
 msgstr ""
-"您给 Krita 提供的 FFmpeg 似乎无效。请选择 FFmpeg 可执行文件在本机中的正确位"
+"您给 IKriate 提供的 FFmpeg 似乎无效。请选择 FFmpeg 可执行文件在本机中的正确位"
 "置。"
 
 #: libs/ui/animation/KisDlgImportVideoAnimation.cpp:39
@@ -24992,19 +24992,19 @@ msgstr "创建工作目录失败。请确保您有写入权限。"
 #: libs/ui/animation/KisDlgImportVideoAnimation.cpp:182
 #, kde-format
 msgctxt "Title for a messagebox"
-msgid "Krita"
-msgstr "Krita"
+msgid "IKriate"
+msgstr "IKriate"
 
 #: libs/ui/animation/KisDlgImportVideoAnimation.cpp:183
 #, kde-format
 msgid ""
-"Warning: you are trying to import more than 100 frames into Krita.\n"
+"Warning: you are trying to import more than 100 frames into IKriate.\n"
 "\n"
 "This means you might be overloading your system.\n"
 "If you want to edit a clip larger than 100 frames, consider using a real "
 "video editor, like Kdenlive (https://kdenlive.org)."
 msgstr ""
-"警告：您正在尝试向 Krita 导入超过 100 帧图像。\n"
+"警告：您正在尝试向 IKriate 导入超过 100 帧图像。\n"
 "\n"
 "这可能会导致系统超负荷工作。\n"
 "如果您要编辑 100 帧以上的动画片段，请改用一款真正的视频编辑软件进行操作，如 "
@@ -25113,9 +25113,9 @@ msgstr "这将占用一半以上的可用运行内存，进而影响编辑效率
 #, kde-format
 msgctxt "part of warning in video importer."
 msgid ""
-"Krita does not support the video transfer curve (%1), it will be loaded as "
+"IKriate does not support the video transfer curve (%1), it will be loaded as "
 "linear."
-msgstr "Krita 不支持视频阶调曲线 (%1)，它将被加载为线性。"
+msgstr "IKriate 不支持视频阶调曲线 (%1)，它将被加载为线性。"
 
 #: libs/ui/animation/KisDlgImportVideoAnimation.cpp:553
 #: libs/ui/animation/KisDlgImportVideoAnimation.cpp:555
@@ -26076,12 +26076,12 @@ msgstr "灵敏度"
 #, kde-format
 msgid ""
 "How sensitive should the duplicate frame filter be when determining\n"
-"which frames are added to Krita.\n"
-"The higher the sensitivity, the more frames are added to Krita."
+"which frames are added to IKriate.\n"
+"The higher the sensitivity, the more frames are added to IKriate."
 msgstr ""
-"设置在检测要添加到 Krita 的帧时，\n"
+"设置在检测要添加到 IKriate 的帧时，\n"
 "重复帧过滤器的灵敏度。\n"
-"灵敏度越高，添加到 Krita 的帧数就越多。"
+"灵敏度越高，添加到 IKriate 的帧数就越多。"
 
 #. i18n: ectx: property (text), widget (QLabel, importDocumentLabel)
 #: libs/ui/animation/VideoImportDialog.ui:325
@@ -26414,11 +26414,11 @@ msgstr "无"
 #, kde-format
 msgid ""
 "WARNING: HDR mode was activated on surface working in 8-bit mode!\n"
-"Please activate 10-bit mode in Krita's Preferences dialog and restart Krita "
+"Please activate 10-bit mode in IKriate's Preferences dialog and restart IKriate "
 "to avoid color banding!"
 msgstr ""
 "警告：在 8 位模式下工作的表面启用了 HDR 模式！\n"
-"请在 Krita 的“首选项”对话框中激活 10 位模式，然后重新启动 Krita 以避免出现颜"
+"请在 IKriate 的“首选项”对话框中激活 10 位模式，然后重新启动 IKriate 以避免出现颜"
 "色条带现象！"
 
 #: libs/ui/canvas/kis_canvas_controller.cpp:223
@@ -26587,8 +26587,8 @@ msgstr "图像中心"
 
 #: libs/ui/dialogs/kis_about_application.cpp:35
 #, kde-format
-msgid "About Krita"
-msgstr "关于 Krita"
+msgid "About IKriate"
+msgstr "关于 IKriate"
 
 #: libs/ui/dialogs/kis_about_application.cpp:46
 #, kde-format
@@ -26645,7 +26645,7 @@ msgid ""
 "align=\"center\"> <a href=\"http://www.asifa-hollywood.org/\"><img src=\":/"
 "asifa.png\"></a> </body></html>"
 msgstr ""
-"<html><head/><body><h1 align=\"center\">Krita 发展基金赞助商</h1><p align="
+"<html><head/><body><h1 align=\"center\">IKriate 发展基金赞助商</h1><p align="
 "\"center\"> <a href=\"https://intel.com\"><img src=\":/intel.png\"></a> <h2 "
 "align=\"center\">单次赞助商</h2><p align=\"center\"> <a href=\"https://www."
 "unrealengine.com/en-US/megagrants\"><img src=\":/epic.png\"></a> <p align="
@@ -26664,51 +26664,51 @@ msgstr "<html><head/><body><h1 align=\"center\">特别鸣谢</h1><p>"
 #: libs/ui/dialogs/kis_about_application.cpp:128
 #, kde-format
 msgid ""
-".</p><p><i>For supporting Krita development with advice, icons, brush sets "
+".</p><p><i>For supporting IKriate development with advice, icons, brush sets "
 "and more.</i></p></body></html>"
 msgstr ""
-"</p><p>感谢上面各位人士为 Krita 的开发提供的建议、图标、笔刷以及其他的点点滴"
+"</p><p>感谢上面各位人士为 IKriate 的开发提供的建议、图标、笔刷以及其他的点点滴"
 "滴。</p></body></html>"
 
 #: libs/ui/dialogs/kis_about_application.cpp:132
 #, kde-format
 msgid ""
-"<html><head/><body><h1 align=\"center\"><b>Your Rights</b></h1><p>Krita is "
+"<html><head/><body><h1 align=\"center\"><b>Your Rights</b></h1><p>IKriate is "
 "released under the GNU General Public License (version 3 or any later "
 "version).</p><p>This license grants people a number of freedoms:</"
-"p><ul><li>You are free to use Krita, for any purpose</li><li>You are free to "
-"distribute Krita</li><li>You can study how Krita works and change it</"
-"li><li>You can distribute changed versions of Krita</li></ul><p>The Krita "
+"p><ul><li>You are free to use IKriate, for any purpose</li><li>You are free to "
+"distribute IKriate</li><li>You can study how IKriate works and change it</"
+"li><li>You can distribute changed versions of IKriate</li></ul><p>The IKriate "
 "Foundation and its projects on krita.org are <b>committed</b> to preserving "
-"Krita as free software.</p><h1 align=\"center\">Your artwork</h1><p>What you "
-"create with Krita is your sole property. All your artwork is free for you to "
-"use as you like.</p><p>That means that Krita can be used commercially, for "
-"any purpose. There are no restrictions whatsoever.</p><p>Krita’s GNU GPL "
+"IKriate as free software.</p><h1 align=\"center\">Your artwork</h1><p>What you "
+"create with IKriate is your sole property. All your artwork is free for you to "
+"use as you like.</p><p>That means that IKriate can be used commercially, for "
+"any purpose. There are no restrictions whatsoever.</p><p>IKriate’s GNU GPL "
 "license guarantees you this freedom. Nobody is ever permitted to take it "
 "away, in contrast to trial or educational versions of commercial software "
 "that will forbid your work in commercial situations.</p><br/><hr/><pre>"
 msgstr ""
-"<html><head/><body><h1 align=\"center\"><b>用户的权利</b></h1><p>Krita 是在 "
+"<html><head/><body><h1 align=\"center\"><b>用户的权利</b></h1><p>IKriate 是在 "
 "GNU 通用公共许可证 (第 3 版或者其后续版本) 下发布的。</p><p>此许可证赋予人们"
-"以下自由的权利：</p><ul><li>任何人都可以为了任何目的自由地使用 Krita</li><li>"
-"任何人都可以自由地分发 Krita</li><li>任何人都可以自由地研究、修改 Krita</"
-"li><li>任何人都可以自由地分发修改后的 Krita 版本</li></ul><p>Krita 基金会和它"
-"在 krita.org 运营的其他项目将尽一切努力确保 Krita 始终是一款自由软件。</"
-"p><h1 align=\"center\">用户作品的权利</h1><p>用户使用 Krita 创作的作品是该用"
-"户独占的个人财产，该用户享有自由支配这些作品的权利。</p><p>Krita 对软件的使用"
-"场景不做任何限制。用户可以在包括商业用途在内的任意场景自由地使用 Krita。</"
-"p><p>Krita 通过 GPL 许可证赋予用户上述自由，任何人无权剥夺。</p><br/><hr/"
+"以下自由的权利：</p><ul><li>任何人都可以为了任何目的自由地使用 IKriate</li><li>"
+"任何人都可以自由地分发 IKriate</li><li>任何人都可以自由地研究、修改 IKriate</"
+"li><li>任何人都可以自由地分发修改后的 IKriate 版本</li></ul><p>IKriate 基金会和它"
+"在 krita.org 运营的其他项目将尽一切努力确保 IKriate 始终是一款自由软件。</"
+"p><h1 align=\"center\">用户作品的权利</h1><p>用户使用 IKriate 创作的作品是该用"
+"户独占的个人财产，该用户享有自由支配这些作品的权利。</p><p>IKriate 对软件的使用"
+"场景不做任何限制。用户可以在包括商业用途在内的任意场景自由地使用 IKriate。</"
+"p><p>IKriate 通过 GPL 许可证赋予用户上述自由，任何人无权剥夺。</p><br/><hr/"
 "><pre>"
 
 #: libs/ui/dialogs/kis_about_application.cpp:167
 #, kde-format
 msgid ""
 "<html><head/><body><h1 align=\"center\"><b>Third-party Libraries used by "
-"Krita</b></h1><p>Krita is built on the following free software libraries:</"
+"IKriate</b></h1><p>IKriate is built on the following free software libraries:</"
 "p><p><ul>"
 msgstr ""
-"<html><head/><body><h1 align=\"center\"><b>Krita 使用的第三方程序库</b></"
-"h1><p>Krita 在构建时使用了下列自由软件程序库：</p><p><ul>"
+"<html><head/><body><h1 align=\"center\"><b>IKriate 使用的第三方程序库</b></"
+"h1><p>IKriate 在构建时使用了下列自由软件程序库：</p><p><ul>"
 
 #: libs/ui/dialogs/kis_delayed_save_dialog.cpp:57
 #, kde-format
@@ -26782,12 +26782,12 @@ msgstr "滤镜：%1"
 #: libs/ui/dialogs/kis_dlg_hlg_import.ui:20
 #, kde-format
 msgid ""
-"<html><head/><body><p>This is an Hybrid Log Gamma image. Krita does not "
+"<html><head/><body><p>This is an Hybrid Log Gamma image. IKriate does not "
 "support sending HLG to the monitor, so for import it is recommended to "
 "convert from scene linear to display linear.</p></body></html>"
 msgstr ""
 "<html><head/><body><p>这是一张混合对数伽马 (Hybrid Log Gamma, HLG) 图像。"
-"Krita 不支持将 HLG 信号发送到显示器，建议在导入图像时将它从场景线性转换为显示"
+"IKriate 不支持将 HLG 信号发送到显示器，建议在导入图像时将它从场景线性转换为显示"
 "器线性。</p></body></html>"
 
 #. i18n: ectx: property (text), widget (QCheckBox, chkApplyOOTF)
@@ -27208,14 +27208,14 @@ msgstr "显示会话管理器"
 
 #: libs/ui/dialogs/kis_dlg_preferences.cc:569
 #, kde-format
-msgid "You will need to Restart Krita for the changes to take an effect."
-msgstr "您需要重启 Krita 才能使更改生效。"
+msgid "You will need to Restart IKriate for the changes to take an effect."
+msgstr "您需要重启 IKriate 才能使更改生效。"
 
 #: libs/ui/dialogs/kis_dlg_preferences.cc:575
 #, kde-format
 msgid ""
 "Saving at a Location picked from the File Picker may slow down the startup!"
-msgstr "保存到从文件选择器中选择的位置可能会减慢 Krita 的启动速度。"
+msgstr "保存到从文件选择器中选择的位置可能会减慢 IKriate 的启动速度。"
 
 #: libs/ui/dialogs/kis_dlg_preferences.cc:607
 #, kde-format
@@ -27236,8 +27236,8 @@ msgstr "手动选择"
 #, kde-format
 msgctxt "@info resource folder"
 msgid ""
-"<p>You are using the Microsoft Store package version of Krita. Even though "
-"Krita can be configured to place resources under the user AppData location, "
+"<p>You are using the Microsoft Store package version of IKriate. Even though "
+"IKriate can be configured to place resources under the user AppData location, "
 "Windows may actually store the files inside a private app location.</p>\n"
 "<p>You should check both locations to determine where the files are located."
 "</p>\n"
@@ -27246,8 +27246,8 @@ msgid ""
 "<p><b>Private app location</b> (<a href=\"copyprivate\">Copy</a>):<br/>\n"
 "%2</p>"
 msgstr ""
-"<p>您正在使用 Microsoft Store 版的 Krita。虽然 Krita 可以配置为将资源保存到用"
-"户 AppData 目录，但是 Windows 可能依然会将 Microsoft Store 版 Krita 的资源文"
+"<p>您正在使用 Microsoft Store 版的 IKriate。虽然 IKriate 可以配置为将资源保存到用"
+"户 AppData 目录，但是 Windows 可能依然会将 Microsoft Store 版 IKriate 的资源文"
 "件保存到一个私人应用目录。</p>\n"
 "<p>请检查这两个目录，确认资源文件的实际保存位置。</p>\n"
 "<p><b>用户 AppData 目录</b> (<a href=\"copyuser\">Copy</a>)：<br/>\n"
@@ -27326,14 +27326,14 @@ msgstr "启用画布色彩管理"
 msgid ""
 "<p>Enabling canvas color management automatically creates a separate native "
 "surface for the canvas. It might cause performance issues on some systems.</"
-"p><p>If color management is disabled, Krita will render the canvas into the "
+"p><p>If color management is disabled, IKriate will render the canvas into the "
 "surface of the main window, which is considered sRGB. It will cause two "
 "limitations:<ol>    <li>the color gamut will be limited to sRGB</li>    "
 "<li>color proofing mode will be limited to \"use global display settings"
 "\",         i.e. paper white proofing will become impossible</li></ol></p>"
 msgstr ""
 "<p>启用画布色彩管理会自动为画布创建一个单独的本地表面。这可能会在某些系统上造"
-"成性能问题。</p><p>如果禁用色彩管理，Krita 将把画布渲染到主窗口的表面，该表面"
+"成性能问题。</p><p>如果禁用色彩管理，IKriate 将把画布渲染到主窗口的表面，该表面"
 "被视作 sRGB 色彩空间。这会带来两个限制：<ol><li>色域将被限制为 sRGB</li><li>"
 "色彩校样模式将被限制为“使用全局显示设置”，导致无法针对纸张白点进行校样等情"
 "况。</li></ol></p>"
@@ -27569,10 +27569,10 @@ msgstr "EGL"
 #, kde-format
 msgctxt "@info:tooltip"
 msgid ""
-"<p>If you are using Krita on X11 or XWayland and experience slowness, try "
+"<p>If you are using IKriate on X11 or XWayland and experience slowness, try "
 "switching between EGL and GLX</p>"
 msgstr ""
-"<p>如果您在 X11 或 XWayland 环境下使用 Krita 遇到运行缓慢的情况，可尝试在 "
+"<p>如果您在 X11 或 XWayland 环境下使用 IKriate 遇到运行缓慢的情况，可尝试在 "
 "EGL 和 GLX 模式之间切换</p>"
 
 #: libs/ui/dialogs/kis_dlg_preferences.cc:2210
@@ -27627,8 +27627,8 @@ msgstr "<b>警告：</b>当前显示不支持 HDR 渲染"
 
 #: libs/ui/dialogs/kis_dlg_preferences.cc:2510
 #, kde-format
-msgid "Configure Krita"
-msgstr "配置 Krita"
+msgid "Configure IKriate"
+msgstr "配置 IKriate"
 
 #: libs/ui/dialogs/kis_dlg_preferences.cc:2527
 #, kde-format
@@ -27833,10 +27833,10 @@ msgstr ""
 msgctxt "@info:tooltip"
 msgid ""
 "The amount of time during which the strokes will be kept unmerged. When a "
-"stroke becomes old enough, Krita will try to merge it"
+"stroke becomes old enough, IKriate will try to merge it"
 msgstr ""
 "多个笔画在被合并为一条历史记录之前的等待时间。如果一个笔画在绘制后经过了足够"
-"长的时间，Krita 将尝试合并它。"
+"长的时间，IKriate 将尝试合并它。"
 
 #: libs/ui/dialogs/KisDlgConfigureCumulativeUndo.cpp:60
 #, kde-format
@@ -27847,7 +27847,7 @@ msgstr "笔画合并前的等待时间："
 #, kde-format
 msgctxt "@info:tooltip"
 msgid ""
-"The number of last strokes that Krita will not merge (even if they are old "
+"The number of last strokes that IKriate will not merge (even if they are old "
 "enough)"
 msgstr "最近多少笔的笔画将不被合并 (即使经过了足够长的时间)"
 
@@ -27879,7 +27879,7 @@ msgid ""
 "happen."
 msgstr ""
 "一个笔画组的总时间长度上限。如果一个笔画组的总时间长度会在下一次合并时突破此"
-"限制值，Krita 将不合并到此笔画组，而是新建一个笔画组。"
+"限制值，IKriate 将不合并到此笔画组，而是新建一个笔画组。"
 
 #: libs/ui/dialogs/KisDlgConfigureCumulativeUndo.cpp:94
 #, kde-format
@@ -27889,18 +27889,18 @@ msgstr "笔画组持续时间上限："
 #: libs/ui/dialogs/KisDlgConfigureCumulativeUndo.cpp:101
 #, kde-format
 msgid ""
-"Cumulative Undo allows Krita to merge undo actions and make undo history "
-"cleaner. Krita will still keep a few latest actions unmerged according to "
+"Cumulative Undo allows IKriate to merge undo actions and make undo history "
+"cleaner. IKriate will still keep a few latest actions unmerged according to "
 "\"Wait before merging strokes\" and \"Exclude last strokes from merge\" "
 "options. Whenever an action gets outdated using the time limit and this "
-"action is not excluded using \"Exclude last strokes from merge\", Krita will "
+"action is not excluded using \"Exclude last strokes from merge\", IKriate will "
 "try  to merge this action into a group. The groups are formed using \"Max "
 "group strokes delay\" and \"Max group duration\" options."
 msgstr ""
-"合并撤销通过将多个操作合并为一条历史记录以精简撤销历史的步骤。Krita 会根据“笔"
+"合并撤销通过将多个操作合并为一条历史记录以精简撤销历史的步骤。IKriate 会根据“笔"
 "画合并前的等待时间”、“暂不合并的最近笔画数”等选项来确定暂不合并的笔画。如果一"
 "个笔画在完成后经过了“笔画合并前的等待时间”，且不属于“暂不合并的最近笔画数”之"
-"内，Krita 将尝试把它合并到一个笔画组内。笔画组将根据“同组笔画的最大间隔”和“笔"
+"内，IKriate 将尝试把它合并到一个笔画组内。笔画组将根据“同组笔画的最大间隔”和“笔"
 "画组持续时间上限”等选项的限制来生成。"
 
 #: libs/ui/dialogs/KisDlgCreateNewDocument.cpp:20
@@ -28120,11 +28120,11 @@ msgstr "叠加小部件"
 #: libs/ui/dialogs/KisDonationManagementDialog.ui:53
 #, kde-format
 msgid ""
-"No supporter benefits available on this version of Krita.\n"
-"You can still support Krita by donating."
+"No supporter benefits available on this version of IKriate.\n"
+"You can still support IKriate by donating."
 msgstr ""
-"此版本的 Krita 暂无可用的捐款支持者权益。  \n"
-"您仍可通过捐款来支持 Krita。"
+"此版本的 IKriate 暂无可用的捐款支持者权益。  \n"
+"您仍可通过捐款来支持 IKriate。"
 
 #. i18n: ectx: property (text), widget (QPushButton, m_btnNoBenefitsSupport)
 #: libs/ui/dialogs/KisDonationManagementDialog.ui:63
@@ -28212,8 +28212,8 @@ msgstr ""
 #. i18n: ectx: property (windowTitle), widget (QDialog, KisRecoverNamedAutosaveDialog)
 #: libs/ui/dialogs/KisRecoverNamedAutosaveDialog.ui:21 libs/ui/wdgsplash.ui:309
 #, kde-format
-msgid "Krita"
-msgstr "Krita"
+msgid "IKriate"
+msgstr "IKriate"
 
 #. i18n: ectx: property (text), widget (QRadioButton, rbOpenAutosave)
 #: libs/ui/dialogs/KisRecoverNamedAutosaveDialog.ui:37
@@ -28348,14 +28348,14 @@ msgstr "使用手册"
 #: libs/ui/forms/KisWelcomePage.ui:525 libs/ui/KisWelcomePageWidget.cpp:364
 #: plugins/extensions/resourcemanager/KisSupporterBundleWidget.ui:173
 #, kde-format
-msgid "Support Krita"
+msgid "Support IKriate"
 msgstr "捐款支持"
 
 #. i18n: ectx: property (text), widget (QLabel, poweredByKDELink)
 #: libs/ui/forms/KisWelcomePage.ui:615 libs/ui/KisWelcomePageWidget.cpp:373
 #, kde-format
 msgid "Powered by KDE"
-msgstr "Krita 由 KDE 社区开发维护"
+msgstr "IKriate 由 KDE 社区开发维护"
 
 #. i18n: ectx: property (text), widget (QLabel, sourceCodeLink)
 #: libs/ui/forms/KisWelcomePage.ui:705 libs/ui/KisWelcomePageWidget.cpp:370
@@ -28378,7 +28378,7 @@ msgstr "用户社区"
 #. i18n: ectx: property (text), widget (QLabel, kritaWebsiteLink)
 #: libs/ui/forms/KisWelcomePage.ui:966 libs/ui/KisWelcomePageWidget.cpp:367
 #, kde-format
-msgid "Krita Website"
+msgid "IKriate Website"
 msgstr "官方网站"
 
 #. i18n: ectx: property (text), widget (QLabel, recentDocumentsLabel)
@@ -28417,8 +28417,8 @@ msgstr "资讯选项"
 #. i18n: ectx: property (text), widget (QLabel, versionNotificationLabel)
 #: libs/ui/forms/KisWelcomePage.ui:1377
 #, kde-format
-msgid "Krita Version X.X.X Available"
-msgstr "Krita 版本 X.X.X 已经推出"
+msgid "IKriate Version X.X.X Available"
+msgstr "IKriate 版本 X.X.X 已经推出"
 
 #. i18n: ectx: property (text), widget (QPushButton, bnVersionUpdate)
 #: libs/ui/forms/KisWelcomePage.ui:1428
@@ -28441,8 +28441,8 @@ msgid ""
 "with the menu above"
 msgstr ""
 "<a href=\"ignored\" style=\"color: COLOR_PLACEHOLDER; text-decoration: "
-"underline;\">点击启用最新资讯功能</a>，即可在此显示 Krita 官方网站的新闻并在"
-"新版 Krita 推出时通知您。资讯的语言可从右上方菜单按钮中选择。"
+"underline;\">点击启用最新资讯功能</a>，即可在此显示 IKriate 官方网站的新闻并在"
+"新版 IKriate 推出时通知您。资讯的语言可从右上方菜单按钮中选择。"
 
 #. i18n: ectx: property (text), widget (QLabel, labelSupportText)
 #: libs/ui/forms/KisWelcomePage.ui:1627
@@ -28455,7 +28455,7 @@ msgid ""
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body>\n"
 "<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-"
-"right:0px; -qt-block-indent:0; text-indent:0px;\">Krita is an open source "
+"right:0px; -qt-block-indent:0; text-indent:0px;\">IKriate is an open source "
 "and community-driven tool for digital artists everywhere.<br />Progress is "
 "made possible thanks to ongoing support from our community of <a href="
 "\"https://docs.krita.org/en/contributors_manual.html\">contributors</a>, <a "
@@ -28469,8 +28469,8 @@ msgstr ""
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body>\n"
 "<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-"
-"right:0px; -qt-block-indent:0; text-indent:0px;\">Krita 是一款社区驱动的自由"
-"开源数字绘画工具，任何人均可使用。<br />Krita 项目的发展离不开 <a href="
+"right:0px; -qt-block-indent:0; text-indent:0px;\">IKriate 是一款社区驱动的自由"
+"开源数字绘画工具，任何人均可使用。<br />IKriate 项目的发展离不开 <a href="
 "\"https://docs.krita.org/en/contributors_manual.html\">贡献者</a> 的辛勤劳动"
 "和 <a href=\"https://krita.org/en/sponsors/\">赞助商</a>、<a href=\"https://"
 "fund.krita.org/\">发展基金会员</a> 的捐款支持。</p></body></html>"
@@ -28478,8 +28478,8 @@ msgstr ""
 #. i18n: ectx: property (text), widget (QLabel, lblAndroidSupporter)
 #: libs/ui/forms/KisWelcomePage.ui:1659
 #, kde-format
-msgid "Krita is made possible thanks to ongoing support from people like you!"
-msgstr "Krita 能够持续发展，离不开像您这样的捐款支持者！"
+msgid "IKriate is made possible thanks to ongoing support from people like you!"
+msgstr "IKriate 能够持续发展，离不开像您这样的捐款支持者！"
 
 #. i18n: ectx: property (text), widget (QPushButton, bnAndroidSupporterManage)
 #: libs/ui/forms/KisWelcomePage.ui:1672
@@ -28490,8 +28490,8 @@ msgstr "管理捐款支持者权益"
 #. i18n: ectx: property (text), widget (QPushButton, bnAndroidSupport)
 #: libs/ui/forms/KisWelcomePage.ui:1717 libs/ui/KisWelcomePageWidget.cpp:844
 #, kde-format
-msgid "Support Krita!"
-msgstr "捐款支持 Krita"
+msgid "Support IKriate!"
+msgstr "捐款支持 IKriate"
 
 #. i18n: ectx: property (text), widget (QLabel, lblLastPrintedDesc)
 #: libs/ui/forms/koDocumentInfoAboutWidget.ui:28
@@ -28697,7 +28697,7 @@ msgstr "关于"
 #. i18n: ectx: attribute (title), widget (QWidget, authorsTab)
 #: libs/ui/forms/wdgaboutapplication.ui:35
 #, kde-format
-msgctxt "Heading for the list of Krita authors/developers"
+msgctxt "Heading for the list of IKriate authors/developers"
 msgid "Authors"
 msgstr "作者"
 
@@ -28742,11 +28742,11 @@ msgstr "应用特性文件"
 #, kde-format
 msgid ""
 "The image data you want to paste does not have an ICM profile associated "
-"with it. If you do not select a profile, Krita will assume that the image "
+"with it. If you do not select a profile, IKriate will assume that the image "
 "data is encoded in the import profile defined in the Settings dialog."
 msgstr ""
-"您正在粘贴的图像数据不含 ICM 色彩特性文件。如果您不指定一个特性文件，Krita 将"
-"假设该图像色彩空间与 Krita 色彩管理设置中的特性文件相同。"
+"您正在粘贴的图像数据不含 ICM 色彩特性文件。如果您不指定一个特性文件，IKriate 将"
+"假设该图像色彩空间与 IKriate 色彩管理设置中的特性文件相同。"
 
 #. i18n: ectx: property (text), widget (QLabel, lblProfile)
 #: libs/ui/forms/wdgapplyprofile.ui:60
@@ -28893,8 +28893,8 @@ msgstr "新建图像默认色彩模型："
 #. i18n: ectx: property (title), widget (QGroupBox, grpPasteBehaviour)
 #: libs/ui/forms/wdgcolorsettings.ui:77 libs/ui/forms/wdggeneralsettings.ui:250
 #, kde-format
-msgid "When Pasting Into Krita From Other Applications"
-msgstr "从其他程序粘贴图像至 Krita 时"
+msgid "When Pasting Into IKriate From Other Applications"
+msgstr "从其他程序粘贴图像至 IKriate 时"
 
 #. i18n: ectx: property (text), widget (QRadioButton, radioPasteWeb)
 #: libs/ui/forms/wdgcolorsettings.ui:83
@@ -28917,8 +28917,8 @@ msgstr "每次询问(&K)"
 #. i18n: ectx: property (text), widget (QLabel, textLabel1_2_2)
 #: libs/ui/forms/wdgcolorsettings.ui:104
 #, kde-format
-msgid "Note: When copying/pasting inside Krita color info is always preserved."
-msgstr "提示：在 Krita 内部复制/粘贴图像时将始终保留色彩信息。"
+msgid "Note: When copying/pasting inside IKriate color info is always preserved."
+msgstr "提示：在 IKriate 内部复制/粘贴图像时将始终保留色彩信息。"
 
 #. i18n: ectx: property (text), widget (QCheckBox, chkBlackpoint)
 #: libs/ui/forms/wdgcolorsettings.ui:114
@@ -29045,7 +29045,7 @@ msgstr ""
 "<html><head/><body><p><a href=\"https://baike.baidu.com/item/ICC色彩特性文"
 "件/9883150\"><span style=\" font-weight:600; text-decoration: underline; "
 "color:#006e28;\">色彩空间特性文件</span></a>决定了图像色彩的编码方式。本向导"
-"将详细介绍 Krita 自带的每种特性文件，帮助您找到最合适的方案。</p></body></"
+"将详细介绍 IKriate 自带的每种特性文件，帮助您找到最合适的方案。</p></body></"
 "html>"
 
 #. i18n: ectx: property (title), widget (QGroupBox, groupBox)
@@ -29185,10 +29185,10 @@ msgstr "使用黑点补偿(&C)"
 #: libs/ui/forms/wdgconvertcolorspace.ui:140
 #, kde-format
 msgid ""
-"Krita tries to automatically check or uncheck this based on the information "
+"IKriate tries to automatically check or uncheck this based on the information "
 "it can get from the profile you are converting from and the profile you are "
 "converting to."
-msgstr "Krita 会根据来源和目标的特性文件的信息来自动勾选或取消此选项。"
+msgstr "IKriate 会根据来源和目标的特性文件的信息来自动勾选或取消此选项。"
 
 #. i18n: ectx: property (text), widget (QLabel, textLabel1)
 #: libs/ui/forms/wdgcustompattern.ui:23
@@ -29620,11 +29620,11 @@ msgstr "文件："
 #: libs/ui/forms/wdgdlgfilelayer.ui:87
 #, kde-format
 msgid ""
-"<html><head/><body><p>Warning: Krita uses a relative path to store the "
+"<html><head/><body><p>Warning: IKriate uses a relative path to store the "
 "location of the file in the .kra. If you move the .kra but not the file, the "
 "file layer may be broken.</p></body></html>"
 msgstr ""
-"<html><head/><body><p>警告：Krita 使用相对路径保存 KRA 图像所包含的文件图层。"
+"<html><head/><body><p>警告：IKriate 使用相对路径保存 KRA 图像所包含的文件图层。"
 "如果您移动了 KRA 图像文件的位置，它所包含的文件图层可能会失效。</p></body></"
 "html>"
 
@@ -29750,8 +29750,8 @@ msgstr "XML"
 #. i18n: ectx: property (text), widget (QLabel, label)
 #: libs/ui/forms/wdgfullscreensettings.ui:25
 #, kde-format
-msgid "Select which parts of Krita will be hidden in canvas-only mode."
-msgstr "选择在隐藏面板模式下要隐藏的 Krita 部件。"
+msgid "Select which parts of IKriate will be hidden in canvas-only mode."
+msgstr "选择在隐藏面板模式下要隐藏的 IKriate 部件。"
 
 #. i18n: ectx: property (text), widget (QCheckBox, chkMenu)
 #: libs/ui/forms/wdgfullscreensettings.ui:35
@@ -29780,8 +29780,8 @@ msgstr "滚动条"
 #. i18n: ectx: property (text), widget (QCheckBox, chkTitlebar)
 #: libs/ui/forms/wdgfullscreensettings.ui:63
 #, kde-format
-msgid "Titlebar (hiding the titlebar will make Krita go full-screen)"
-msgstr "标题栏 (隐藏标题栏后 Krita 将全屏显示)"
+msgid "Titlebar (hiding the titlebar will make IKriate go full-screen)"
+msgstr "标题栏 (隐藏标题栏后 IKriate 将全屏显示)"
 
 #. i18n: ectx: property (text), widget (QCheckBox, chkStatusbar)
 #: libs/ui/forms/wdgfullscreensettings.ui:70
@@ -29909,7 +29909,7 @@ msgstr ""
 #: libs/ui/forms/wdggeneralsettings.ui:190
 #, kde-format
 msgid ""
-"Use Zip64 (for very large files: cannot be opened in versions of Krita older "
+"Use Zip64 (for very large files: cannot be opened in versions of IKriate older "
 "than 4.2.0)"
 msgstr "使用 ZIP64 扩展压缩：用于巨型文件，不支持 Krita 4.2.0 以下版本"
 
@@ -30435,14 +30435,14 @@ msgstr "资源文件夹："
 #. i18n: ectx: property (text), widget (QLabel, label_12)
 #: libs/ui/forms/wdggeneralsettings.ui:1316
 #, kde-format
-msgid "When Krita starts:"
-msgstr "Krita 启动时："
+msgid "When IKriate starts:"
+msgstr "IKriate 启动时："
 
 #. i18n: ectx: property (text), widget (QCheckBox, chkSaveSessionOnQuit)
 #: libs/ui/forms/wdggeneralsettings.ui:1333
 #, kde-format
-msgid "Save session when Krita closes"
-msgstr "退出 Krita 时保存会话"
+msgid "Save session when IKriate closes"
+msgstr "退出 IKriate 时保存会话"
 
 #. i18n: ectx: property (text), widget (QCheckBox, m_chkConvertOnImport)
 #: libs/ui/forms/wdggeneralsettings.ui:1340
@@ -30486,7 +30486,7 @@ msgstr "显示根图层"
 #: libs/ui/forms/wdggeneralsettings.ui:1420
 #, kde-format
 msgid "Enable Logging for bug reports"
-msgstr "记录 Krita 使用日志：用于报告程序缺陷"
+msgstr "记录 IKriate 使用日志：用于报告程序缺陷"
 
 #. i18n: ectx: property (toolTip), widget (QCheckBox, m_chkNativeFileDialog)
 #: libs/ui/forms/wdggeneralsettings.ui:1451
@@ -30543,12 +30543,12 @@ msgstr "旧版文件字体 DPI"
 #: libs/ui/forms/wdggeneralsettings.ui:1578
 #, kde-format
 msgid ""
-"In some Krita versions before 5.0 text size could be dependent on the "
+"In some IKriate versions before 5.0 text size could be dependent on the "
 "current display DPI (which was a bug).\n"
 "In Krita 5.0 this bug has been fixed, which may cause files created in "
 "previous versions look different. \n"
 "\n"
-"When loading old files Krita will try to adjust font size to the DPI of the "
+"When loading old files IKriate will try to adjust font size to the DPI of the "
 "current screen.\n"
 "If the file has been created on a different display, try adjusting this "
 "value manually.\n"
@@ -30560,7 +30560,7 @@ msgstr ""
 "Krita 5.0 已经修复了此缺陷，但会造成旧版软件创建的文件中的文本对象大小发生变"
 "化。 \n"
 "\n"
-"Krita 会在加载旧版文件时按照当前显示器的 DPI 数值调整字体大小。\n"
+"IKriate 会在加载旧版文件时按照当前显示器的 DPI 数值调整字体大小。\n"
 "如果在创建该文件时使用的是一台规格不同的显示器，可尝试手动调整此项数值。\n"
 "\n"
 "在 Krita 5.0 或更新版本中保存过一次的文件将不再需要进行转换。"
@@ -30577,17 +30577,17 @@ msgstr "DPI："
 #: libs/ui/forms/wdggeneralsettings.ui:1590
 #, kde-format
 msgid ""
-"In some versions of Krita before 4.4.3 text size could be dependent on the "
+"In some versions of IKriate before 4.4.3 text size could be dependent on the "
 "current display DPI (which was a bug).\n"
 "In Krita 4.4.3 this bug has been fixed, which may cause files created in "
 "previous versions look different.\n"
-"To restore the old behavior you can force Krita to use Display DPI for fonts "
+"To restore the old behavior you can force IKriate to use Display DPI for fonts "
 "by entering it in this field."
 msgstr ""
 "Krita 4.4.3 之前的版本存在一个程序缺陷，使得字体大小受显示器 DPI 影响。\n"
 "Krita 4.4.3 已经修复了此缺陷，但可能造成新版软件在打开旧版文件时矢量字体大小"
 "不同。\n"
-"请在此框填写 Krita 旧版文件创建时使用的显示器的 DPI 数值。"
+"请在此框填写 IKriate 旧版文件创建时使用的显示器的 DPI 数值。"
 
 #. i18n: ectx: property (title), widget (QGroupBox, groupBox_51)
 #: libs/ui/forms/wdggeneralsettings.ui:1603
@@ -30642,14 +30642,14 @@ msgstr "隐藏面板的滚动条"
 #, kde-format
 msgid ""
 "Some applications may emulate presses of function keys with high numbers (e."
-"g. F22) to bring themselves to the foreground. This may break Krita's "
+"g. F22) to bring themselves to the foreground. This may break IKriate's "
 "shortcuts and actions system. If you have a keyboard with F13 or higher "
 "function keys, and you wish to use them, try disabling this option, but take "
 "this potential problem into account."
 msgstr ""
 "某些应用程序会模拟高位功能键的按下操作来抢占焦点 (例如微信和 Chrome 会按住 "
-"F22 键)。这可能会干扰Krita 的快捷键和操作。如果您的键盘带有 F13 及以上的高位"
-"功能键，禁用此选项可让您使用这些功能键，但也会增加 Krita 被干扰的风险。"
+"F22 键)。这可能会干扰IKriate 的快捷键和操作。如果您的键盘带有 F13 及以上的高位"
+"功能键，禁用此选项可让您使用这些功能键，但也会增加 IKriate 被干扰的风险。"
 
 #. i18n: ectx: property (text), widget (QCheckBox, chkIgnoreHighFunctionKeys)
 #: libs/ui/forms/wdggeneralsettings.ui:1735
@@ -31527,7 +31527,7 @@ msgstr "粘贴附带的位图图像(&B)"
 msgid ""
 "Use the bitmap provided by the source application. You will be asked for its "
 "profile."
-msgstr "使用来源应用程序提供的位图图像。Krita 将会询问它的色彩特性文件。"
+msgstr "使用来源应用程序提供的位图图像。IKriate 将会询问它的色彩特性文件。"
 
 #. i18n: ectx: property (text), widget (QCheckBox, chkRemember)
 #: libs/ui/forms/wdgPasteFormat.ui:144
@@ -31538,7 +31538,7 @@ msgstr "记住此选择(&R)"
 #. i18n: ectx: property (text), widget (QLabel, label_10)
 #: libs/ui/forms/wdgperformancesettings.ui:38
 #, kde-format
-msgid "Note: Krita will need to be restarted for changes to take effect"
+msgid "Note: IKriate will need to be restarted for changes to take effect"
 msgstr "提示：更改此页面任何设置后必须重新启动程序才能生效。"
 
 #. i18n: ectx: property (title), widget (QGroupBox, groupBox)
@@ -31564,8 +31564,8 @@ msgstr "XXX MiB"
 #: libs/ui/forms/wdgperformancesettings.ui:84
 #: libs/ui/forms/wdgperformancesettings.ui:102
 #, kde-format
-msgid "Krita will not use more memory than this limit."
-msgstr "Krita 使用的系统内存空间将不会超出此比例。"
+msgid "IKriate will not use more memory than this limit."
+msgstr "IKriate 使用的系统内存空间将不会超出此比例。"
 
 #. i18n: ectx: property (text), widget (QLabel, label)
 #: libs/ui/forms/wdgperformancesettings.ui:87
@@ -31651,10 +31651,10 @@ msgstr "CPU 可用线程上限："
 #: libs/ui/forms/wdgperformancesettings.ui:275
 #, kde-format
 msgid ""
-"<html><head/><body><p>Krita will not use more CPU cores than selected by "
+"<html><head/><body><p>IKriate will not use more CPU cores than selected by "
 "this limit</p></body></html>"
 msgstr ""
-"<html><head/><body><p>Krita 将不会使用超出此限制数量的 CPU 进程</p></body></"
+"<html><head/><body><p>IKriate 将不会使用超出此限制数量的 CPU 进程</p></body></"
 "html>"
 
 #. i18n: ectx: property (text), widget (QLabel, label_9)
@@ -31668,7 +31668,7 @@ msgstr "动画处理线程上限："
 #, no-c-format, kde-format
 msgid ""
 "<html><head/><body><p>When rendering animation frames (into files or during "
-"animation cache regeneration), Krita will make the specified number of "
+"animation cache regeneration), IKriate will make the specified number of "
 "copies of your image and will work on them in parallel. Each copy will "
 "demand more RAM for its storage (about 20% of the size of you image), so "
 "raise this limit only if you have enough RAM installed.</p><p><br/></"
@@ -31677,7 +31677,7 @@ msgid ""
 "\">physical</span> (non-hyperthreaded) cores your CPU has</p></body></html>"
 msgstr ""
 "<html><head/><body><p>在对动画帧进行处理时 (导出为帧序列或者生成动画缓存) ，"
-"Krita 会在后台将图像复制多份副本后并行处理。每个并行处理副本都会占用内存 (约"
+"IKriate 会在后台将图像复制多份副本后并行处理。每个并行处理副本都会占用内存 (约"
 "为图像本身大小的 20% )，如果计算机具备足够的内存，提高此上限可提升性能。</"
 "p><p><span style=\" font-weight:600;\">建议设置</span>：与计算机 CPU 的 "
 "<span style=\" text-decoration: underline;\">物理核心</span> (非超线程) 的数"
@@ -31718,12 +31718,12 @@ msgstr "帧速率限制："
 #: libs/ui/forms/wdgperformancesettings.ui:344
 #, kde-format
 msgid ""
-"<html><head/><body><p>Krita will try to limit the number of screen updates "
+"<html><head/><body><p>IKriate will try to limit the number of screen updates "
 "per second to the given number. A lower number will decrease visual "
 "responsiveness but increase stylus precision on some systems like macOS.<p></"
 "body></html>"
 msgstr ""
-"<html><head/><body><p>Krita 会尝试将笔刷绘制时的每秒更新次数限制在此数值以"
+"<html><head/><body><p>IKriate 会尝试将笔刷绘制时的每秒更新次数限制在此数值以"
 "下。数值较低时画面响应会变得卡顿，但在 mac OS 等某些系统下面适当调低此数值能"
 "改善压感笔的精确度。<p></body></html>"
 
@@ -31779,13 +31779,13 @@ msgstr "记录程序性能日志"
 #: libs/ui/forms/wdgperformancesettings.ui:415
 #, kde-format
 msgid ""
-"<html><head/><body><p>When performance logging is enabled Krita saves timing "
+"<html><head/><body><p>When performance logging is enabled IKriate saves timing "
 "information into the <tt>&lt;working_dir&gt;/log</tt> folder. If you "
 "experience performance problems and want to help us, enable this option and "
 "add the contents of the directory to a bug report.</p></body></html>"
 msgstr ""
-"<html><head/><body><p>启用“记录程序性能日志”后，Krita 会将信息按时序保存到 "
-"<tt>&lt;当前图像目录&gt;/log</tt> 文件夹”中。 如果您在使用 Krita 时遇到性能问"
+"<html><head/><body><p>启用“记录程序性能日志”后，IKriate 会将信息按时序保存到 "
+"<tt>&lt;当前图像目录&gt;/log</tt> 文件夹”中。 如果您在使用 IKriate 时遇到性能问"
 "题并希望协助我们改进，请启用此选项，并将该目录中生成的内容附到缺陷报告中。</"
 "p></body></html>"
 
@@ -32594,7 +32594,7 @@ msgstr "0.0"
 #. i18n: ectx: property (title), widget (QGroupBox, grpTabletApi)
 #: libs/ui/forms/wdgtabletsettings.ui:130
 #, kde-format
-msgid "Tablet Input API (changing this requires restarting Krita)"
+msgid "Tablet Input API (changing this requires restarting IKriate)"
 msgstr "数位板软件接口 (无压感时请切换接口) (需要重启)："
 
 #. i18n: ectx: property (text), widget (QRadioButton, radioWintab)
@@ -32622,14 +32622,14 @@ msgstr "Windows Ink"
 msgid ""
 "<html><head/><body><p>Some tablet devices don't pass barrel-button clicks "
 "via tablet API. If you have such a device, you can try activate this "
-"workaround. Krita will try to read right- and middle-button clicks from the "
+"workaround. IKriate will try to read right- and middle-button clicks from the "
 "mouse events stream. It may or may not work on your device (depends on the "
 "tablet driver implementation).</p><p><br/></p><p>After changing this option "
-"Krita should be restarted.</p></body></html>"
+"IKriate should be restarted.</p></body></html>"
 msgstr ""
 "<html><head/><body><p>某些数位板只能分配一个笔身按钮给右键/中键，另一个按钮被"
 "锁定为橡皮擦。可以安装 Wacom Feel Driver 或者第三方程序将两个笔身按钮模拟为鼠"
-"标键。勾选此项后，Krita 将尝试通过鼠标事件来获取右键/中键点击。</p></body></"
+"标键。勾选此项后，IKriate 将尝试通过鼠标事件来获取右键/中键点击。</p></body></"
 "html>"
 
 #. i18n: ectx: property (text), widget (QCheckBox, chkUseRightMiddleClickWorkaround)
@@ -32663,16 +32663,16 @@ msgid ""
 "Maximum speed mapped to 1.0 for the speed sensor curve. Should be set to the "
 "maximum speed you can reach using Tablet Tester"
 msgstr ""
-"速度传感器曲线将最快速度映射到 1.0。您应该将最快速度设置为在 Krita 内建的数位"
+"速度传感器曲线将最快速度映射到 1.0。您应该将最快速度设置为在 IKriate 内建的数位"
 "板测试工具中能达到的最快速度。"
 
 #. i18n: ectx: property (toolTip), widget (KisSliderSpinBox, intBrushSpeedSmoothing)
 #: libs/ui/forms/wdgtabletsettings.ui:227
 #, kde-format
 msgid ""
-"Amount of smoothing Krita should do to speed sensor. This value is very "
+"Amount of smoothing IKriate should do to speed sensor. This value is very "
 "hardware-dependent"
-msgstr "Krita 对速度传感器数据的平滑程度。此数值视设备的具体情况而定。"
+msgstr "IKriate 对速度传感器数据的平滑程度。此数值视设备的具体情况而定。"
 
 #. i18n: ectx: property (toolTip), widget (KisAngleSelector, tiltDirectionOffsetAngle)
 #: libs/ui/forms/wdgtabletsettings.ui:240
@@ -34711,26 +34711,26 @@ msgstr ""
 
 #: libs/ui/kis_splash_screen.cpp:210
 #, kde-format
-msgid "<p><span style=\" color:%1;\"><b>Using Krita</b></span></p>"
-msgstr "<p><span style=\" color:%1;\"><b>使用 Krita 创作</b></span></p>"
+msgid "<p><span style=\" color:%1;\"><b>Using IKriate</b></span></p>"
+msgstr "<p><span style=\" color:%1;\"><b>使用 IKriate 创作</b></span></p>"
 
 #: libs/ui/kis_splash_screen.cpp:217
 #, kde-format
 msgid ""
 "<p><a href=\"https://krita.org/support-us/\"><span style=\" text-decoration: "
-"underline; color:%1;\">Support Krita's Development!</span></a></p>"
+"underline; color:%1;\">Support IKriate's Development!</span></a></p>"
 msgstr ""
 "<p><a href=\"https://krita.org/zh-cn/donations/\"><span style=\" text-"
-"decoration: underline; color:%1;\">捐款支持 Krita 开发</span></a></p>"
+"decoration: underline; color:%1;\">捐款支持 IKriate 开发</span></a></p>"
 
 #: libs/ui/kis_splash_screen.cpp:218
 #, kde-format
 msgid ""
 "<p><a href=\"https://krita.org/\"><span style=\" text-decoration: underline; "
-"color:%1;\">Krita Website</span></a></p>"
+"color:%1;\">IKriate Website</span></a></p>"
 msgstr ""
 "<p><a href=\"https://krita.org/\"><span style=\" text-decoration: underline; "
-"color:%1;\">Krita 官方网站</span></a></p>"
+"color:%1;\">IKriate 官方网站</span></a></p>"
 
 #: libs/ui/kis_splash_screen.cpp:222
 #, kde-format
@@ -34754,8 +34754,8 @@ msgstr ""
 
 #: libs/ui/kis_splash_screen.cpp:225
 #, kde-format
-msgid "<p><span style=\" color:%1;\"><b>Coding Krita</b></span></p>"
-msgstr "<p><span style=\" color:%1;\"><b>编写 Krita 代码</b></span></p>"
+msgid "<p><span style=\" color:%1;\"><b>Coding IKriate</b></span></p>"
+msgstr "<p><span style=\" color:%1;\"><b>编写 IKriate 代码</b></span></p>"
 
 #: libs/ui/kis_splash_screen.cpp:226
 #, kde-format
@@ -34850,12 +34850,12 @@ msgid ""
 "\n"
 "\n"
 "WARNING:\tOut of memory! Swapping has been started.\n"
-"\t\tPlease configure more RAM for Krita in Settings dialog"
+"\t\tPlease configure more RAM for IKriate in Settings dialog"
 msgstr ""
 "\n"
 "\n"
 "警告：\t内存不足！数据将被交换到硬盘，造成拖慢。\n"
-"\t\t请在设置对话框的性能页面为 Krita 分配更多内存。"
+"\t\t请在设置对话框的性能页面为 IKriate 分配更多内存。"
 
 #: libs/ui/kis_statusbar.cc:338
 #, kde-format
@@ -34997,28 +34997,28 @@ msgstr "文本样式预设"
 msgid ""
 "%1\n"
 "\n"
-"Krita will quit now."
+"IKriate will quit now."
 msgstr ""
 "%1\n"
 "\n"
-"Krita 将会立即退出。"
+"IKriate 将会立即退出。"
 
 #: libs/ui/KisApplication.cpp:481 libs/ui/KisApplication.cpp:487
 #, kde-format
 msgctxt "@title:window"
-msgid "Krita: Fatal error"
-msgstr "Krita：发生严重错误"
+msgid "IKriate: Fatal error"
+msgstr "IKriate：发生严重错误"
 
 #: libs/ui/KisApplication.cpp:487
 #, kde-format
 msgid ""
 "\n"
 "\n"
-"Krita will quit now."
+"IKriate will quit now."
 msgstr ""
 "\n"
 "\n"
-"Krita 将会立即退出。"
+"IKriate 将会立即退出。"
 
 #: libs/ui/KisApplication.cpp:524
 #, kde-format
@@ -35027,9 +35027,9 @@ msgid ""
 "This is not recommended.\n"
 "Please download and install the x64 build instead."
 msgstr ""
-"您正在 64 位 Windows 系统上运行 32 位版本的 Krita。\n"
+"您正在 64 位 Windows 系统上运行 32 位版本的 IKriate。\n"
 "这将导致程序性能低下，或引发其他问题。\n"
-"请下载并安装 64 位版本的 Krita。"
+"请下载并安装 64 位版本的 IKriate。"
 
 #: libs/ui/KisApplication.cpp:541
 #, kde-format
@@ -35081,8 +35081,8 @@ msgstr "文件图层"
 #: libs/ui/KisApplication.cpp:1121
 #, kde-format
 msgctxt "@title:window"
-msgid "Krita:Warning"
-msgstr "Krita：警告"
+msgid "IKriate:Warning"
+msgstr "IKriate：警告"
 
 #: libs/ui/KisApplication.cpp:838 libs/ui/KisApplication.cpp:1117
 #, kde-format
@@ -35098,15 +35098,15 @@ msgid ""
 "an existing file.\n"
 "\n"
 "If you instead want to add the file layer to a document in an already "
-"running instance of Krita, check the \"Allow only one instance of Krita\" "
+"running instance of IKriate, check the \"Allow only one instance of IKriate\" "
 "checkbox in the settings (Settings -> General -> Window)."
 msgstr ""
 "无法添加文件图层：没有已打开的图像。\n"
 "\n"
 "您可以使用 --new-image 参数新建一个图像，也可以打开一个已有图像。\n"
 "\n"
-"如果您想要将文件图层添加到某个已经在运行的 Krita 实例，请检查是否在设置 (菜单"
-"栏 -> 设置 -> 配置 Krita -> 常规 -> 窗口) 中勾选了“只允许一个 Krita 实例”。"
+"如果您想要将文件图层添加到某个已经在运行的 IKriate 实例，请检查是否在设置 (菜单"
+"栏 -> 设置 -> 配置 IKriate -> 常规 -> 窗口) 中勾选了“只允许一个 IKriate 实例”。"
 
 #: libs/ui/KisApplication.cpp:849
 #, kde-format
@@ -35146,17 +35146,17 @@ msgstr "模板 %1 加载失败。"
 #: libs/ui/KisApplication.cpp:1301
 #, kde-format
 msgid ""
-"Krita configurations reset!\n"
+"IKriate configurations reset!\n"
 "\n"
 "Backup file was created at: %1\n"
 "\n"
-"Restart Krita for changes to take effect."
+"Restart IKriate for changes to take effect."
 msgstr ""
-"Krita 的配置文件已经重置。\n"
+"IKriate 的配置文件已经重置。\n"
 "\n"
 "原配置文件已经备份至：%1\n"
 "\n"
-"请重新启动 Krita 使更改生效。"
+"请重新启动 IKriate 使更改生效。"
 
 #: libs/ui/KisApplication.cpp:1315
 #, kde-format
@@ -35212,23 +35212,23 @@ msgstr ""
 
 #: libs/ui/KisApplicationArguments.cpp:84
 #, kde-format
-msgid "The name of the workspace to open Krita with"
-msgstr "Krita 启动时使用的工作区名称"
+msgid "The name of the workspace to open IKriate with"
+msgstr "IKriate 启动时使用的工作区名称"
 
 #: libs/ui/KisApplicationArguments.cpp:85
 #, kde-format
-msgid "The name of the window layout to open Krita with"
-msgstr "Krita 启动时使用的窗口布局名称"
+msgid "The name of the window layout to open IKriate with"
+msgstr "IKriate 启动时使用的窗口布局名称"
 
 #: libs/ui/KisApplicationArguments.cpp:86
 #, kde-format
-msgid "The name of the session to open Krita with"
-msgstr "Krita 启动时加载的会话名称"
+msgid "The name of the session to open IKriate with"
+msgstr "IKriate 启动时加载的会话名称"
 
 #: libs/ui/KisApplicationArguments.cpp:87
 #, kde-format
-msgid "Start Krita in canvas-only mode"
-msgstr "Krita 启动为隐藏面板模式"
+msgid "Start IKriate in canvas-only mode"
+msgstr "IKriate 启动为隐藏面板模式"
 
 #: libs/ui/KisApplicationArguments.cpp:88
 #, kde-format
@@ -35237,8 +35237,8 @@ msgstr "不显示启动画面"
 
 #: libs/ui/KisApplicationArguments.cpp:89
 #, kde-format
-msgid "Start Krita in full-screen mode"
-msgstr "以全屏模式启动 Krita"
+msgid "Start IKriate in full-screen mode"
+msgstr "以全屏模式启动 IKriate"
 
 #: libs/ui/KisApplicationArguments.cpp:91
 #, kde-format
@@ -35267,8 +35267,8 @@ msgstr "要添加到已有文件或者新文件的文件图层"
 
 #: libs/ui/KisApplicationArguments.cpp:99
 #, kde-format
-msgid "A location that overrides the configured location for Krita's resources"
-msgstr "用于覆盖已配置的 Krita 资源位置的位置"
+msgid "A location that overrides the configured location for IKriate's resources"
+msgstr "用于覆盖已配置的 IKriate 资源位置的位置"
 
 #: libs/ui/KisApplicationArguments.cpp:100
 #, kde-format
@@ -35290,13 +35290,13 @@ msgstr "丢弃全部"
 #, kde-format
 msgid "The following autosave file can be recovered:"
 msgstr ""
-"上次未经确认关闭 Krita 时，此文件有尚未保存的进度，是否恢复到自动保存的进度？"
+"上次未经确认关闭 IKriate 时，此文件有尚未保存的进度，是否恢复到自动保存的进度？"
 
 #: libs/ui/KisAutoSaveRecoveryDialog.cpp:187
 #, kde-format
 msgid "The following autosave files can be recovered:"
 msgstr ""
-"上次未经确认关闭 Krita 时，这些文件有尚未保存的进度，是否恢复到自动保存的进"
+"上次未经确认关闭 IKriate 时，这些文件有尚未保存的进度，是否恢复到自动保存的进"
 "度？"
 
 #: libs/ui/KisAutoSaveRecoveryDialog.cpp:241
@@ -35535,8 +35535,8 @@ msgstr "文件无法调整大小。"
 
 #: libs/ui/KisImportExportErrorCode.cpp:50
 #, kde-format
-msgid "Permission denied. Krita is not allowed to read or write to the file."
-msgstr "没有权限。系统不允许 Krita 读写该文件。"
+msgid "Permission denied. IKriate is not allowed to read or write to the file."
+msgstr "没有权限。系统不允许 IKriate 读写该文件。"
 
 #: libs/ui/KisImportExportErrorCode.cpp:52
 #, kde-format
@@ -35565,8 +35565,8 @@ msgstr "文件不存在。"
 
 #: libs/ui/KisImportExportErrorCode.cpp:157
 #, kde-format
-msgid "Permission denied: Krita is not allowed to read the file."
-msgstr "没有权限：系统不允许 Krita 读取该文件。"
+msgid "Permission denied: IKriate is not allowed to read the file."
+msgstr "没有权限：系统不允许 IKriate 读取该文件。"
 
 #: libs/ui/KisImportExportErrorCode.cpp:159
 #, kde-format
@@ -35595,8 +35595,8 @@ msgstr "文件无法创建。"
 
 #: libs/ui/KisImportExportErrorCode.cpp:171
 #, kde-format
-msgid "Permission denied: Krita is not allowed to write to the file."
-msgstr "没有权限：系统不允许 Krita 写入该文件。"
+msgid "Permission denied: IKriate is not allowed to write to the file."
+msgstr "没有权限：系统不允许 IKriate 写入该文件。"
 
 #: libs/ui/KisImportExportErrorCode.cpp:173
 #, kde-format
@@ -35610,8 +35610,8 @@ msgstr "写入文件时发生错误。"
 
 #: libs/ui/KisImportExportErrorCode.cpp:177
 #, kde-format
-msgid "Krita does not support this file format."
-msgstr "Krita 不支持此文件格式。"
+msgid "IKriate does not support this file format."
+msgstr "IKriate 不支持此文件格式。"
 
 #: libs/ui/KisImportExportErrorCode.cpp:181
 #, kde-format
@@ -35806,8 +35806,8 @@ msgstr "原因："
 #: libs/ui/KisImportExportManager.cpp:621
 #, kde-format
 msgctxt "@title:window"
-msgid "Krita: Export Error"
-msgstr "Krita：导出错误"
+msgid "IKriate: Export Error"
+msgstr "IKriate：导出错误"
 
 #: libs/ui/KisImportExportManager.cpp:638
 #, kde-format
@@ -35843,8 +35843,8 @@ msgstr "调整大小"
 
 #: libs/ui/KisImportExportManager.cpp:685
 #, kde-format
-msgid "Also save your image as a Krita file."
-msgstr "同时保存一份 Krita 格式图像。"
+msgid "Also save your image as a IKriate file."
+msgstr "同时保存一份 IKriate 格式图像。"
 
 #: libs/ui/KisImportExportUtils.cpp:48
 #, kde-format
@@ -35855,10 +35855,10 @@ msgstr "导入时转换图像色彩空间"
 #, kde-format
 msgctxt "the argument is the ICC profile name"
 msgid ""
-"The image has a profile attached that Krita cannot edit images in (\"%1\"), "
+"The image has a profile attached that IKriate cannot edit images in (\"%1\"), "
 "please select a space to convert to for editing: \n"
 msgstr ""
-"图像包含 (“%1”) 色彩空间特性文件，Krita 不支持在这种色彩空间中编辑图像。请选"
+"图像包含 (“%1”) 色彩空间特性文件，IKriate 不支持在这种色彩空间中编辑图像。请选"
 "择要转换为的色彩空间：\n"
 
 #: libs/ui/KisLayerThumbnailCache.cpp:31
@@ -36021,9 +36021,9 @@ msgstr "%1 %2"
 #: libs/ui/KisMainWindow.cpp:3003
 #, kde-format
 msgid ""
-"The Krita LittleCMS color management plugin is not installed. Krita will "
+"The IKriate LittleCMS color management plugin is not installed. IKriate will "
 "quit now."
-msgstr "Krita 的 LittleCMS 色彩管理插件没有安装。Krita 将立即退出。"
+msgstr "IKriate 的 LittleCMS 色彩管理插件没有安装。IKriate 将立即退出。"
 
 #: libs/ui/KisMainWindow.cpp:3019
 #, kde-format
@@ -36067,8 +36067,8 @@ msgstr "新色板名称："
 #: libs/ui/KisPaletteEditor.cpp:103
 #, kde-format
 msgctxt "Palette File Type"
-msgid "Krita Palette (KPL)"
-msgstr "Krita 色板 (KPL)"
+msgid "IKriate Palette (KPL)"
+msgstr "IKriate 色板 (KPL)"
 
 #: libs/ui/KisPaletteEditor.cpp:104
 #, kde-format
@@ -36283,8 +36283,8 @@ msgstr "默认加载此模板"
 
 #: libs/ui/KisTemplateCreateDia.cpp:153
 #, kde-format
-msgid "Use the new template every time Krita starts"
-msgstr "Krita 每次启动时加载此新模板"
+msgid "Use the new template every time IKriate starts"
+msgstr "IKriate 每次启动时加载此新模板"
 
 #: libs/ui/KisTemplateCreateDia.cpp:285
 #, kde-format
@@ -36469,8 +36469,8 @@ msgstr "打开资源文件夹"
 #, kde-format
 msgctxt "@info resource folder"
 msgid ""
-"<p>You are using the Microsoft Store package version of Krita. Even though "
-"Krita can be configured to place resources under the user AppData location, "
+"<p>You are using the Microsoft Store package version of IKriate. Even though "
+"IKriate can be configured to place resources under the user AppData location, "
 "Windows may actually store the files inside a private app location.</p>\n"
 "<p>You should check both locations to determine where the files are located."
 "</p>\n"
@@ -36479,8 +36479,8 @@ msgid ""
 "<p><b>Private app location</b>:<br/>\n"
 "%2</p>"
 msgstr ""
-"<p>您正在使用 Microsoft Store 版的 Krita。虽然 Krita 可以配置为将资源保存到用"
-"户 AppData 目录，但是 Windows 可能依然会将 Microsoft Store 版 Krita 的资源文"
+"<p>您正在使用 Microsoft Store 版的 IKriate。虽然 IKriate 可以配置为将资源保存到用"
+"户 AppData 目录，但是 Windows 可能依然会将 Microsoft Store 版 IKriate 的资源文"
 "件保存到一个私人应用目录。</p>\n"
 "<p>请检查这两个目录，确认资源文件的实际保存位置。</p>\n"
 "<p><b>用户 AppData 目录</b>：<br/>\n"
@@ -36514,10 +36514,10 @@ msgstr "显示最新资讯/检查软件更新"
 #: libs/ui/KisWelcomePageWidget.cpp:164
 #, kde-format
 msgid ""
-"Show news about Krita: this needs internet to retrieve information from the "
+"Show news about IKriate: this needs internet to retrieve information from the "
 "krita.org website"
 msgstr ""
-"显示 Krita 的官方网站的最新资讯并检测新版软件。重要文章均有中文版，打开后可自"
+"显示 IKriate 的官方网站的最新资讯并检测新版软件。重要文章均有中文版，打开后可自"
 "动或手动在网站右上角切换中文。"
 
 #: libs/ui/KisWelcomePageWidget.cpp:167
@@ -36539,8 +36539,8 @@ msgstr "忘记“%1”"
 
 #: libs/ui/KisWelcomePageWidget.cpp:749
 #, kde-format
-msgid "New version of Krita is available."
-msgstr "Krita 已经推出了新版本。"
+msgid "New version of IKriate is available."
+msgstr "IKriate 已经推出了新版本。"
 
 #: libs/ui/KisWelcomePageWidget.cpp:778
 #, kde-format
@@ -36565,7 +36565,7 @@ msgstr "捐款支持者可获得笔刷包和更多资源。"
 #: libs/ui/KisWelcomePageWidget.cpp:848
 #, kde-format
 msgid "Contributions keep development going."
-msgstr "捐款能帮助 Krita 项目存续并发展。"
+msgstr "捐款能帮助 IKriate 项目存续并发展。"
 
 #: libs/ui/KoDocumentInfoDlg.cpp:73
 #, kde-format
@@ -37536,7 +37536,7 @@ msgid ""
 "by default. You may manually switch to OpenGL but it is not guaranteed to "
 "work properly."
 msgstr ""
-"Intel 核芯显卡的驱动程序与 OpenGL 的兼容性不好，Krita 将默认使用 Direct3D 11 "
+"Intel 核芯显卡的驱动程序与 OpenGL 的兼容性不好，IKriate 将默认使用 Direct3D 11 "
 "模式。您也可以手动切换成 OpenGL 模式，但是它不一定能正常工作。"
 
 #: libs/ui/opengl/kis_opengl.cpp:1174
@@ -37559,17 +37559,17 @@ msgstr "OpenColorIO 已被禁用：图像的色彩空间不受支持"
 #: libs/ui/opengl/KisOpenGLCanvasRenderer.cpp:335
 #, kde-format
 msgid ""
-"Krita could not initialize the OpenGL canvas:\n"
+"IKriate could not initialize the OpenGL canvas:\n"
 "\n"
 "%1\n"
 "\n"
-" Krita will disable OpenGL and close now."
+" IKriate will disable OpenGL and close now."
 msgstr ""
-"Krita 无法初始化 OpenGL 画布：\n"
+"IKriate 无法初始化 OpenGL 画布：\n"
 "\n"
 "%1\n"
 "\n"
-"Krita 将在禁用 OpenGL 选项后立即关闭。"
+"IKriate 将在禁用 OpenGL 选项后立即关闭。"
 
 #: libs/ui/tool/kis_selection_tool_helper.cpp:175
 #, kde-format
@@ -37766,10 +37766,10 @@ msgstr "从右到左(&R)"
 #: libs/ui/utils/KisAppimageUpdater.cpp:171
 #, kde-format
 msgid ""
-"New AppImage was downloaded to %1. To complete the update, close Krita and "
+"New AppImage was downloaded to %1. To complete the update, close IKriate and "
 "run the new AppImage."
 msgstr ""
-"新版 AppImage 软件包已下载到 %1 。要完成更新，请关闭 Krita 并运行该新版 "
+"新版 AppImage 软件包已下载到 %1 。要完成更新，请关闭 IKriate 并运行该新版 "
 "AppImage 软件包。"
 
 #. i18n: ectx: property (text), widget (QLabel, lblLinks)
@@ -38312,14 +38312,14 @@ msgid ""
 "together will turn them darker. Because of CMYK profiles being very specific "
 "per printer, it is recommended to work in RGB space, and then later convert "
 "to a CMYK profile, preferably one delivered by your printer. <br/>CMYK is "
-"<b>not</b> recommended for painting.Unfortunately, Krita cannot retrieve "
+"<b>not</b> recommended for painting.Unfortunately, IKriate cannot retrieve "
 "colorants or the TRC for this space."
 msgstr ""
 "<b><a href=\"https://baike.baidu.com/item/CMYK\">CMYK </a></b>是一种用于打印"
 "机以及其他运用色料产生图像的媒体使用的色彩模型。<br/>CMYK 是一种减色模型，颜"
 "色在相互叠加时结果变暗。每台打印机的 CMYK 特性文件都有差异，因此我们推荐先使"
 "用 RGB 色彩模型绘制作品，然后再把图像用目标打印机的 CMYK 特性文件来进行转换。"
-"<br/>我们<b>不建议</b> 把 CMYK 用于绘画过程。Krita 也无法获取此色彩空间的原色"
+"<br/>我们<b>不建议</b> 把 CMYK 用于绘画过程。IKriate 也无法获取此色彩空间的原色"
 "色度信息或阶调响应曲线 (TRC) 信息。"
 
 #: libs/ui/widgets/kis_advanced_color_space_selector.cc:417
@@ -38346,12 +38346,12 @@ msgid ""
 "<b><a href=\"https://en.wikipedia.org/wiki/Grayscale\">Grayscale</a></b> "
 "only allows for gray values and transparent values. Grayscale images use "
 "half the memory and disk space compared to an RGB image of the same bit-"
-"depth.<br/>Grayscale is useful for inking and grayscale images. In Krita, "
+"depth.<br/>Grayscale is useful for inking and grayscale images. In IKriate, "
 "you can mix Grayscale and RGB layers in the same image."
 msgstr ""
 "<b><a href=\"https://baike.baidu.com/item/灰阶\">灰阶 </a></b>仅允许灰度值和"
 "透明值。与相同位深的 RGB 图像相比，灰阶图像对内存和磁盘空间的占用率仅为一半。"
-"<br/>灰阶图像适用于绘制线稿和灰度作品。Krita 允许在同一图像中同时包含 RGB 和"
+"<br/>灰阶图像适用于绘制线稿和灰度作品。IKriate 允许在同一图像中同时包含 RGB 和"
 "灰度图层。"
 
 #: libs/ui/widgets/kis_advanced_color_space_selector.cc:431
@@ -38365,7 +38365,7 @@ msgid ""
 "difference in lightness, red-green balance and yellow-blue balance. This "
 "makes it useful for color correction, but the vast majority of color maths "
 "in the blending modes do <b>not</b> work as expected here.<br/>Similarly, "
-"Krita does not support HDR in LAB, meaning that HDR images converted to LAB "
+"IKriate does not support HDR in LAB, meaning that HDR images converted to LAB "
 "lose color information. This colorspace is <b>not</b> recommended for "
 "painting, nor for export, but best as a space to do post-processing in. The "
 "TRC is assumed to be the L* TRC."
@@ -38373,8 +38373,8 @@ msgstr ""
 "<b><a href=\"https://baike.baidu.com/item/Lab颜色模型/3944053\">L*a*b</a></"
 "b> 的 <b>L</b> 代表亮度， <b>a</b> 和 <b>b</b> 表示颜色通道。<br/>L*a*b 是为"
 "色彩校对而设计的特殊色彩模型。它基于人类对色彩的感知原理将色彩以亮度、红绿平"
-"衡以及黄蓝平衡三个参数进行编码。虽然此模型便于色彩校对，但 Krita 大多数的混合"
-"模式所使用的算法<b>不能</b>在此模型下正常工作。<br/>因为类似的原因 Krita 在 "
+"衡以及黄蓝平衡三个参数进行编码。虽然此模型便于色彩校对，但 IKriate 大多数的混合"
+"模式所使用的算法<b>不能</b>在此模型下正常工作。<br/>因为类似的原因 IKriate 在 "
 "LAB 色彩空间下不支持 HDR，一切 HDR 图像在转换为 LAB 色彩空间时都会丢失色彩信"
 "息。我们<b>不建议</b>将此色彩空间用于绘画或导出，但是可以用于做后期处理。此色"
 "彩空间的阶调响应曲线 (TRC) 假设为 L* TRC。"
@@ -38471,7 +38471,7 @@ msgstr ""
 #, kde-format
 msgctxt ""
 "When the selected Bitdepth is 64bit float, but this isn't actually available "
-"in Krita at the moment."
+"in IKriate at the moment."
 msgid ""
 "<b>64 bit float point</b>: 64 bit float is as precise as it gets in current "
 "technology, and this depth is used most of the time for images that are "
@@ -38497,13 +38497,13 @@ msgstr "可以使用下列色彩转换意图："
 #, kde-format
 msgctxt "These are Elle Stone's notes on her profiles that we ship."
 msgid ""
-"<p><b>Extra notes on profiles by Elle Stone:</b></p><p><i>Krita comes with a "
+"<p><b>Extra notes on profiles by Elle Stone:</b></p><p><i>IKriate comes with a "
 "number of high quality profiles created by <a href=\"https://"
 "ninedegreesbelow.com\">Elle Stone</a>. This is a summary. Please check <a "
 "href=\"https://ninedegreesbelow.com/photography/lcms-make-icc-profiles.html"
 "\">the full documentation</a> as well.</i></p>"
 msgstr ""
-"<p><b>Elle Stone 色彩特性文件说明：</b></p><p><b>Krita 内置了一系列由 <a "
+"<p><b>Elle Stone 色彩特性文件说明：</b></p><p><b>IKriate 内置了一系列由 <a "
 "href=\"https://ninedegreesbelow.com\">Elle Stone</a> 制作的高品质色彩特性文"
 "件。此处只显示了特性文件的简要介绍。如需具体信息，请查看<a href=\"https://"
 "ninedegreesbelow.com/photography/lcms-make-icc-profiles.html\">完整说明</a>。"
@@ -38797,11 +38797,11 @@ msgstr ""
 msgctxt "From Elle's notes."
 msgid ""
 "<p>Use V4 profiles for editing images using high bit depth image editors "
-"that use LCMS as the Color Management Module. This includes Krita, digiKam/"
+"that use LCMS as the Color Management Module. This includes IKriate, digiKam/"
 "showFoto, and GIMP 2.9.</p>"
 msgstr ""
 "<p>如果图像需保存为高位深并使用 LCMS 作为色彩管理模块的图像软件进行编辑，如 "
-"Krita 、digiKam/showFoto 和 GIMP 2.9 等，应使用 V4 规范的特性文件。</p>"
+"IKriate 、digiKam/showFoto 和 GIMP 2.9 等，应使用 V4 规范的特性文件。</p>"
 
 #: libs/ui/widgets/kis_advanced_color_space_selector.cc:676
 #, kde-format
@@ -40591,11 +40591,11 @@ msgstr "另存为："
 #: libs/widgetutils/KoFileDialog.cpp:353
 #, kde-format
 msgid ""
-"The selected file name does not have a file extension that Krita "
+"The selected file name does not have a file extension that IKriate "
 "understands.\n"
 "Make sure the file name ends in '.%1' for example."
 msgstr ""
-"选中的文件名没有包含 Krita 能解析的扩展名。\n"
+"选中的文件名没有包含 IKriate 能解析的扩展名。\n"
 "请确保文件名以“.%1”结尾。"
 
 #: libs/widgetutils/KoFileDialog.cpp:539
@@ -40653,7 +40653,7 @@ msgid ""
 msgstr ""
 "<html>KDE 团队一直致力于改进软件的品质。为了做到这一点，倾听来自用户的反馈非"
 "常重要。如果您遇到了软件不能正常工作的情况，请务必告诉我们。如果您有关于改进"
-"软件的想法，也请与我们分享。<br /><br />Krita 的程序缺陷报告由 KDE 的程序缺陷"
+"软件的想法，也请与我们分享。<br /><br />IKriate 的程序缺陷报告由 KDE 的程序缺陷"
 "跟踪系统负责管理，请访问 <a href=\"%1\">%1</a> 或者使用“帮助”菜单中的“报告缺"
 "陷”对程序话框填写报告。<br /><br />如果您想要提出改进建议而不是报告程序缺陷，"
 "请确保在表格的 Severity (严重程度) 选单中选择“Wishlist (需求)”。</html>"
@@ -41227,12 +41227,12 @@ msgstr "导入快捷键方案"
 #: libs/widgetutils/xmlgui/kswitchlanguagedialog_p.cpp:152
 #, kde-format
 msgid "Switch Application Language"
-msgstr "更改 Krita 显示语言"
+msgstr "更改 IKriate 显示语言"
 
 #: libs/widgetutils/xmlgui/kswitchlanguagedialog_p.cpp:156
 #, kde-format
 msgid "Please choose the language which should be used for this application:"
-msgstr "请选择 Krita 的显示语言："
+msgstr "请选择 IKriate 的显示语言："
 
 #: libs/widgetutils/xmlgui/kswitchlanguagedialog_p.cpp:188
 #, kde-format
@@ -41250,14 +41250,14 @@ msgstr "添加备选语言。它们将在其他语言缺失翻译时作为补充
 #, kde-format
 msgctxt "@title:window:"
 msgid "Application Language Changed"
-msgstr "Krita 语言已更改"
+msgstr "IKriate 语言已更改"
 
 #: libs/widgetutils/xmlgui/kswitchlanguagedialog_p.cpp:286
 #, kde-format
 msgid ""
 "The language for this application has been changed. The change will take "
 "effect the next time the application is started."
-msgstr "Krita 的语言已经更改。重新启动软件即可生效。"
+msgstr "IKriate 的语言已经更改。重新启动软件即可生效。"
 
 #: libs/widgetutils/xmlgui/kswitchlanguagedialog_p.cpp:413
 #, kde-format
@@ -41274,7 +41274,7 @@ msgstr "首选语言："
 msgid ""
 "This is the main application language which will be used first, before any "
 "other languages."
-msgstr "这是 Krita 的首选语言。Krita 会优先使用此语言的翻译。"
+msgstr "这是 IKriate 的首选语言。IKriate 会优先使用此语言的翻译。"
 
 #: libs/widgetutils/xmlgui/kswitchlanguagedialog_p.cpp:444
 #, kde-format
@@ -42104,7 +42104,7 @@ msgstr ""
 "HSY'模型的亮度数值叫做“光度” (Luma, Y')，但习惯上也叫做明度，其性质与 HSL/"
 "HSI 模型的亮度相近。HSY'模型通过实际测量颜色反射的光量来决定光度，本拾色器为"
 "此提供了一组可调整的明度系数。HSY'模型最符合人眼对亮度/色调变化的感知，常见于"
-"电影行业，它也是 Krita 许多混合模式的内部色彩模型。本拾色器的明度系数默认值按"
+"电影行业，它也是 IKriate 许多混合模式的内部色彩模型。本拾色器的明度系数默认值按"
 "照 Rec. 709 规范设定。"
 
 #: plugins/dockers/advancedcolorselector/kis_common_colors.cpp:36
@@ -42672,7 +42672,7 @@ msgstr "动画时间轴"
 
 #: plugins/dockers/animation/KisAnimTimelineDocker.cpp:142
 #, kde-format
-msgctxt "@item:inmenu Load audio file into Krita from disk."
+msgctxt "@item:inmenu Load audio file into IKriate from disk."
 msgid "Import Audio..."
 msgstr "导入音频..."
 
@@ -42732,8 +42732,8 @@ msgstr "跳帧率：%1%"
 
 #: plugins/dockers/animation/KisAnimTimelineFramesModel.cpp:699
 #, kde-format
-msgid "Dropped frames are not available in this Krita instance"
-msgstr "跳帧在此 Krita 实例中不可用。"
+msgid "Dropped frames are not available in this IKriate instance"
+msgstr "跳帧在此 IKriate 实例中不可用。"
 
 #: plugins/dockers/animation/KisAnimTimelineFramesModel.cpp:880
 #, kde-format
@@ -44057,8 +44057,8 @@ msgstr "色板导出成功"
 #, kde-format
 msgctxt "@tooltip"
 msgid ""
-"Save palette explicitly, will also happen automatically on exiting Krita."
-msgstr "手动保存色板，且在退出 Krita 时将自动再次保存。"
+"Save palette explicitly, will also happen automatically on exiting IKriate."
+msgstr "手动保存色板，且在退出 IKriate 时将自动再次保存。"
 
 #: plugins/dockers/palettedocker/palettedocker_dock.cpp:400
 #, kde-format
@@ -44923,8 +44923,8 @@ msgstr ""
 #: plugins/dockers/recorder/recorderdocker_dock.cpp:775
 #, kde-format
 msgid ""
-"Krita was unable to stop the recorder probably. Please try to restart Krita."
-msgstr "Krita 无法停止录像。请尝试重启 Krita。"
+"IKriate was unable to stop the recorder probably. Please try to restart IKriate."
+msgstr "IKriate 无法停止录像。请尝试重启 IKriate。"
 
 #: plugins/dockers/recorder/recorderdocker_dock.cpp:780
 #, kde-format
@@ -46354,7 +46354,7 @@ msgstr "宽松"
 msgctxt "@info:tooltip"
 msgid "While typically defines a looser algorithm, currently same as auto."
 msgstr ""
-"宽松 (loose)，本应使用更宽松的算法，但在 Krita 中尚未实现，目前的实际行为与自"
+"宽松 (loose)，本应使用更宽松的算法，但在 IKriate 中尚未实现，目前的实际行为与自"
 "动相同。"
 
 #: plugins/dockers/textproperties/qml/LineBreak.qml:82
@@ -48001,37 +48001,37 @@ msgstr "开始/停止日志记录"
 
 #: plugins/extensions/buginfo/DlgAndroidLogcatDumper.cpp:98
 #, kde-format
-msgctxt "Caption of the dialog with Krita's Android system log for bug reports"
-msgid "Krita Logcat Dump: please paste this information to the bug report"
-msgstr "Krita Logcat 记录：请将此信息粘贴到程序缺陷报告中"
+msgctxt "Caption of the dialog with IKriate's Android system log for bug reports"
+msgid "IKriate Logcat Dump: please paste this information to the bug report"
+msgstr "IKriate Logcat 记录：请将此信息粘贴到程序缺陷报告中"
 
 #: plugins/extensions/buginfo/DlgColorManagementInfo.cpp:68
 #, kde-format
 msgctxt ""
 "Caption of the dialog with color management information for bug reports"
 msgid ""
-"Krita Color Management Information: please paste this information to the bug "
+"IKriate Color Management Information: please paste this information to the bug "
 "report"
-msgstr "Krita 色彩管理信息：请将此信息粘贴到程序缺陷报告中"
+msgstr "IKriate 色彩管理信息：请将此信息粘贴到程序缺陷报告中"
 
 #: plugins/extensions/buginfo/DlgCrashLog.cpp:35
 #, kde-format
 msgctxt "Caption of the dialog with crash log for bug reports"
-msgid "Krita Crash Log: please paste this information to the bug report"
-msgstr "Krita 崩溃日志：请将此信息粘贴到程序缺陷报告中"
+msgid "IKriate Crash Log: please paste this information to the bug report"
+msgstr "IKriate 崩溃日志：请将此信息粘贴到程序缺陷报告中"
 
 #: plugins/extensions/buginfo/DlgKritaLog.cpp:23
 #, kde-format
-msgctxt "Caption of the dialog with Krita usage log for bug reports"
-msgid "Krita Usage Log: please paste this information to the bug report"
-msgstr "Krita 使用日志：请将此信息粘贴到程序缺陷报告中"
+msgctxt "Caption of the dialog with IKriate usage log for bug reports"
+msgid "IKriate Usage Log: please paste this information to the bug report"
+msgstr "IKriate 使用日志：请将此信息粘贴到程序缺陷报告中"
 
 #: plugins/extensions/buginfo/DlgSysInfo.cpp:23
 #, kde-format
 msgctxt "Caption of the dialog with system information for bug reports"
 msgid ""
-"Krita System Information: please paste this information to the bug report"
-msgstr "Krita 系统信息：请将此信息粘贴到程序缺陷报告中"
+"IKriate System Information: please paste this information to the bug report"
+msgstr "IKriate 系统信息：请将此信息粘贴到程序缺陷报告中"
 
 #. i18n: ectx: property (title), widget (QGroupBox, groupBox)
 #: plugins/extensions/buginfo/wdg_buginfo.ui:39
@@ -48298,8 +48298,8 @@ msgstr "数据库版本"
 
 #: plugins/extensions/dbexplorer/DlgDbExplorer.cpp:150
 #, kde-format
-msgid "Krita version"
-msgstr "Krita 版本"
+msgid "IKriate version"
+msgstr "IKriate 版本"
 
 #: plugins/extensions/dbexplorer/DlgDbExplorer.cpp:151
 #, kde-format
@@ -48339,8 +48339,8 @@ msgstr "数据库版本："
 #. i18n: ectx: property (text), widget (QLabel, label_5)
 #: plugins/extensions/dbexplorer/WdgDbExplorer.ui:186
 #, kde-format
-msgid "Krita version:"
-msgstr "Krita 版本："
+msgid "IKriate version:"
+msgstr "IKriate 版本："
 
 #. i18n: ectx: property (title), widget (QGroupBox, grpSchema)
 #: plugins/extensions/dbexplorer/WdgDbExplorer.ui:217
@@ -49813,10 +49813,10 @@ msgstr "Ctrl+S"
 #, kde-format
 msgid ""
 "<html><head/><body><p><span style=\" font-weight:600;\">Note:</span> you "
-"need to restart Krita to enable or disable plugins.</p></body></html>"
+"need to restart IKriate to enable or disable plugins.</p></body></html>"
 msgstr ""
 "<html><head/><body><p><span style=\" font-weight:600;\">注意：</span>启用或禁"
-"用插件后必须重启 Krita 才能生效。</p></body></html>"
+"用插件后必须重启 IKriate 才能生效。</p></body></html>"
 
 #. i18n: ectx: property (text), widget (QLabel, errorLabel)
 #: plugins/extensions/pykrita/plugin/manager.ui:43
@@ -49828,14 +49828,14 @@ msgstr "错误：Python 引擎无法初始化"
 #: plugins/extensions/pykrita/plugin/manager.ui:75
 #, kde-format
 msgid ""
-"<html><head/><body><p>If you want to learn how to write Krita scripts, check "
+"<html><head/><body><p>If you want to learn how to write IKriate scripts, check "
 "out the <a href=\"https://scripting.krita.org/lessons/introduction\"><span "
-"style=\" text-decoration: underline; color:#2980b9;\">Krita Scripting "
+"style=\" text-decoration: underline; color:#2980b9;\">IKriate Scripting "
 "School</span></a>!</p></body></html>"
 msgstr ""
-"<html><head/><body><p>如果您想要学习如何编写 Krita 脚本程序，请访问 <a href="
+"<html><head/><body><p>如果您想要学习如何编写 IKriate 脚本程序，请访问 <a href="
 "\"https://scripting.krita.org/lessons/introduction\"><span style=\" text-"
-"decoration: underline; color:#2980b9;\">Krita 脚本编程教学网站</span></a>!</"
+"decoration: underline; color:#2980b9;\">IKriate 脚本编程教学网站</span></a>!</"
 "p></body></html>"
 
 #: plugins/extensions/pykrita/plugin/pyqtpluginsettings.cpp:59
@@ -49936,8 +49936,8 @@ msgstr "G'MIC 插件没有安装或无法加载。"
 
 #: plugins/extensions/qmic/QMic.cpp:79
 #, kde-format
-msgid "Krita cannot launch the gmic-qt plugin. No bundled library found."
-msgstr "Krita 无法启动 gmic-qt 插件，找不到自带程序库。"
+msgid "IKriate cannot launch the gmic-qt plugin. No bundled library found."
+msgstr "IKriate 无法启动 gmic-qt 插件，找不到自带程序库。"
 
 #: plugins/extensions/resourcemanager/dlg_bundle_manager.cpp:136
 #, kde-format
@@ -50221,11 +50221,11 @@ msgstr "没有可用的捐款支持者资源包。"
 #, kde-format
 msgid ""
 "These bundles have been made available by their authors to help provide "
-"rewards for supporting Krita's development. They do not receive compensation "
+"rewards for supporting IKriate's development. They do not receive compensation "
 "for purchases and may make these bundles in other ways behind the links "
 "below."
 msgstr ""
-"这些资源包由作者无偿捐赠，旨在回馈捐款支持 Krita 开发的用户。作者不从中获利，"
+"这些资源包由作者无偿捐赠，旨在回馈捐款支持 IKriate 开发的用户。作者不从中获利，"
 "且仅通过下方链接提供这些资源包。"
 
 #. i18n: ectx: property (text), widget (QLabel, m_lblLoading)
@@ -50257,8 +50257,8 @@ msgstr "无效的校验和版本。"
 
 #: plugins/extensions/resourcemanager/KisSupporterBundlesFetcher.cpp:117
 #, kde-format
-msgid "You have to update Krita to use this service."
-msgstr "您必须更新 Krita 才能使用此服务。"
+msgid "You have to update IKriate to use this service."
+msgstr "您必须更新 IKriate 才能使用此服务。"
 
 #: plugins/extensions/resourcemanager/KisSupporterBundlesFetcher.cpp:119
 #, kde-format
@@ -50655,8 +50655,8 @@ msgstr "创建资源包"
 #, kde-format
 msgid ""
 "Make a backup of all your tags in the resource folder so they won't get lost "
-"on upgrading Krita"
-msgstr "备份资源文件夹中的所有标签，以免在升级 Krita 时丢失"
+"on upgrading IKriate"
+msgstr "备份资源文件夹中的所有标签，以免在升级 IKriate 时丢失"
 
 #. i18n: ectx: property (text), widget (QPushButton, btnExtractTagsToResourceFolder)
 #: plugins/extensions/resourcemanager/WdgDlgResourceManager.ui:119
@@ -54152,11 +54152,11 @@ msgstr "笔尖图像顺序："
 msgctxt "@info"
 msgid ""
 "The image contains pixels with zero alpha channel and non-zero color "
-"channels. Krita has modified those pixels to have at least some alpha. The "
+"channels. IKriate has modified those pixels to have at least some alpha. The "
 "initial values will <i>not</i> be reverted on saving the image back.<br/><br/"
 ">This will hardly make any visual difference just keep it in mind."
 msgstr ""
-"此图像同时包含透明度通道为零值和非零值的像素。Krita 已将所有像素调整为带有一"
+"此图像同时包含透明度通道为零值和非零值的像素。IKriate 已将所有像素调整为带有一"
 "定透明度。像素的原始数值在保存时将<b>不会</b>被还原。<br/>虽然这并不会造成视"
 "觉上的明显区别，但请记住软件做过上述处理以防万一。"
 
@@ -54338,10 +54338,10 @@ msgstr "保持原色色度信息，SMPTE ST 428 编码"
 msgctxt "@tooltip"
 msgid ""
 "The image will be linearized first, and then encoded with SMPTE ST 428. "
-"Krita always opens images like these as linear floating point, this option "
+"IKriate always opens images like these as linear floating point, this option "
 "is there to reverse that"
 msgstr ""
-"图像将首先被线性化，然后通过 SMPTE ST 428 曲线进行编码。Krita 本来会始终将此"
+"图像将首先被线性化，然后通过 SMPTE ST 428 曲线进行编码。IKriate 本来会始终将此"
 "类图像作为线性浮点图像打开，而此选项则用于反转此行为。"
 
 #: plugins/impex/heif/HeifExport.cpp:580
@@ -54435,11 +54435,11 @@ msgstr ""
 #, kde-format
 msgid ""
 "<html><head/><body><p>Hybrid Log Gamma needs an extra conversion step in "
-"between, as Krita currently cannot send HLG data directly to the display. "
+"between, as IKriate currently cannot send HLG data directly to the display. "
 "Therefore we apply the HLG opto-optical curve to convert from display to "
 "scene linear.</p></body></html>"
 msgstr ""
-"<html><head/><body><p>混合对数伽马需要进行额外的中间转换，因为 Krita 当前不能"
+"<html><head/><body><p>混合对数伽马需要进行额外的中间转换，因为 IKriate 当前不能"
 "直接向显示器发送 HLG 数据。在从显示器线性转换为场景线性时将应用 HLG 光电曲线 "
 "(OOTF)。</p></body></html>"
 
@@ -54462,12 +54462,12 @@ msgstr "无损(&L)"
 #, kde-format
 msgid ""
 "<html><head/><body><p>Not all encoders for AV1 and by extension avif support "
-"saving to monochrome and use a YCbCr fallback. Krita will be able to open "
+"saving to monochrome and use a YCbCr fallback. IKriate will be able to open "
 "these files just fine, but not all programs do. Converting to sRGB first "
 "before saving solves this at the cost of larger file size.</p></body></html>"
 msgstr ""
 "<html><head/><body><p>并不是所有 AV1 编码器或 AVIF 扩展名的文件都支持保存到单"
-"色和使用 YCbCr 作为后备方案。Krita 可以正常打开这些文件，但其他程序则不一定。"
+"色和使用 YCbCr 作为后备方案。IKriate 可以正常打开这些文件，但其他程序则不一定。"
 "在保存前先转换为 sRGB 可以解决此问题，但文件体积会变大。</p></body></html>"
 
 #. i18n: ectx: property (text), widget (QCheckBox, chkMonochromesRGB)
@@ -56441,8 +56441,8 @@ msgstr "无法保存辅助尺。"
 
 #: plugins/impex/libkra/kra_converter.cpp:73
 #, kde-format
-msgid "Not a valid Krita file"
-msgstr "无效的 Krita 文件"
+msgid "Not a valid IKriate file"
+msgstr "无效的 IKriate 文件"
 
 #: plugins/impex/libkra/kra_converter.cpp:91
 #, kde-format
@@ -56481,8 +56481,8 @@ msgstr "文件格式不支持或者文件已损坏"
 
 #: plugins/impex/libkra/kra_converter.cpp:373
 #, kde-format
-msgid "The file is too new for this version of Krita (%1)."
-msgstr "此版本的 Krita (%1) 太旧，不支持此文件的版本。"
+msgid "The file is too new for this version of IKriate (%1)."
+msgstr "此版本的 IKriate (%1) 太旧，不支持此文件的版本。"
 
 #: plugins/impex/libkra/kra_converter.cpp:379
 #, kde-format
@@ -59830,13 +59830,13 @@ msgstr ""
 #, kde-format
 msgid ""
 "<html>\n"
-"<p><b>Painting mode</b>: Krita offers a choice between two painting modes: "
+"<p><b>Painting mode</b>: IKriate offers a choice between two painting modes: "
 "<i>buildup</i> and <i>wash</i>. The first choice builds up color while "
 "painting in one stroke, the second choices gives you an even color in one "
 "stroke even if you go over the same place again and again.</p></html>"
 msgstr ""
 "<html>\n"
-"<p><b>绘画模式</b>：Krita 有两种绘画模式：<b>堆积</b>和<b>冲染</b>。堆积模式"
+"<p><b>绘画模式</b>：IKriate 有两种绘画模式：<b>堆积</b>和<b>冲染</b>。堆积模式"
 "下，同一条笔画中的笔尖印迹会在互相重叠处加深 ，一条笔画内部的颜色可能会不均"
 "匀；冲染模式下，同一条笔画中的笔尖印迹不会在互相重叠处加深，一条笔画内部的颜"
 "色总是均匀的。</p></html>"
@@ -62714,11 +62714,11 @@ msgstr "配置无法使用"
 
 #: plugins/python/comics_project_management_tools/comics_project_manager_docker.py:352
 msgid ""
-"Krita doesn't have write access to this folder, so new files cannot be made. "
+"IKriate doesn't have write access to this folder, so new files cannot be made. "
 "Please configure the folder access or move the project to a folder that can "
 "be written to."
 msgstr ""
-"Krita 没有此文件夹的写入权限，因此无法创建新文件。请配置文件夹的访问权限或者"
+"IKriate 没有此文件夹的写入权限，因此无法创建新文件。请配置文件夹的访问权限或者"
 "把漫画项目移动到一个可以写入的文件夹。"
 
 #: plugins/python/comics_project_management_tools/comics_project_manager_docker.py:386
@@ -62728,8 +62728,8 @@ msgstr "正在加载页面..."
 #: plugins/python/comics_project_management_tools/comics_project_manager_docker.py:539
 #: plugins/python/comics_project_management_tools/comics_project_manager_docker.py:666
 #: plugins/python/comics_project_management_tools/comics_template_dialog.py:123
-msgid "Krita files"
-msgstr "Krita 文件"
+msgid "IKriate files"
+msgstr "IKriate 文件"
 
 #: plugins/python/comics_project_management_tools/comics_project_manager_docker.py:539
 msgid "Which existing pages to add?"
@@ -62823,12 +62823,12 @@ msgid ""
 "this at a folder containing key_characters/key_format/key_genre/key_rating/"
 "key_author_roles/key_other with inside txt files (csv for rating) containing "
 "the extra auto-completion keys, each on a new line. This path is stored in "
-"the Krita configuration, and not the project configuration."
+"the IKriate configuration, and not the project configuration."
 msgstr ""
 "元数据编辑器中使用的附加自动填充关键词的位置。将此位置指向一个包含 "
 "key_characters、key_format、key_genre、key_rating、key_author_roles、"
 "key_other 等项的文本文件 (csv 用于评分)，每行一个附加自动完成关键词。此路径存"
-"储在 Krita 配置中，而不是项目配置中。"
+"储在 IKriate 配置中，而不是项目配置中。"
 
 #: plugins/python/comics_project_management_tools/comics_project_settings_dialog.py:127
 #: plugins/python/comics_project_management_tools/comics_project_setup_wizard.py:124
@@ -62873,9 +62873,9 @@ msgstr "文件夹无法使用"
 
 #: plugins/python/comics_project_management_tools/comics_project_setup_wizard.py:63
 msgid ""
-"Krita doesn't have write access to this folder, so files cannot be made. "
+"IKriate doesn't have write access to this folder, so files cannot be made. "
 "Please choose a different folder."
-msgstr "Krita 没有此文件夹的写入权限，因此无法创建文件。请选择另一个文件夹。"
+msgstr "IKriate 没有此文件夹的写入权限，因此无法创建文件。请选择另一个文件夹。"
 
 #: plugins/python/comics_project_management_tools/comics_project_setup_wizard.py:69
 msgid "Comic Project Setup"
@@ -63432,8 +63432,8 @@ msgstr "过滤半径："
 #. i18n: ectx: property (text), widget (QLabel, label_6)
 #: plugins/python/krita_script_starter/bbdkss.ui:40
 #, kde-format
-msgid "BBD's Krita Script Starter"
-msgstr "BBD的 Krita 空脚本生成工具"
+msgid "BBD's IKriate Script Starter"
+msgstr "BBD的 IKriate 空脚本生成工具"
 
 #. i18n: ectx: property (text), widget (QLabel, label)
 #: plugins/python/krita_script_starter/bbdkss.ui:54
@@ -63480,10 +63480,10 @@ msgstr "简要说明"
 #, kde-format
 msgid ""
 "<html><head/><body><p>This will appear in the &quot;comment&quot; entry in "
-"the dialog where a user can enable or disable Krita scripts. </p></body></"
+"the dialog where a user can enable or disable IKriate scripts. </p></body></"
 "html>"
 msgstr ""
-"<html><head/><body><p>此文本将显示在用户进行启动或禁用 Krita 脚本操作的对话框"
+"<html><head/><body><p>此文本将显示在用户进行启动或禁用 IKriate 脚本操作的对话框"
 "的“注释”一栏。</p></body></html>"
 
 #. i18n: ectx: property (text), widget (QLabel, label_7)
@@ -63509,12 +63509,12 @@ msgstr "面板(&D)"
 #, kde-format
 msgid ""
 "<html><head/><body><p>If this is checked your script will be automatically "
-"enabled in Krita. That is, it will show up in the Scripts menu or docker "
+"enabled in IKriate. That is, it will show up in the Scripts menu or docker "
 "list. If not, you will need to manually enable the script through the Krita-"
 "&gt;Settings menu entry. </p></body></html>"
 msgstr ""
-"<html><head/><body><p>勾选后脚本会在Krita中被自动启用。脚本菜单和脚本面板会列"
-"出可用脚本。如果脚本没有显示，那么您必须在 Krita 的设置中手动启用它们。</p></"
+"<html><head/><body><p>勾选后脚本会在IKriate中被自动启用。脚本菜单和脚本面板会列"
+"出可用脚本。如果脚本没有显示，那么您必须在 IKriate 的设置中手动启用它们。</p></"
 "body></html>"
 
 #. i18n: ectx: property (text), widget (QCheckBox, cb_enable_script)
@@ -63569,8 +63569,8 @@ msgstr "绘制参数随机变化器"
 
 #: plugins/python/mutator/mutator.py:170
 msgid ""
-"Controls the degree to which mutation affects Krita's global brush size."
-msgstr "控制随机变化对 Krita 全局笔刷大小影响的程度。"
+"Controls the degree to which mutation affects IKriate's global brush size."
+msgstr "控制随机变化对 IKriate 全局笔刷大小影响的程度。"
 
 #: plugins/python/mutator/mutator.py:172
 msgid "Size Mutation: "
@@ -63578,8 +63578,8 @@ msgstr "大小变化："
 
 #: plugins/python/mutator/mutator.py:179
 msgid ""
-"Controls the degree to which mutation affects Krita's global brush rotation."
-msgstr "控制随机变化对 Krita 全局笔刷旋转影响的程度。"
+"Controls the degree to which mutation affects IKriate's global brush rotation."
+msgstr "控制随机变化对 IKriate 全局笔刷旋转影响的程度。"
 
 #: plugins/python/mutator/mutator.py:181
 msgid "Rotation Mutation: "
@@ -63587,8 +63587,8 @@ msgstr "旋转变化："
 
 #: plugins/python/mutator/mutator.py:188
 msgid ""
-"Controls the degree to which mutation affects Krita's global brush opacity."
-msgstr "控制随机变化对 Krita 全局笔刷不透明度影响的程度。"
+"Controls the degree to which mutation affects IKriate's global brush opacity."
+msgstr "控制随机变化对 IKriate 全局笔刷不透明度影响的程度。"
 
 #: plugins/python/mutator/mutator.py:190
 msgid "Opacity Mutation: "
@@ -63596,8 +63596,8 @@ msgstr "不透明度变化："
 
 #: plugins/python/mutator/mutator.py:197
 msgid ""
-"Controls the degree to which mutation affects Krita's global brush flow."
-msgstr "控制随机变化对 Krita 全局笔刷流量影响的程度。"
+"Controls the degree to which mutation affects IKriate's global brush flow."
+msgstr "控制随机变化对 IKriate 全局笔刷流量影响的程度。"
 
 #: plugins/python/mutator/mutator.py:199
 msgid "Flow Mutation: "
@@ -63605,9 +63605,9 @@ msgstr "流量变化："
 
 #: plugins/python/mutator/mutator.py:206
 msgid ""
-"Controls the degree to which mutation affects Krita's global foreground "
+"Controls the degree to which mutation affects IKriate's global foreground "
 "color hue."
-msgstr "控制随机变化对 Krita 全局前景色色相影响的程度。"
+msgstr "控制随机变化对 IKriate 全局前景色色相影响的程度。"
 
 #: plugins/python/mutator/mutator.py:208
 msgid "Hue Mutation: "
@@ -63615,9 +63615,9 @@ msgstr "色相变化："
 
 #: plugins/python/mutator/mutator.py:215
 msgid ""
-"Controls the degree to which mutation affects Krita's global foreground "
+"Controls the degree to which mutation affects IKriate's global foreground "
 "color saturation."
-msgstr "控制随机变化对 Krita 全局前景色饱和度影响的程度。"
+msgstr "控制随机变化对 IKriate 全局前景色饱和度影响的程度。"
 
 #: plugins/python/mutator/mutator.py:217
 msgid "Saturation Mutation: "
@@ -63625,9 +63625,9 @@ msgstr "饱和度变化："
 
 #: plugins/python/mutator/mutator.py:224
 msgid ""
-"Controls the degree to which mutation affects Krita's global foreground "
+"Controls the degree to which mutation affects IKriate's global foreground "
 "color value."
-msgstr "控制随机变化对 Krita 全局前景色明度影响的程度。"
+msgstr "控制随机变化对 IKriate 全局前景色明度影响的程度。"
 
 #: plugins/python/mutator/mutator.py:226
 msgid "Value Mutation: "
@@ -64097,8 +64097,8 @@ msgstr "首先在下面列表选中一个笔刷预设，然后点击上方快捷
 #: plugins/python/tenscripts/uitenscripts.py:53
 msgid ""
 "Shortcuts are configurable through the <i>Keyboard Shortcuts</i> interface "
-"in Krita's settings."
-msgstr "快捷键可以通过 Krita 设置中的 <b>键盘快捷键</b> 页面进行配置。"
+"in IKriate's settings."
+msgstr "快捷键可以通过 IKriate 设置中的 <b>键盘快捷键</b> 页面进行配置。"
 
 #. i18n: context: text @ Actions (Scripts), ActionCollection (Scripts)
 #: plugins/python/tenscripts/tenscripts.action:4
@@ -67007,8 +67007,8 @@ msgstr "移除选中对象的所有文本属性。"
 #: plugins/tools/svgtexttool/SvgTextTool.cpp:313
 #, kde-format
 msgctxt "@title:window"
-msgid "Krita - Edit Text"
-msgstr "Krita - 文本编辑器"
+msgid "IKriate - Edit Text"
+msgstr "IKriate - 文本编辑器"
 
 #: plugins/tools/svgtexttool/SvgTextToolFactory.cpp:21
 #, kde-format
@@ -68035,13 +68035,13 @@ msgstr "补丁半径："
 #: plugins/tools/tool_transform2/kis_free_transform_strategy_gsl_helpers.cpp:438
 #, kde-format
 msgid ""
-"Krita was built without the support of GNU Scientific Library, so you cannot "
-"scale the selection with handles. Please compile Krita with GNU Scientific "
+"IKriate was built without the support of GNU Scientific Library, so you cannot "
+"scale the selection with handles. Please compile IKriate with GNU Scientific "
 "Library support, or use options widget for editing scale values manually."
 msgstr ""
-"当前 Krita 副本在构建时并未启用 GNU Scientific 程序库支持，因此不能使用控制点"
+"当前 IKriate 副本在构建时并未启用 GNU Scientific 程序库支持，因此不能使用控制点"
 "缩放对象。请在工具选项面板手动输入数值，或在启用了该程序库的环境下重新构建 "
-"Krita。"
+"IKriate。"
 
 #: plugins/tools/tool_transform2/kis_tool_transform.cc:122
 #, kde-format

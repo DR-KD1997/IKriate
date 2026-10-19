@@ -49,12 +49,12 @@ QIcon KisColorSpaceSelectorPlugin::icon() const
 
 QString KisColorSpaceSelectorPlugin::toolTip() const
 {
-    return tr("Krita widget for selecting color spaces.");
+    return tr("IKriate widget for selecting color spaces.");
 }
 
 QString KisColorSpaceSelectorPlugin::whatsThis() const
 {
-    return tr("Krita widget for selecting color spaces.");
+    return tr("IKriate widget for selecting color spaces.");
 }
 
 bool KisColorSpaceSelectorPlugin::isContainer() const

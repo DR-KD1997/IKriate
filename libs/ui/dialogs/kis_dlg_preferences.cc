@@ -566,7 +566,7 @@ GeneralTab::GeneralTab(QWidget *_parent, const char *_name)
 
     grpRestartMessage->setPixmap(
         grpRestartMessage->style()->standardIcon(QStyle::SP_MessageBoxWarning).pixmap(QSize(32, 32)));
-    grpRestartMessage->setText(i18n("You will need to Restart Krita for the changes to take an effect."));
+    grpRestartMessage->setText(i18n("You will need to Restart IKriate for the changes to take an effect."));
 
     grpAndroidWarningMessage->setVisible(false);
     grpAndroidWarningMessage->setPixmap(
@@ -709,8 +709,8 @@ GeneralTab::GeneralTab(QWidget *_parent, const char *_name)
             grpWindowsAppData->style()->standardIcon(QStyle::SP_MessageBoxInformation).pixmap(QSize(32, 32)));
         // Similar text is also used in KisViewManager.cpp
         grpWindowsAppData->setText(i18nc("@info resource folder",
-                                         "<p>You are using the Microsoft Store package version of Krita. "
-                                         "Even though Krita can be configured to place resources under the "
+                                         "<p>You are using the Microsoft Store package version of IKriate. "
+                                         "Even though IKriate can be configured to place resources under the "
                                          "user AppData location, Windows may actually store the files "
                                          "inside a private app location.</p>\n"
                                          "<p>You should check both locations to determine where "
@@ -1336,7 +1336,7 @@ ColorSettingsTab::ColorSettingsTab(QWidget *parent, const char *name)
                  "a separate native surface for the canvas. It might cause "
                  "performance issues on some systems.</p>"
                  ""
-                 "<p>If color management is disabled, Krita will render "
+                 "<p>If color management is disabled, IKriate will render "
                  "the canvas into the surface of the main window, which "
                  "is considered sRGB. It will cause two limitations:"
                  ""
@@ -2167,7 +2167,7 @@ DisplaySettingsTab::DisplaySettingsTab(QWidget *parent, const char *name)
             cmbPreferredXcbGlApi->addItem(*currentXcbGlProvider == KisOpenGL::XCB_EGL ? eglCurrent : eglNotCurrent, KisOpenGL::XCB_EGL);
 
             cmbPreferredXcbGlApi->setToolTip(i18nc("@info:tooltip",
-                "<p>If you are using Krita on X11 or XWayland and experience slowness, "
+                "<p>If you are using IKriate on X11 or XWayland and experience slowness, "
                 "try switching between EGL and GLX</p>"));
 
             KisOpenGL::XcbGLProviderProtocol preferredValue =
@@ -2507,7 +2507,7 @@ KisDlgPreferences::KisDlgPreferences(QWidget* parent, const char* name)
     : KPageDialog(parent)
 {
     Q_UNUSED(name);
-    setWindowTitle(i18n("Configure Krita"));
+    setWindowTitle(i18n("Configure IKriate"));
     setStandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel | QDialogButtonBox::RestoreDefaults);
 
     setFaceType(KPageDialog::List);

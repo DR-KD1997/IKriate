@@ -1,12 +1,14 @@
 # SPDX-FileCopyrightText: 2026 IKriate contributors
 # SPDX-License-Identifier: CC0-1.0
 #
-# Windows x64 build of IKriate.
+# Windows x64 build of IKriate (Qt 6).
 #
 # Follows upstream Krita's CI (build-tools/ci-scripts/windows.yml): the ~90
 # third-party dependencies are not built here but downloaded as prebuilt
 # packages from KDE's public package registry (teams/ci-artifacts/krita-windows),
 # using Krita's own krita-deps-management / krita-ci-utilities tooling.
+# The Qt 6 packages come from the dependency branch "transition.now/qt6",
+# exactly like upstream's windows-build-qt6 job (build-tools/ci-scripts/windows.yml).
 #
 # Those packages are built with llvm-mingw (clang 21); the compiler here must
 # match. If the dependency packages move to a newer toolchain, bump
@@ -27,7 +29,7 @@ concurrency:
 
 env:
   LLVM_MINGW_VERSION: '20251216'
-  DEPS_BRANCH: master
+  DEPS_BRANCH: transition.now/qt6
   PYTHONUTF8: '1'
 
 jobs:
@@ -46,7 +48,7 @@ jobs:
       # KDECI_CC_CACHE is deliberately unset: it switches Krita's runner to ccache,
       # which is not reliably on PATH for its subprocesses on hosted Windows runners.
       KDECI_COMPRESS_PACKAGES_ON_DOWNLOAD: 'False'
-      KDECI_EXTRA_CMAKE_ARGS: -DHIDE_SAFE_ASSERTS=ON -DBUILD_TESTING=OFF
+      KDECI_EXTRA_CMAKE_ARGS: -DHIDE_SAFE_ASSERTS=ON -DBUILD_TESTING=OFF -DBUILD_WITH_QT6=ON -DALLOW_UNSTABLE=QT6 -DIKRIATE_ICF=safe
       # Tests are not built (BUILD_TESTING=OFF); skip the test-runner phase.
       KDECI_ONLY_BUILD: 'True'
       KRITACI_SKIP_DEBUG_PACKAGE: 'True'
@@ -131,7 +133,7 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: ikriate-windows-x64
+          name: ikriate-windows-qt6-x64
           path: |
             ikriate-x64-*.zip
             ikriate-x64-*-setup.exe

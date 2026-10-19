@@ -15,15 +15,23 @@ by expected value.
 | JPEG speed | The Linux build did not find `libjpeg-turbo`'s TurboJPEG API, so the JPEG/TIFF filters fell back to plain libjpeg paths. | `libturbojpeg0-dev` added to Linux build instructions and CI. |
 | Release builds | No link-time optimisation option. | `IKRIATE_ENABLE_LTO` (off until measured on all targets). |
 
+## Done in the second milestone (redesign)
+
+| Area | Change |
+|---|---|
+| Qt 6 | Windows and Linux CI build with Qt 6 (`BUILD_WITH_QT6=ON`): Windows from KDE's `transition.now/qt6` packages, Linux in an Ubuntu 26.04 container (Qt 6.10, KF6). Android stays on Qt 5 until KDE ships Qt 6 Android packages. Verified with a full local Qt 6 build. |
+| Interface | New home screen, gallery, New Canvas and Template sheets, settings page, and the Desktop, Kriate and Minimal layouts, built from palette-derived styles and Lucide line icons. Menus, toolbars, dockers and the status bar are hidden in all three layouts; the docker interface is opt-in under Settings › Advanced. |
+| Erasing | Eraser presets removed; erase is a mode applied to any brush (and to the pen's eraser end). |
+| Touch | Touch painting is off by default: one finger pans, only the pen draws. |
+| Android start | The launch screen stays up (sticky splash) until the home screen has painted, replacing the black screen during start-up. |
+| Branding | `rebrand-strings.py` renames the product in all translatable text and the 75 translation catalogues; About/splash credit Krita accurately and drop Krita's sponsors and donation links; Krita's colour themes renamed "Classic …"; Android billing code (the Krita Foundation's Play Store products) removed; AppStream metadata rewritten. File-format names (".kra, Krita document") and the Python API module name are kept, since they name Krita's format and API. |
+| Size | Identical code folding (`IKRIATE_ICF=safe`) in Windows and Linux CI; brushes merged into one optimised bundle without duplicate tips and patterns. |
+
 ## Recommended next
 
-1. **Plan the Qt 6 move.** Qt 5.15 is past its standard support period (open-source users
-   depend on KDE's patch collection), and upstream Krita's roadmap expects the Qt 6 build to
-   stop being experimental by the end of 2026. IKriate tracks the
-   combined `krita/6.0` branch, so the same source builds with `-DBUILD_WITH_QT6=ON`.
-   The IKriate code avoids Qt5-only APIs or guards them (`QT_VERSION` checks), so the cost is
-   mostly in dependencies and CI. Doing it soon also lines IKriate up with upstream's QML
-   tablet work (the `kritatablet` prototype and QML tool options).
+1. **Qt 6 on Android.** Switch `build-android.yml` to Qt 6 once KDE publishes Qt 6 Android
+   dependency packages (none on `transition.now/qt6` yet); the IKriate code already builds
+   with both Qt versions.
 2. **Use patched Qt on Linux.** Krita carries Qt patches for tablet enter/leave events,
    key press/release pairing and frame-rate-limited updates (`KRITA_QT_HAS_*_PATCH`). Distro
    Qt lacks them (`QT_HAS_ENTER_LEAVE_PATCH - not found` in the configure log). The Windows
@@ -50,9 +58,8 @@ by expected value.
    (the Python in KDE's dependency packages is missing `setuptools`/`sipconfig` at configure
    time), so Krita's Python plugins are not in the zip. Bootstrap `setuptools` into that
    Python before configuring, as upstream's VM image does.
-10. **AppStream metainfo.** `org.kde.krita.appdata.xml` still carries Krita's description and
-    translated paragraphs; current `appstreamcli` rejects them, so the AppImage is built with
-    `NO_APPSTREAM=1`. Write an IKriate description and drop the inherited translations.
+10. **AppStream metainfo.** Rewritten for IKriate (English only); `NO_APPSTREAM=1` can be
+    dropped from the AppImage step once `appstreamcli validate` passes in CI.
 11. **Android scripting.** Python plugins are unavailable in the Android build (no embedded
    interpreter). This matters for IKriate because tablet users can't use script-based
    add-ons; it is a large upstream change, so track it rather than fork it.

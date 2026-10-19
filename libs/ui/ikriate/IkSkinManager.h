@@ -48,7 +48,19 @@ class KRITAUI_EXPORT IkSkinManager : public QObject
 {
     Q_OBJECT
 public:
+    enum ThemeMode {
+        FollowSystem = 0,
+        Light = 1,
+        Dark = 2,
+    };
+
     struct Settings {
+        /// Skin used when the theme resolves to dark / to light.
+        QString darkSkinId;
+        QString lightSkinId;
+        ThemeMode themeMode {FollowSystem};
+        /// Effective skin, resolved from the fields above (kept for callers
+        /// that pick one skin directly; setting it updates the matching slot).
         QString skinId;
         bool overrideAccent {false};
         QColor accent;
@@ -63,6 +75,13 @@ public:
     QList<IkSkin> availableSkins() const;
     IkSkin skin(const QString &id) const;
     QString defaultSkinId() const;
+    QString defaultLightSkinId() const;
+    /// Whether the operating system currently prefers a dark appearance.
+    static bool systemPrefersDark();
+    /// True if @p skin has a dark window background.
+    static bool isDarkSkin(const IkSkin &skin);
+    /// The skin the current settings resolve to.
+    QString effectiveSkinId() const;
 
     Settings settings() const;
     void setSettings(const Settings &settings, bool apply = true);

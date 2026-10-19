@@ -272,6 +272,13 @@ private:
     KisSignalCompressor m_optionWidgetUpdateCompressor;
 
     QString m_eraserName;
+
+    // IKriate: draw/erase mode, independent of the active brush. The pen's
+    // eraser end switches to erase mode for as long as it is in use.
+    void ikSetEraseMode(bool erase);
+    bool m_ikEraseMode {false};
+    bool m_ikEraserTipActive {false};
+    bool m_ikModeBeforeEraserTip {false};
     QString m_defaultPresetName;
 };
 

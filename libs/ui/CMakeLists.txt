@@ -17,6 +17,11 @@ if (APPLE)
     find_library(APPKIT_LIBRARY AppKit)
 endif ()
 
+# IKriate: all IKriate interface code lives in ikriate/.
+file(GLOB IKRIATE_UI_SRCS CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/ikriate/*.cpp)
+# Interface icons: Lucide (ISC licence, see ikriate/icons/LICENSE.lucide) plus a few IKriate ones.
+qt_add_resources(IKRIATE_UI_SRCS ikriate/icons/ikriate-icons.qrc)
+
 set(kritaui_LIB_SRCS
     canvas/kis_canvas_widget_base.cpp
     canvas/kis_canvas2.cpp
@@ -448,12 +453,7 @@ set(kritaui_LIB_SRCS
     KisImportExportAdditionalChecks.cpp
 
     thememanager.cpp
-    ikriate/IkAppearanceDialog.cpp
-    ikriate/IkBrushStudio.cpp
-    ikriate/IkChromeOverlays.cpp
-    ikriate/IkChromeWidgets.cpp
-    ikriate/IkInterfaceManager.cpp
-    ikriate/IkSkinManager.cpp
+    ${IKRIATE_UI_SRCS}
 
     kis_mainwindow_observer.cpp
     KisViewManager.cpp

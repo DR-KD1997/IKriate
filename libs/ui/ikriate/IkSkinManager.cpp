@@ -22,6 +22,14 @@
 #include <IkPaths.h>
 #include <KoResourcePaths.h>
 
+#include <QGuiApplication>
+#include <QSettings>
+#include <QStyleHints>
+#if defined(Q_OS_ANDROID) && QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+#include <QtAndroid>
+#include <QAndroidJniObject>
+#endif
+
 namespace
 {
 const char *const kConfigGroup = "IKriate Skin";
@@ -64,7 +72,7 @@ IkSkin readSkin(const QString &path, bool userSkin)
         }
     }
     if (s.description.isEmpty() && fi.suffix() == QLatin1String("colors")) {
-        s.description = i18n("Krita colour theme");
+        s.description = i18n("Colour theme");
     }
     return s;
 }
@@ -94,16 +102,88 @@ IkSkinManager *IkSkinManager::instance()
 IkSkinManager::IkSkinManager()
 {
     const KConfigGroup cfg(KSharedConfig::openConfig(), kConfigGroup);
-    m_settings.skinId = cfg.readEntry("Skin", defaultSkinId());
+    m_settings.darkSkinId = cfg.readEntry("DarkSkin", QString());
+    m_settings.lightSkinId = cfg.readEntry("LightSkin", QString());
+    m_settings.themeMode = ThemeMode(qBound(0, cfg.readEntry("ThemeMode", int(FollowSystem)), 2));
+    // Settings from before the light/dark split: one skin, used for both.
+    const QString legacy = cfg.readEntry("Skin", QString());
+    if (!legacy.isEmpty() && m_settings.darkSkinId.isEmpty() && m_settings.lightSkinId.isEmpty()) {
+        const bool dark = isDarkSkin(skin(legacy));
+        (dark ? m_settings.darkSkinId : m_settings.lightSkinId) = legacy;
+        m_settings.themeMode = dark ? Dark : Light;
+    }
+    if (m_settings.darkSkinId.isEmpty()) m_settings.darkSkinId = defaultSkinId();
+    if (m_settings.lightSkinId.isEmpty()) m_settings.lightSkinId = defaultLightSkinId();
     m_settings.overrideAccent = cfg.readEntry("OverrideAccent", false);
-    m_settings.accent = cfg.readEntry("Accent", QColor(0xF2, 0xA5, 0x41));
+    m_settings.accent = cfg.readEntry("Accent", QColor(0xC4, 0x6F, 0xD0));
     m_settings.tint = cfg.readEntry("Tint", QColor(0x5B, 0xA8, 0xE8));
     m_settings.tintStrength = qBound(0, cfg.readEntry("TintStrength", 0), 100);
+    m_settings.skinId = effectiveSkinId();
 }
 
 QString IkSkinManager::defaultSkinId() const
 {
-    return QStringLiteral("ikriate-charcoal");
+    return QStringLiteral("ikriate-dark");
+}
+
+QString IkSkinManager::defaultLightSkinId() const
+{
+    return QStringLiteral("ikriate-light");
+}
+
+bool IkSkinManager::isDarkSkin(const IkSkin &s)
+{
+    if (s.filePath.isEmpty()) return true;
+    KConfig cfg(s.filePath, KConfig::SimpleConfig);
+    const QColor bg = KConfigGroup(&cfg, "Colors:Window").readEntry("BackgroundNormal", QColor(Qt::black));
+    return bg.lightnessF() < 0.5;
+}
+
+bool IkSkinManager::systemPrefersDark()
+{
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
+    if (QGuiApplication::instance()) {
+        const Qt::ColorScheme scheme = QGuiApplication::styleHints()->colorScheme();
+        if (scheme != Qt::ColorScheme::Unknown) {
+            return scheme == Qt::ColorScheme::Dark;
+        }
+    }
+#endif
+#if defined(Q_OS_ANDROID)
+    // Configuration.uiMode & UI_MODE_NIGHT_MASK == UI_MODE_NIGHT_YES
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+    QAndroidJniObject context = QtAndroid::androidContext();
+    if (context.isValid()) {
+        QAndroidJniObject res = context.callObjectMethod("getResources", "()Landroid/content/res/Resources;");
+        QAndroidJniObject conf = res.callObjectMethod("getConfiguration", "()Landroid/content/res/Configuration;");
+        if (conf.isValid()) {
+            const int uiMode = conf.getField<jint>("uiMode");
+            return (uiMode & 0x30) == 0x20;
+        }
+    }
+#endif
+    return true;
+#elif defined(Q_OS_WIN)
+    QSettings personalize(QStringLiteral("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize"),
+                          QSettings::NativeFormat);
+    return personalize.value(QStringLiteral("AppsUseLightTheme"), 0).toInt() == 0;
+#else
+    // Linux desktops: the freedesktop "prefer-dark" setting reaches Qt 6.5+
+    // above; otherwise default to dark, which suits painting.
+    return true;
+#endif
+}
+
+QString IkSkinManager::effectiveSkinId() const
+{
+    bool dark = true;
+    switch (m_settings.themeMode) {
+    case Light: dark = false; break;
+    case Dark: dark = true; break;
+    case FollowSystem:
+    default: dark = systemPrefersDark(); break;
+    }
+    return dark ? m_settings.darkSkinId : m_settings.lightSkinId;
 }
 
 QString IkSkinManager::activeThemeName()
@@ -174,8 +254,18 @@ IkSkinManager::Settings IkSkinManager::settings() const
 
 void IkSkinManager::setSettings(const Settings &settings, bool applyNow)
 {
-    m_settings = settings;
+    Settings next = settings;
+    // A directly chosen skin goes into the slot matching its brightness.
+    if (!next.skinId.isEmpty() && next.skinId != m_settings.skinId) {
+        const bool dark = isDarkSkin(skin(next.skinId));
+        (dark ? next.darkSkinId : next.lightSkinId) = next.skinId;
+        if (next.themeMode != FollowSystem) {
+            next.themeMode = dark ? Dark : Light;
+        }
+    }
+    m_settings = next;
     m_settings.tintStrength = qBound(0, m_settings.tintStrength, 100);
+    m_settings.skinId = effectiveSkinId();
     saveSettings();
     if (applyNow) apply();
 }
@@ -183,7 +273,10 @@ void IkSkinManager::setSettings(const Settings &settings, bool applyNow)
 void IkSkinManager::saveSettings() const
 {
     KConfigGroup cfg(KSharedConfig::openConfig(), kConfigGroup);
-    cfg.writeEntry("Skin", m_settings.skinId);
+    cfg.deleteEntry("Skin");
+    cfg.writeEntry("DarkSkin", m_settings.darkSkinId);
+    cfg.writeEntry("LightSkin", m_settings.lightSkinId);
+    cfg.writeEntry("ThemeMode", int(m_settings.themeMode));
     cfg.writeEntry("OverrideAccent", m_settings.overrideAccent);
     cfg.writeEntry("Accent", m_settings.accent);
     cfg.writeEntry("Tint", m_settings.tint);

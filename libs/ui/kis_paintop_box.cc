@@ -696,6 +696,12 @@ void KisPaintopBox::setCurrentPaintop(KisPaintOpPresetSP preset)
     m_presetsEditor->setPaintOpSettingsWidget(m_optionWidget);
     m_presetsEditor->readOptionSetting(preset->settings());
 
+    // IKriate: the brush takes on the current draw/erase mode instead of
+    // switching it (Krita presets could carry their own eraser mode).
+    if (preset->settings()->eraserMode() != m_ikEraseMode) {
+        preset->settings()->setEraserMode(m_ikEraseMode);
+    }
+
     m_resourceProvider->setPaintOpPreset(preset);
 
 
@@ -909,15 +915,28 @@ void KisPaintopBox::slotSetPaintop(const QString& paintOpId)
     }
 }
 
-void KisPaintopBox::slotInputDeviceChanged(const KoInputDevice& inputDevice)
+void KisPaintopBox::slotInputDeviceChanged(const KoInputDevice& eventInputDevice)
 {
+    // IKriate: the pen's eraser end uses the same brush as its tip, in erase
+    // mode, instead of a separately remembered eraser preset.
+    const bool eraserTip = eventInputDevice.pointer() == KoInputDevice::Pointer::Eraser;
+    const KoInputDevice inputDevice = eraserTip
+        ? KoInputDevice(eventInputDevice.device(), KoInputDevice::Pointer::Pen, eventInputDevice.uniqueTabletId())
+        : eventInputDevice;
+    if (eraserTip != m_ikEraserTipActive) {
+        m_ikEraserTipActive = eraserTip;
+        if (eraserTip) {
+            m_ikModeBeforeEraserTip = m_ikEraseMode;
+            ikSetEraseMode(true);
+        } else {
+            ikSetEraseMode(m_ikModeBeforeEraserTip);
+        }
+    }
+
     TabletToolMap::iterator toolData = m_tabletToolMap.find(inputDevice);
 
     //qDebug() << "slotInputDeviceChanged()" << inputDevice.device() << inputDevice.uniqueTabletId();
 
-    m_eraserTogglePresetAction->setChecked(inputDevice.pointer() == KoInputDevice::Pointer::Eraser);
-    m_eraserSelectPresetAction->setChecked(inputDevice.pointer() == KoInputDevice::Pointer::Eraser);
-    m_brushSelectPresetAction->setChecked(inputDevice.pointer() == KoInputDevice::Pointer::Pen);
 
     m_currTabletToolID = TabletToolID(inputDevice);
 
@@ -958,38 +977,33 @@ void KisPaintopBox::slotInputDeviceChanged(const KoInputDevice& inputDevice)
     }
 }
 
+// IKriate: the "eraser preset" actions now switch the draw/erase mode of the
+// current brush; there are no eraser-only brushes.
 void KisPaintopBox::slotToggleEraserPreset(bool usingEraser)
 {
-    KoInputDevice::InputDevice dev = KoInputDevice::InputDevice::Unknown;
-    KoInputDevice::Pointer ptr = usingEraser ? KoInputDevice::Pointer::Eraser : KoInputDevice::Pointer::Pen;
-    qint64 id = -1;
-    const KoInputDevice inputDevice(dev, ptr, id);
-    slotInputDeviceChanged(inputDevice);
+    ikSetEraseMode(usingEraser);
 }
 
 void KisPaintopBox::slotSelectEraserPreset()
 {
-    // automatically select freehand brush tool for these select actions
     KoToolManager::instance()->switchToolRequested("KritaShape/KisToolBrush");
-
-    KoInputDevice::InputDevice dev = KoInputDevice::InputDevice::Unknown;
-    KoInputDevice::Pointer ptr = KoInputDevice::Pointer::Eraser;
-    qint64 id = -1;
-    const KoInputDevice inputDevice(dev, ptr, id);
-    slotInputDeviceChanged(inputDevice);
+    ikSetEraseMode(true);
 }
 
 
 void KisPaintopBox::slotSelectBrushPreset()
 {
-    // automatically select freehand brush tool for these select actions
     KoToolManager::instance()->switchToolRequested("KritaShape/KisToolBrush");
+    ikSetEraseMode(false);
+}
 
-    KoInputDevice::InputDevice dev = KoInputDevice::InputDevice::Unknown;
-    KoInputDevice::Pointer ptr = KoInputDevice::Pointer::Pen;
-    qint64 id = -1;
-    const KoInputDevice inputDevice(dev, ptr, id);
-    slotInputDeviceChanged(inputDevice);
+void KisPaintopBox::ikSetEraseMode(bool erase)
+{
+    if (m_eraseAction->isChecked() != erase) {
+        m_eraseAction->setChecked(erase); // -> slotToggleEraseMode()
+    } else {
+        m_ikEraseMode = erase;
+    }
 }
 
 
@@ -1132,6 +1146,8 @@ void KisPaintopBox::slotColorSpaceChanged(const KoColorSpace* colorSpace)
 
 void KisPaintopBox::slotToggleEraseMode(bool checked)
 {
+    m_ikEraseMode = checked;
+    m_eraserTogglePresetAction->setChecked(checked);
     const bool oldEraserMode = m_resourceProvider->eraserMode();
     m_resourceProvider->setEraserMode(checked);
 

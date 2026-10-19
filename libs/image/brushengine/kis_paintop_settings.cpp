@@ -410,20 +410,20 @@ QString KisPaintOpSettings::paintOpCompositeOp()
     return proxy->getString("CompositeOp", COMPOSITE_OVER);
 }
 
+// IKriate: erasing is a mode of the canvas that applies to whichever brush is
+// active, not a property of a brush. The flag still lives on the settings so
+// the paint engines see it, but it is never saved into a preset, does not mark
+// the preset as modified and is not shared through locked options.
 void KisPaintOpSettings::setEraserMode(bool value)
 {
-    KisLockedPropertiesProxySP proxy(
-                KisLockedPropertiesServer::instance()->createLockedPropertiesProxy(this));
-
-    proxy->setProperty("EraserMode", value);
+    KisPropertiesConfiguration::setProperty("EraserMode", value);
+    setPropertyNotSaved("EraserMode");
+    onPropertyChanged();
 }
 
 bool KisPaintOpSettings::eraserMode()
 {
-    KisLockedPropertiesProxySP proxy(
-                KisLockedPropertiesServer::instance()->createLockedPropertiesProxy(this));
-
-    return proxy->getBool("EraserMode", false);
+    return getBool("EraserMode", false);
 }
 
 QString KisPaintOpSettings::effectivePaintOpCompositeOp()

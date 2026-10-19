@@ -1,9 +1,11 @@
 # SPDX-FileCopyrightText: 2026 IKriate contributors
 # SPDX-License-Identifier: CC0-1.0
 #
-# Linux build of IKriate, packaged as an AppImage.
-# Uses Ubuntu 24.04's Qt 5.15 and KDE Frameworks 5 (the same setup as the
-# reference build in packaging/README-IKRIATE.md).
+# Linux build of IKriate (Qt 6), packaged as an AppImage.
+# Builds inside an Ubuntu 26.04 container, whose Qt 6.10 and KDE Frameworks 6
+# packages (including Immer, Zug and Lager) are all Krita 6 needs. This is the
+# same setup as the reference build in packaging/README-IKRIATE.md.
+# The AppImage bundles Qt and needs a distribution with glibc 2.42 or newer.
 name: Linux (AppImage)
 
 on:
@@ -19,72 +21,55 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 env:
-  IMMER_COMMIT: bd4fc749b97dfa2b66a8f3de00bbf234db4856ef
-  ZUG_COMMIT: 065b213d0d790fef2d8f410d61d0c0f1f01afddd
-  LAGER_COMMIT: ddf87b467dca57cb03fb5ff94dff9ca2c633a15e
   CCACHE_DIR: ${{ github.workspace }}/.ccache
   CCACHE_MAXSIZE: 4G
 
 jobs:
   appimage:
     runs-on: ubuntu-24.04
+    container:
+      image: ubuntu:26.04
+      options: --privileged   # FUSE-free AppImage tools still need /dev access
     timeout-minutes: 350
     defaults:
       run:
         shell: bash   # implies -eo pipefail, so "| tee" keeps failures visible
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Free disk space
-        run: sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
-
       - name: Install build dependencies
         run: |
-          sudo apt-get update
-          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-            ccache ninja-build cmake extra-cmake-modules gettext patchelf file desktop-file-utils libfuse2 \
-            qtbase5-dev qtbase5-private-dev qtdeclarative5-dev qtquickcontrols2-5-dev libqt5svg5-dev \
-            qttools5-dev qttools5-dev-tools libqt5x11extras5-dev qtmultimedia5-dev libqt5opengl5-dev \
-            qml-module-qtquick-controls2 qml-module-qtquick-layouts qml-module-qtquick-window2 \
-            qml-module-qtquick-shapes qml-module-qtqml qml-module-qtquick2 \
-            qml-module-qtqml-models2 qml-module-qtgraphicaleffects \
-            libkf5config-dev libkf5coreaddons-dev libkf5widgetsaddons-dev libkf5completion-dev \
-            libkf5guiaddons-dev libkf5i18n-dev libkf5itemmodels-dev libkf5itemviews-dev \
-            libkf5windowsystem-dev libkf5crash-dev libkf5kdcraw-dev \
-            libboost-system-dev libeigen3-dev libexiv2-dev liblcms2-dev libfftw3-dev libgsl-dev \
+          apt-get update
+          DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+            ca-certificates git wget file xz-utils zstd squashfs-tools python3 \
+            build-essential lld ccache ninja-build cmake extra-cmake-modules gettext patchelf desktop-file-utils pkg-config \
+            qt6-base-dev qt6-base-private-dev qt6-declarative-dev qt6-declarative-private-dev qt6-svg-dev \
+            qt6-tools-dev qt6-tools-dev-tools qt6-l10n-tools qt6-5compat-dev qt6-multimedia-dev qt6-wayland-dev \
+            qml6-module-qtqml-workerscript qml6-module-qtquick-controls qml6-module-qtquick-layouts \
+            qml6-module-qtquick-shapes qml6-module-qtquick-templates qml6-module-qtquick-window libqt6svgwidgets6 \
+            libkf6colorscheme-dev libkf6completion-dev libkf6config-dev libkf6coreaddons-dev libkf6crash-dev \
+            libkf6guiaddons-dev libkf6i18n-dev libkf6itemmodels-dev libkf6itemviews-dev libkf6widgetsaddons-dev \
+            libkf6windowsystem-dev libkdcrawqt6-dev libimmer-dev libzug-dev liblager-dev libkseexpr-dev \
+            libboost-dev libeigen3-dev libexiv2-dev liblcms2-dev libfftw3-dev libgsl-dev \
             libheif-dev libjxl-dev libopenexr-dev libopenjp2-7-dev libpng-dev libtiff-dev libwebp-dev \
-            libgif-dev libjpeg-dev libturbojpeg0-dev libpoppler-qt5-dev libraw-dev libquazip5-dev libmypaint-dev \
+            libgif-dev libjpeg-dev libturbojpeg0-dev libpoppler-qt6-dev libraw-dev libquazip1-qt6-dev libmypaint-dev \
             libopencolorio-dev libharfbuzz-dev libfreetype-dev libfontconfig-dev libunibreak-dev \
             libxsimd-dev libsdl2-dev libfribidi-dev libx11-dev libxi-dev zlib1g-dev
 
-      - name: Build Immer, Zug and Lager
-        run: |
-          for spec in "immer $IMMER_COMMIT" "zug $ZUG_COMMIT" "lager $LAGER_COMMIT"; do
-            set -- $spec
-            git clone --quiet https://github.com/arximboldi/$1.git /tmp/$1
-            git -C /tmp/$1 checkout --quiet $2
-            cmake -S /tmp/$1 -B /tmp/build-$1 -G Ninja -DCMAKE_INSTALL_PREFIX=/opt/kdeps -DCMAKE_PREFIX_PATH=/opt/kdeps \
-              -Dimmer_BUILD_TESTS=OFF -Dimmer_BUILD_EXAMPLES=OFF -Dimmer_BUILD_DOCS=OFF -Dimmer_BUILD_EXTRAS=OFF \
-              -Dzug_BUILD_TESTS=OFF -Dzug_BUILD_EXAMPLES=OFF -Dzug_BUILD_DOCS=OFF \
-              -Dlager_BUILD_TESTS=OFF -Dlager_BUILD_EXAMPLES=OFF -Dlager_BUILD_DOCS=OFF \
-              -Dlager_BUILD_DEBUGGER_EXAMPLES=OFF -DENABLE_PYTHON=OFF -DENABLE_GUILE=OFF
-            cmake --build /tmp/build-$1
-            sudo cmake --install /tmp/build-$1
-          done
+      - uses: actions/checkout@v4
 
       - name: Restore compiler cache
         uses: actions/cache@v4
         with:
           path: .ccache
-          key: ccache-linux-${{ github.sha }}
-          restore-keys: ccache-linux-
+          key: ccache-linux-qt6-${{ github.sha }}
+          restore-keys: ccache-linux-qt6-
 
       - name: Configure
         run: |
           cmake -S . -B build -G Ninja \
             -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_INSTALL_LIBDIR=lib \
-            -DCMAKE_PREFIX_PATH=/opt/kdeps \
+            -DBUILD_WITH_QT6=ON -DALLOW_UNSTABLE=QT6 \
+            -DIKRIATE_ICF=safe \
             -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
             -DBUILD_TESTING=OFF -DFOUNDATION_BUILD=ON 2>&1 | tee configure.log
 
@@ -92,8 +77,8 @@ jobs:
         run: cmake --build build --parallel 4 2>&1 | tee build.log
 
       - name: Install into AppDir
-        # --strip: linuxdeploy only strips libraries it deploys itself, so
-        # Krita's ~170 plugin modules would otherwise ship with symbol tables.
+        # --strip: linuxdeploy only strips libraries it deploys itself, so the
+        # ~170 plugin modules would otherwise ship with symbol tables.
         run: DESTDIR="$PWD/AppDir" cmake --install build --strip
 
       - name: Package AppImage
@@ -103,15 +88,15 @@ jobs:
           wget -nv https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
           wget -nv https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage
           chmod +x linuxdeploy*.AppImage
-          # Hosted runners may lack FUSE; unpack the tool AppImages instead of mounting them.
+          # Containers lack FUSE; unpack the tool AppImages instead of mounting them.
           export APPIMAGE_EXTRACT_AND_RUN=1
-          # appimagetool validates the AppStream file; Krita's inherited metainfo has
-          # localized <description> tags that newer appstreamcli rejects.
           export NO_APPSTREAM=1
-          export QMAKE=/usr/lib/qt5/bin/qmake
-          export EXTRA_QT_PLUGINS="svg;iconengines"
+          export QMAKE=/usr/lib/qt6/bin/qmake6
+          export EXTRA_QT_MODULES="svgwidgets"
+          export EXTRA_PLATFORM_PLUGINS="libqwayland-generic.so"
+          export EXTRA_QT_PLUGINS="svg;iconengines;wayland-shell-integration;wayland-decoration-client;wayland-graphics-integration-client"
           export QML_SOURCES_PATHS="$PWD/plugins:$PWD/libs"
-          export LD_LIBRARY_PATH="$PWD/AppDir/usr/lib:$PWD/AppDir/usr/lib/x86_64-linux-gnu:/opt/kdeps/lib"
+          export LD_LIBRARY_PATH="$PWD/AppDir/usr/lib:$PWD/AppDir/usr/lib/x86_64-linux-gnu"
           export OUTPUT="IKriate-${GITHUB_REF_NAME//\//-}-x86_64.AppImage"
           ./linuxdeploy-x86_64.AppImage --appdir AppDir \
             --desktop-file AppDir/usr/share/applications/org.kde.krita.desktop \
@@ -140,7 +125,7 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: ikriate-linux-x86_64
+          name: ikriate-linux-qt6-x86_64
           path: IKriate-*.AppImage
           if-no-files-found: error
 

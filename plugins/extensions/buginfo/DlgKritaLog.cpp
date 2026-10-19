@@ -20,7 +20,7 @@ QString DlgKritaLog::originalFileName()
 
 QString DlgKritaLog::captionText()
 {
-    return i18nc("Caption of the dialog with Krita usage log for bug reports", "Krita Usage Log: please paste this information to the bug report");
+    return i18nc("Caption of the dialog with IKriate usage log for bug reports", "IKriate Usage Log: please paste this information to the bug report");
 }
 
 QString DlgKritaLog::replacementWarningText()

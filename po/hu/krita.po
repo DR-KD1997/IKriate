@@ -1010,8 +1010,8 @@ msgstr "Pepper & Carrot szóbuborékok"
 #. i18n: Display name of resource, see context: [path-to-resources]/[resource-type]/[resource-filename]
 #, kde-format
 msgctxt "./krita/data/symbols/preset_icons.svg"
-msgid "Krita Brush Preset Icon Library"
-msgstr "Krita ecsetbeállítás-ikonkönyvtár"
+msgid "IKriate Brush Preset Icon Library"
+msgstr "IKriate ecsetbeállítás-ikonkönyvtár"
 
 #. i18n: Display name of resource, see context: [path-to-resources]/[resource-type]/[resource-filename]
 #, kde-format
@@ -8257,10 +8257,10 @@ msgstr "Erőforrás-mappa megnyitása"
 #, kde-format
 msgctxt "action"
 msgid ""
-"Opens a file browser at the location Krita saves resources such as brushes "
+"Opens a file browser at the location IKriate saves resources such as brushes "
 "to."
 msgstr ""
-"Megnyit egy fájlkezelőt ott, ahová a Krita az erőforrásokat (például "
+"Megnyit egy fájlkezelőt ott, ahová a IKriate az erőforrásokat (például "
 "ecseteket) menti."
 
 #. i18n: context: text @ Action (windows_cascade), Actions (General), ActionCollection (Krita)
@@ -8473,8 +8473,8 @@ msgstr "Digitális rajztábla hibakereső bekapcsolása"
 #: krita/krita.action:167 krita/krita.action:169 krita/krita.action:170
 #, kde-format
 msgctxt "action"
-msgid "Show Krita log for bug reports."
-msgstr "Krita napló megjelenítése a hibajelentésekhez."
+msgid "Show IKriate log for bug reports."
+msgstr "IKriate napló megjelenítése a hibajelentésekhez."
 
 #. i18n: context: text @ Action (sysinfo), Actions (General), ActionCollection (Krita)
 #. i18n: context: toolTip @ Action (sysinfo), Actions (General), ActionCollection (Krita)
@@ -15787,8 +15787,8 @@ msgstr "Beállítások"
 #: krita/kritamenu.action:1775
 #, kde-format
 msgctxt "action"
-msgid "&Configure Krita..."
-msgstr "A Krita &beállítása..."
+msgid "&Configure IKriate..."
+msgstr "A IKriate &beállítása..."
 
 #. i18n: context: toolTip @ Action (options_configure), Actions (Settings), ActionCollection (Menu)
 #. i18n: context: iconText @ Action (options_configure), Actions (Settings), ActionCollection (Menu)
@@ -15797,8 +15797,8 @@ msgstr "A Krita &beállítása..."
 #: krita/kritamenu.action:1777 krita/kritamenu.action:1778
 #, kde-format
 msgctxt "action"
-msgid "Configure Krita"
-msgstr "Krita beállítása"
+msgid "Configure IKriate"
+msgstr "IKriate beállítása"
 
 #. i18n: context: text @ Action (manage_bundles), Actions (Settings), ActionCollection (Menu)
 #: krita/kritamenu.action:1787
@@ -16022,8 +16022,8 @@ msgstr "Súgó"
 #: krita/kritamenu.action:1933
 #, kde-format
 msgctxt "action"
-msgid "Krita &Handbook"
-msgstr "Krita &kézikönyv"
+msgid "IKriate &Handbook"
+msgstr "IKriate &kézikönyv"
 
 #. i18n: context: toolTip @ Action (help_contents), Actions (Help), ActionCollection (Menu)
 #. i18n: context: iconText @ Action (help_contents), Actions (Help), ActionCollection (Menu)
@@ -16032,8 +16032,8 @@ msgstr "Krita &kézikönyv"
 #: krita/kritamenu.action:1935 krita/kritamenu.action:1936
 #, kde-format
 msgctxt "action"
-msgid "Krita Handbook"
-msgstr "Krita kézikönyv"
+msgid "IKriate Handbook"
+msgstr "IKriate kézikönyv"
 
 #. i18n: context: text @ Action (help_report_bug), Actions (Help), ActionCollection (Menu)
 #: krita/kritamenu.action:1943
@@ -16056,8 +16056,8 @@ msgstr "Hiba jelentése"
 #: krita/kritamenu.action:1953
 #, kde-format
 msgctxt "action"
-msgid "&About Krita"
-msgstr "Krita &névjegye"
+msgid "&About IKriate"
+msgstr "IKriate &névjegye"
 
 #. i18n: context: toolTip @ Action (help_about_app), Actions (Help), ActionCollection (Menu)
 #. i18n: context: iconText @ Action (help_about_app), Actions (Help), ActionCollection (Menu)
@@ -16066,8 +16066,8 @@ msgstr "Krita &névjegye"
 #: krita/kritamenu.action:1955 krita/kritamenu.action:1956
 #, kde-format
 msgctxt "action"
-msgid "About Krita"
-msgstr "Krita névjegye"
+msgid "About IKriate"
+msgstr "IKriate névjegye"
 
 #. i18n: context: text @ Action (help_about_kde), Actions (Help), ActionCollection (Menu)
 #: krita/kritamenu.action:1963
@@ -16388,15 +16388,15 @@ msgstr "Téglalap módosítása"
 #: krita/main.cc:723
 #, kde-format
 msgctxt "@info:credit"
-msgid "© 1999–2026 The Krita Developers"
-msgstr "© 1999–2026 A Krita fejlesztői"
+msgid "© 1999–2026 The IKriate Developers"
+msgstr "© 1999–2026 A IKriate fejlesztői"
 
 #: krita/main.cc:820 libs/ui/KisApplication.cpp:523
 #: libs/ui/KisApplication.cpp:848
 #, kde-format
 msgctxt "@title:window"
-msgid "Krita: Warning"
-msgstr "Krita: Figyelmeztetés"
+msgid "IKriate: Warning"
+msgstr "IKriate: Figyelmeztetés"
 
 #: krita/main.cc:821
 #, kde-format
@@ -19075,7 +19075,7 @@ msgstr "Optikai határok"
 msgctxt "@tooltip"
 msgid ""
 "Adjusts glyphs so they align by their optical bounds. Doesn't do anything in "
-"Krita."
+"IKriate."
 msgstr ""
 "Úgy igazítja a karaktereket, hogy az optikai határuk mentén igazodjanak. A "
 "Kritában nincs hatása."
@@ -19253,7 +19253,7 @@ msgstr "Optikai méret"
 msgctxt "@tooltip"
 msgid ""
 "Indicates how much the font is suitable for its current size. Does nothing "
-"in Krita."
+"in IKriate."
 msgstr ""
 "Jelzi, hogy a betűkészlet mennyire felel meg az aktuális méretének. A "
 "Kritában nincs hatása."
@@ -20895,8 +20895,8 @@ msgstr "Átalakítás útvonallá"
 #: libs/global/kis_assert.cpp:82
 #, kde-format
 msgctxt "@title:window"
-msgid "Krita: Internal Error"
-msgstr "Krita: Belső hiba"
+msgid "IKriate: Internal Error"
+msgstr "IKriate: Belső hiba"
 
 #: libs/global/kis_dom_utils.cpp:128
 #, kde-format
@@ -22396,8 +22396,8 @@ msgstr "Adobe ecsetkönyvtár"
 #: libs/koplugin/KisMimeDatabase.cpp:184
 #, kde-format
 msgctxt "description of a file type"
-msgid "Krita Brush Preset"
-msgstr "Krita ecsetkészlet"
+msgid "IKriate Brush Preset"
+msgstr "IKriate ecsetkészlet"
 
 #: libs/koplugin/KisMimeDatabase.cpp:189
 #, kde-format
@@ -22408,8 +22408,8 @@ msgstr "MyPaint ecset"
 #: libs/koplugin/KisMimeDatabase.cpp:194
 #, kde-format
 msgctxt "description of a file type"
-msgid "Krita Assistant"
-msgstr "Krita rajzsegéd"
+msgid "IKriate Assistant"
+msgstr "IKriate rajzsegéd"
 
 #: libs/koplugin/KisMimeDatabase.cpp:199
 #, kde-format
@@ -22462,8 +22462,8 @@ msgstr "Színpaletta"
 #: libs/koplugin/KisMimeDatabase.cpp:239
 #, kde-format
 msgctxt "description of a file type"
-msgid "Krita Color Palette"
-msgstr "Krita színpaletta"
+msgid "IKriate Color Palette"
+msgstr "IKriate színpaletta"
 
 #: libs/koplugin/KisMimeDatabase.cpp:244
 #, kde-format
@@ -22486,50 +22486,50 @@ msgstr "GIMP minták"
 #: libs/koplugin/KisMimeDatabase.cpp:259
 #, kde-format
 msgctxt "description of a file type"
-msgid "Krita Resource Bundle"
-msgstr "Krita erőforráscsomag"
+msgid "IKriate Resource Bundle"
+msgstr "IKriate erőforráscsomag"
 
 #: libs/koplugin/KisMimeDatabase.cpp:264
 #, kde-format
 msgctxt "description of a file type"
-msgid "Krita Workspace"
-msgstr "Krita munkaterület"
+msgid "IKriate Workspace"
+msgstr "IKriate munkaterület"
 
 #: libs/koplugin/KisMimeDatabase.cpp:269
 #, kde-format
 msgctxt "description of a file type"
-msgid "Krita Window Layout"
-msgstr "Krita ablakelrendezés"
+msgid "IKriate Window Layout"
+msgstr "IKriate ablakelrendezés"
 
 #: libs/koplugin/KisMimeDatabase.cpp:274
 #, kde-format
 msgctxt "description of a file type"
-msgid "Krita Session"
-msgstr "Krita munkamenet"
+msgid "IKriate Session"
+msgstr "IKriate munkamenet"
 
 #: libs/koplugin/KisMimeDatabase.cpp:279
 #, kde-format
 msgctxt "description of a file type"
-msgid "Krita Taskset"
-msgstr "Krita feladatsor"
+msgid "IKriate Taskset"
+msgstr "IKriate feladatsor"
 
 #: libs/koplugin/KisMimeDatabase.cpp:284
 #, kde-format
 msgctxt "description of a file type"
-msgid "Krita Reference Image Collection"
-msgstr "Krita referenciakép-gyűjtemény"
+msgid "IKriate Reference Image Collection"
+msgstr "IKriate referenciakép-gyűjtemény"
 
 #: libs/koplugin/KisMimeDatabase.cpp:289
 #, kde-format
 msgctxt "description of a file type"
-msgid "Krita Gamut Mask"
-msgstr "Krita gamut maszk"
+msgid "IKriate Gamut Mask"
+msgstr "IKriate gamut maszk"
 
 #: libs/koplugin/KisMimeDatabase.cpp:294
 #, kde-format
 msgctxt "description of a file type"
-msgid "Krita Shortcut Scheme"
-msgstr "Krita gyorsbillentyű-séma"
+msgid "IKriate Shortcut Scheme"
+msgstr "IKriate gyorsbillentyű-séma"
 
 #: libs/koplugin/KisMimeDatabase.cpp:299
 #, kde-format
@@ -22570,8 +22570,8 @@ msgstr "SeExpr szkriptcsomag"
 #: libs/koplugin/KisMimeDatabase.cpp:334
 #, kde-format
 msgctxt "description of a file type"
-msgid "Krita Archival Image Format"
-msgstr "Krita Archival képformátum"
+msgid "IKriate Archival Image Format"
+msgstr "IKriate Archival képformátum"
 
 #: libs/koplugin/KisMimeDatabase.cpp:339
 #, kde-format
@@ -22631,8 +22631,8 @@ msgstr ""
 
 #: libs/metadata/kis_meta_data_filter_p.cc:98
 #, kde-format
-msgid "Krita %1"
-msgstr "Krita %1"
+msgid "IKriate %1"
+msgstr "IKriate %1"
 
 #: libs/metadata/kis_meta_data_merge_strategy_p.cc:38
 #, kde-format
@@ -24002,16 +24002,16 @@ msgstr "Helyi erőforrások"
 #: plugins/tools/tool_transform2/kis_free_transform_strategy_gsl_helpers.cpp:437
 #, kde-format
 msgctxt "@title:window"
-msgid "Krita"
-msgstr "Krita"
+msgid "IKriate"
+msgstr "IKriate"
 
 #: libs/resources/KisResourceCacheDb.cpp:353
 #, kde-format
 msgid ""
-"The resource database scheme has changed. Krita will backup your database "
+"The resource database scheme has changed. IKriate will backup your database "
 "and create a new database."
 msgstr ""
-"Az erőforrás-adatbázis sémája megváltozott. A Krita biztonsági mentést "
+"Az erőforrás-adatbázis sémája megváltozott. A IKriate biztonsági mentést "
 "készít az adatbázisról, és újat hoz létre."
 
 #: libs/resources/KisResourceLocator.cpp:106
@@ -24045,8 +24045,8 @@ msgstr ""
 #: libs/resources/KisResourceLocator.cpp:1044
 #, kde-format
 msgid ""
-"Krita is running for the first time. Initialization will take some time."
-msgstr "A Krita most fut először. Az inicializálás igénybe vehet némi időt."
+"IKriate is running for the first time. Initialization will take some time."
+msgstr "A IKriate most fut először. Az inicializálás igénybe vehet némi időt."
 
 #: libs/resources/KisResourceLocator.cpp:1051
 #, kde-format
@@ -25194,13 +25194,13 @@ msgstr ""
 #: libs/ui/animation/KisDlgImportVideoAnimation.cpp:182
 #, kde-format
 msgctxt "Title for a messagebox"
-msgid "Krita"
-msgstr "Krita"
+msgid "IKriate"
+msgstr "IKriate"
 
 #: libs/ui/animation/KisDlgImportVideoAnimation.cpp:183
 #, kde-format
 msgid ""
-"Warning: you are trying to import more than 100 frames into Krita.\n"
+"Warning: you are trying to import more than 100 frames into IKriate.\n"
 "\n"
 "This means you might be overloading your system.\n"
 "If you want to edit a clip larger than 100 frames, consider using a real "
@@ -25322,10 +25322,10 @@ msgstr ""
 #, kde-format
 msgctxt "part of warning in video importer."
 msgid ""
-"Krita does not support the video transfer curve (%1), it will be loaded as "
+"IKriate does not support the video transfer curve (%1), it will be loaded as "
 "linear."
 msgstr ""
-"A Krita nem támogatja ezt a videó-átviteli görbét (%1), lineárisként lesz "
+"A IKriate nem támogatja ezt a videó-átviteli görbét (%1), lineárisként lesz "
 "betöltve."
 
 #: libs/ui/animation/KisDlgImportVideoAnimation.cpp:553
@@ -26304,8 +26304,8 @@ msgstr "Érzékenység"
 #, kde-format
 msgid ""
 "How sensitive should the duplicate frame filter be when determining\n"
-"which frames are added to Krita.\n"
-"The higher the sensitivity, the more frames are added to Krita."
+"which frames are added to IKriate.\n"
+"The higher the sensitivity, the more frames are added to IKriate."
 msgstr ""
 "Milyen érzékenyen szűrje az ismétlődő képkockákat annak eldöntésekor,\n"
 "hogy mely képkockák kerüljenek a Kritába.\n"
@@ -26644,11 +26644,11 @@ msgstr "Nincs"
 #, kde-format
 msgid ""
 "WARNING: HDR mode was activated on surface working in 8-bit mode!\n"
-"Please activate 10-bit mode in Krita's Preferences dialog and restart Krita "
+"Please activate 10-bit mode in IKriate's Preferences dialog and restart IKriate "
 "to avoid color banding!"
 msgstr ""
 "FIGYELEM: A HDR mód 8 bites felületen lett aktiválva!\n"
-"Kérjük, aktiválja a 10 bites módot a Krita beállításaiban és indítsa újra a "
+"Kérjük, aktiválja a 10 bites módot a IKriate beállításaiban és indítsa újra a "
 "programot a sávosodás elkerülése érdekében!"
 
 #: libs/ui/canvas/kis_canvas_controller.cpp:223
@@ -26818,8 +26818,8 @@ msgstr "Kép középpontja"
 
 #: libs/ui/dialogs/kis_about_application.cpp:35
 #, kde-format
-msgid "About Krita"
-msgstr "Krita névjegye"
+msgid "About IKriate"
+msgstr "IKriate névjegye"
 
 #: libs/ui/dialogs/kis_about_application.cpp:46
 #, kde-format
@@ -26889,42 +26889,42 @@ msgstr "<html><head/><body><h1 align=\"center\">Köszönet</h1><p>"
 #: libs/ui/dialogs/kis_about_application.cpp:128
 #, kde-format
 msgid ""
-".</p><p><i>For supporting Krita development with advice, icons, brush sets "
+".</p><p><i>For supporting IKriate development with advice, icons, brush sets "
 "and more.</i></p></body></html>"
 msgstr ""
-".</p><p><i>A Krita fejlesztésének támogatásáért tanácsokkal, ikonokkal, "
+".</p><p><i>A IKriate fejlesztésének támogatásáért tanácsokkal, ikonokkal, "
 "ecsetkészletekkel és egyebekkel.</i></p></body></html>"
 
 #: libs/ui/dialogs/kis_about_application.cpp:132
 #, kde-format
 msgid ""
-"<html><head/><body><h1 align=\"center\"><b>Your Rights</b></h1><p>Krita is "
+"<html><head/><body><h1 align=\"center\"><b>Your Rights</b></h1><p>IKriate is "
 "released under the GNU General Public License (version 3 or any later "
 "version).</p><p>This license grants people a number of freedoms:</"
-"p><ul><li>You are free to use Krita, for any purpose</li><li>You are free to "
-"distribute Krita</li><li>You can study how Krita works and change it</"
-"li><li>You can distribute changed versions of Krita</li></ul><p>The Krita "
+"p><ul><li>You are free to use IKriate, for any purpose</li><li>You are free to "
+"distribute IKriate</li><li>You can study how IKriate works and change it</"
+"li><li>You can distribute changed versions of IKriate</li></ul><p>The IKriate "
 "Foundation and its projects on krita.org are <b>committed</b> to preserving "
-"Krita as free software.</p><h1 align=\"center\">Your artwork</h1><p>What you "
-"create with Krita is your sole property. All your artwork is free for you to "
-"use as you like.</p><p>That means that Krita can be used commercially, for "
-"any purpose. There are no restrictions whatsoever.</p><p>Krita’s GNU GPL "
+"IKriate as free software.</p><h1 align=\"center\">Your artwork</h1><p>What you "
+"create with IKriate is your sole property. All your artwork is free for you to "
+"use as you like.</p><p>That means that IKriate can be used commercially, for "
+"any purpose. There are no restrictions whatsoever.</p><p>IKriate’s GNU GPL "
 "license guarantees you this freedom. Nobody is ever permitted to take it "
 "away, in contrast to trial or educational versions of commercial software "
 "that will forbid your work in commercial situations.</p><br/><hr/><pre>"
 msgstr ""
-"<html><head/><body><h1 align=\"center\"><b>Az Ön jogai</b></h1><p>A Krita a "
+"<html><head/><body><h1 align=\"center\"><b>Az Ön jogai</b></h1><p>A IKriate a "
 "GNU General Public License (3-as vagy bármely későbbi verzió) alatt jelenik "
 "meg.</p><p>Ez a licenc számos szabadságjogot biztosít:</p><ul><li>A Kritát "
 "bármilyen célra szabadon használhatja</li><li>A Kritát szabadon "
-"terjesztheti</li><li>Tanulmányozhatja a Krita működését és megváltoztathatja "
-"azt</li><li>Terjesztheti a Krita módosított változatait</li></ul><p>A Krita "
-"Alapítvány és a krita.org projektjei <b>elkötelezettek</b> a Krita szabad "
+"terjesztheti</li><li>Tanulmányozhatja a IKriate működését és megváltoztathatja "
+"azt</li><li>Terjesztheti a IKriate módosított változatait</li></ul><p>A IKriate "
+"Alapítvány és a krita.org projektjei <b>elkötelezettek</b> a IKriate szabad "
 "szoftverként való megőrzése mellett.</p><h1 align=\"center\">Az Ön művei</"
 "h1><p>Amit a Kritával készít, az az Ön kizárólagos tulajdona. Minden művét "
-"szabadon használhatja, ahogy szeretné.</p><p>Ez azt jelenti, hogy a Krita "
+"szabadon használhatja, ahogy szeretné.</p><p>Ez azt jelenti, hogy a IKriate "
 "kereskedelmi célokra, bármilyen szándékkal használható. Nincsenek "
-"korlátozások.</p><p>A Krita GNU GPL licence garantálja ezt a szabadságot. "
+"korlátozások.</p><p>A IKriate GNU GPL licence garantálja ezt a szabadságot. "
 "Senkinek sem megengedett, hogy ezt elvegye, ellentétben a kereskedelmi "
 "szoftverek próba- vagy oktatási verzióival, amelyek megtilthatják a munkát "
 "kereskedelmi helyzetekben.</p><br/><hr/><pre>"
@@ -26933,11 +26933,11 @@ msgstr ""
 #, kde-format
 msgid ""
 "<html><head/><body><h1 align=\"center\"><b>Third-party Libraries used by "
-"Krita</b></h1><p>Krita is built on the following free software libraries:</"
+"IKriate</b></h1><p>IKriate is built on the following free software libraries:</"
 "p><p><ul>"
 msgstr ""
-"<html><head/><body><h1 align=\"center\"><b>A Krita által használt külső "
-"könyvtárak</b></h1><p>A Krita a következő szabad szoftveres könyvtárakra "
+"<html><head/><body><h1 align=\"center\"><b>A IKriate által használt külső "
+"könyvtárak</b></h1><p>A IKriate a következő szabad szoftveres könyvtárakra "
 "épül:</p><p><ul>"
 
 #: libs/ui/dialogs/kis_delayed_save_dialog.cpp:57
@@ -27014,11 +27014,11 @@ msgstr "Szűrő: %1"
 #: libs/ui/dialogs/kis_dlg_hlg_import.ui:20
 #, kde-format
 msgid ""
-"<html><head/><body><p>This is an Hybrid Log Gamma image. Krita does not "
+"<html><head/><body><p>This is an Hybrid Log Gamma image. IKriate does not "
 "support sending HLG to the monitor, so for import it is recommended to "
 "convert from scene linear to display linear.</p></body></html>"
 msgstr ""
-"<html><head/><body><p>Ez egy Hybrid Log Gamma (HLG) kép. A Krita nem "
+"<html><head/><body><p>Ez egy Hybrid Log Gamma (HLG) kép. A IKriate nem "
 "támogatja a HLG monitorra küldését, ezért importáláskor javasolt a színtér-"
 "lineárisról kijelző-lineárisra való konvertálás.</p></body></html>"
 
@@ -27442,7 +27442,7 @@ msgstr "Munkamenet-kezelő megjelenítése"
 
 #: libs/ui/dialogs/kis_dlg_preferences.cc:569
 #, kde-format
-msgid "You will need to Restart Krita for the changes to take an effect."
+msgid "You will need to Restart IKriate for the changes to take an effect."
 msgstr "A módosítások érvénybe léptetéséhez újra kell indítania a Kritát."
 
 #: libs/ui/dialogs/kis_dlg_preferences.cc:575
@@ -27471,8 +27471,8 @@ msgstr "Kézi választás"
 #, kde-format
 msgctxt "@info resource folder"
 msgid ""
-"<p>You are using the Microsoft Store package version of Krita. Even though "
-"Krita can be configured to place resources under the user AppData location, "
+"<p>You are using the Microsoft Store package version of IKriate. Even though "
+"IKriate can be configured to place resources under the user AppData location, "
 "Windows may actually store the files inside a private app location.</p>\n"
 "<p>You should check both locations to determine where the files are located."
 "</p>\n"
@@ -27481,7 +27481,7 @@ msgid ""
 "<p><b>Private app location</b> (<a href=\"copyprivate\">Copy</a>):<br/>\n"
 "%2</p>"
 msgstr ""
-"<p>Ön a Krita Microsoft Store csomagverzióját használja. Bár a Krita "
+"<p>Ön a IKriate Microsoft Store csomagverzióját használja. Bár a IKriate "
 "beállítható úgy, hogy az erőforrásokat a felhasználói AppData mappába "
 "helyezze, a Windows valójában egy privát alkalmazáshelyen tárolhatja a "
 "fájlokat.</p>\n"
@@ -27563,7 +27563,7 @@ msgstr "Rajzvászon színkezelésének engedélyezése"
 msgid ""
 "<p>Enabling canvas color management automatically creates a separate native "
 "surface for the canvas. It might cause performance issues on some systems.</"
-"p><p>If color management is disabled, Krita will render the canvas into the "
+"p><p>If color management is disabled, IKriate will render the canvas into the "
 "surface of the main window, which is considered sRGB. It will cause two "
 "limitations:<ol>    <li>the color gamut will be limited to sRGB</li>    "
 "<li>color proofing mode will be limited to \"use global display settings"
@@ -27572,7 +27572,7 @@ msgstr ""
 "<p>A rajzvászon színkezelésének engedélyezése automatikusan létrehoz egy "
 "külön natív felületet a vászon számára. Ez bizonyos rendszereken "
 "teljesítménybeli problémákat okozhat.</p><p>Ha a színkezelés ki van "
-"kapcsolva, a Krita a főablak felületére rendereli a vásznat, ami sRGB-nek "
+"kapcsolva, a IKriate a főablak felületére rendereli a vásznat, ami sRGB-nek "
 "minősül. Ez két korlátozással jár:<ol>    <li>a színskála sRGB-re "
 "korlátozódik</li>    <li>a próbanyomat mód a \"globális megjelenítési "
 "beállítások használatára\" korlátozódik, azaz a papírfehér próbanyomat "
@@ -27811,7 +27811,7 @@ msgstr "EGL"
 #, kde-format
 msgctxt "@info:tooltip"
 msgid ""
-"<p>If you are using Krita on X11 or XWayland and experience slowness, try "
+"<p>If you are using IKriate on X11 or XWayland and experience slowness, try "
 "switching between EGL and GLX</p>"
 msgstr ""
 "<p>Ha X11 vagy XWayland rendszeren használja a Kritát és lassulást "
@@ -27869,8 +27869,8 @@ msgstr "<b>Figyelem:</b> a jelenlegi kijelző nem támogatja a HDR renderelést"
 
 #: libs/ui/dialogs/kis_dlg_preferences.cc:2510
 #, kde-format
-msgid "Configure Krita"
-msgstr "Krita beállítása"
+msgid "Configure IKriate"
+msgstr "IKriate beállítása"
 
 #: libs/ui/dialogs/kis_dlg_preferences.cc:2527
 #, kde-format
@@ -28076,10 +28076,10 @@ msgstr ""
 msgctxt "@info:tooltip"
 msgid ""
 "The amount of time during which the strokes will be kept unmerged. When a "
-"stroke becomes old enough, Krita will try to merge it"
+"stroke becomes old enough, IKriate will try to merge it"
 msgstr ""
 "Az az időtartam, ameddig az ecsetvonások egyesítetlenek maradnak. Amikor egy "
-"vonás elég régivé válik, a Krita megpróbálja egyesíteni azt"
+"vonás elég régivé válik, a IKriate megpróbálja egyesíteni azt"
 
 #: libs/ui/dialogs/KisDlgConfigureCumulativeUndo.cpp:60
 #, kde-format
@@ -28090,10 +28090,10 @@ msgstr "Várakozás az ecsetvonások egyesítése előtt:"
 #, kde-format
 msgctxt "@info:tooltip"
 msgid ""
-"The number of last strokes that Krita will not merge (even if they are old "
+"The number of last strokes that IKriate will not merge (even if they are old "
 "enough)"
 msgstr ""
-"Az utolsó ecsetvonások száma, amelyeket a Krita nem egyesít (még akkor sem, "
+"Az utolsó ecsetvonások száma, amelyeket a IKriate nem egyesít (még akkor sem, "
 "ha elég régiek)."
 
 #: libs/ui/dialogs/KisDlgConfigureCumulativeUndo.cpp:70
@@ -28136,20 +28136,20 @@ msgstr "Csoport maximális időtartama:"
 #: libs/ui/dialogs/KisDlgConfigureCumulativeUndo.cpp:101
 #, kde-format
 msgid ""
-"Cumulative Undo allows Krita to merge undo actions and make undo history "
-"cleaner. Krita will still keep a few latest actions unmerged according to "
+"Cumulative Undo allows IKriate to merge undo actions and make undo history "
+"cleaner. IKriate will still keep a few latest actions unmerged according to "
 "\"Wait before merging strokes\" and \"Exclude last strokes from merge\" "
 "options. Whenever an action gets outdated using the time limit and this "
-"action is not excluded using \"Exclude last strokes from merge\", Krita will "
+"action is not excluded using \"Exclude last strokes from merge\", IKriate will "
 "try  to merge this action into a group. The groups are formed using \"Max "
 "group strokes delay\" and \"Max group duration\" options."
 msgstr ""
-"A kumulatív visszavonás lehetővé teszi a Krita számára a visszavonási "
-"műveletek egyesítését, tisztábbá téve az előzményeket. A Krita továbbra is "
+"A kumulatív visszavonás lehetővé teszi a IKriate számára a visszavonási "
+"műveletek egyesítését, tisztábbá téve az előzményeket. A IKriate továbbra is "
 "egyesítetlenül hagy néhány legutóbbi műveletet a \"Várakozás az ecsetvonások "
 "egyesítése előtt\" és az \"Utolsó ecsetvonások kihagyása az egyesítésből\" "
 "opciók alapján. Amikor egy művelet elavul az időkorlát miatt, és nincs "
-"kizárva az utolsó vonások közül, a Krita megpróbálja azt egy csoportba "
+"kizárva az utolsó vonások közül, a IKriate megpróbálja azt egy csoportba "
 "egyesíteni. A csoportok a \"Csoportosított ecsetvonások max. időköze\" és a "
 "\"Csoport maximális időtartama\" opciók alapján jönnek létre."
 
@@ -28376,8 +28376,8 @@ msgstr "Halmozott"
 #: libs/ui/dialogs/KisDonationManagementDialog.ui:53
 #, kde-format
 msgid ""
-"No supporter benefits available on this version of Krita.\n"
-"You can still support Krita by donating."
+"No supporter benefits available on this version of IKriate.\n"
+"You can still support IKriate by donating."
 msgstr ""
 
 #. i18n: ectx: property (text), widget (QPushButton, m_btnNoBenefitsSupport)
@@ -28471,8 +28471,8 @@ msgstr ""
 #. i18n: ectx: property (windowTitle), widget (QDialog, KisRecoverNamedAutosaveDialog)
 #: libs/ui/dialogs/KisRecoverNamedAutosaveDialog.ui:21 libs/ui/wdgsplash.ui:309
 #, kde-format
-msgid "Krita"
-msgstr "Krita"
+msgid "IKriate"
+msgstr "IKriate"
 
 #. i18n: ectx: property (text), widget (QRadioButton, rbOpenAutosave)
 #: libs/ui/dialogs/KisRecoverNamedAutosaveDialog.ui:37
@@ -28607,8 +28607,8 @@ msgstr "Felhasználói kézikönyv"
 #: libs/ui/forms/KisWelcomePage.ui:525 libs/ui/KisWelcomePageWidget.cpp:364
 #: plugins/extensions/resourcemanager/KisSupporterBundleWidget.ui:173
 #, kde-format
-msgid "Support Krita"
-msgstr "Krita támogatása"
+msgid "Support IKriate"
+msgstr "IKriate támogatása"
 
 #. i18n: ectx: property (text), widget (QLabel, poweredByKDELink)
 #: libs/ui/forms/KisWelcomePage.ui:615 libs/ui/KisWelcomePageWidget.cpp:373
@@ -28637,8 +28637,8 @@ msgstr "Felhasználói közösség"
 #. i18n: ectx: property (text), widget (QLabel, kritaWebsiteLink)
 #: libs/ui/forms/KisWelcomePage.ui:966 libs/ui/KisWelcomePageWidget.cpp:367
 #, kde-format
-msgid "Krita Website"
-msgstr "Krita weboldala"
+msgid "IKriate Website"
+msgstr "IKriate weboldala"
 
 #. i18n: ectx: property (text), widget (QLabel, recentDocumentsLabel)
 #: libs/ui/forms/KisWelcomePage.ui:1041
@@ -28678,8 +28678,8 @@ msgstr "Hírek beállításai"
 #. i18n: ectx: property (text), widget (QLabel, versionNotificationLabel)
 #: libs/ui/forms/KisWelcomePage.ui:1377
 #, kde-format
-msgid "Krita Version X.X.X Available"
-msgstr "Elérhető a Krita X.X.X verziója"
+msgid "IKriate Version X.X.X Available"
+msgstr "Elérhető a IKriate X.X.X verziója"
 
 #. i18n: ectx: property (text), widget (QPushButton, bnVersionUpdate)
 #: libs/ui/forms/KisWelcomePage.ui:1428
@@ -28716,7 +28716,7 @@ msgid ""
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body>\n"
 "<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-"
-"right:0px; -qt-block-indent:0; text-indent:0px;\">Krita is an open source "
+"right:0px; -qt-block-indent:0; text-indent:0px;\">IKriate is an open source "
 "and community-driven tool for digital artists everywhere.<br />Progress is "
 "made possible thanks to ongoing support from our community of <a href="
 "\"https://docs.krita.org/en/contributors_manual.html\">contributors</a>, <a "
@@ -28730,7 +28730,7 @@ msgstr ""
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body>\n"
 "<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-"
-"right:0px; -qt-block-indent:0; text-indent:0px;\">A Krita egy nyílt "
+"right:0px; -qt-block-indent:0; text-indent:0px;\">A IKriate egy nyílt "
 "forráskódú és közösségi összefogással készülő eszköz digitális művészek "
 "számára szerte a világon.<br />A fejlődés a közösségünk folyamatos "
 "támogatásának köszönhető: <a href=\"https://docs.krita.org/en/"
@@ -28741,7 +28741,7 @@ msgstr ""
 #. i18n: ectx: property (text), widget (QLabel, lblAndroidSupporter)
 #: libs/ui/forms/KisWelcomePage.ui:1659
 #, kde-format
-msgid "Krita is made possible thanks to ongoing support from people like you!"
+msgid "IKriate is made possible thanks to ongoing support from people like you!"
 msgstr ""
 
 #. i18n: ectx: property (text), widget (QPushButton, bnAndroidSupporterManage)
@@ -28754,8 +28754,8 @@ msgstr ""
 #: libs/ui/forms/KisWelcomePage.ui:1717 libs/ui/KisWelcomePageWidget.cpp:844
 #, fuzzy, kde-format
 #| msgid "Support Krita"
-msgid "Support Krita!"
-msgstr "Krita támogatása"
+msgid "Support IKriate!"
+msgstr "IKriate támogatása"
 
 #. i18n: ectx: property (text), widget (QLabel, lblLastPrintedDesc)
 #: libs/ui/forms/koDocumentInfoAboutWidget.ui:28
@@ -28961,7 +28961,7 @@ msgstr "Névjegy"
 #. i18n: ectx: attribute (title), widget (QWidget, authorsTab)
 #: libs/ui/forms/wdgaboutapplication.ui:35
 #, kde-format
-msgctxt "Heading for the list of Krita authors/developers"
+msgctxt "Heading for the list of IKriate authors/developers"
 msgid "Authors"
 msgstr "Szerzők"
 
@@ -29006,11 +29006,11 @@ msgstr "Profil alkalmazása"
 #, kde-format
 msgid ""
 "The image data you want to paste does not have an ICM profile associated "
-"with it. If you do not select a profile, Krita will assume that the image "
+"with it. If you do not select a profile, IKriate will assume that the image "
 "data is encoded in the import profile defined in the Settings dialog."
 msgstr ""
 "A beilleszteni kívánt képadatokhoz nincs ICM-profil rendelve. Ha nem választ "
-"ki egy profilt, a Krita feltételezi, hogy a képadatok a Beállítások ablakban "
+"ki egy profilt, a IKriate feltételezi, hogy a képadatok a Beállítások ablakban "
 "megadott importálási profillal vannak kódolva."
 
 #. i18n: ectx: property (text), widget (QLabel, lblProfile)
@@ -29166,7 +29166,7 @@ msgstr "Alapértelmezett színmodell használata új képekhez"
 #. i18n: ectx: property (title), widget (QGroupBox, grpPasteBehaviour)
 #: libs/ui/forms/wdgcolorsettings.ui:77 libs/ui/forms/wdggeneralsettings.ui:250
 #, kde-format
-msgid "When Pasting Into Krita From Other Applications"
+msgid "When Pasting Into IKriate From Other Applications"
 msgstr "Más alkalmazásokból a Kritába való beillesztéskor"
 
 #. i18n: ectx: property (text), widget (QRadioButton, radioPasteWeb)
@@ -29190,7 +29190,7 @@ msgstr "Rá&kérdezés minden alkalommal"
 #. i18n: ectx: property (text), widget (QLabel, textLabel1_2_2)
 #: libs/ui/forms/wdgcolorsettings.ui:104
 #, kde-format
-msgid "Note: When copying/pasting inside Krita color info is always preserved."
+msgid "Note: When copying/pasting inside IKriate color info is always preserved."
 msgstr ""
 "Megjegyzés: A Kritán belüli másoláskor/beillesztéskor a színinformációk "
 "mindig megmaradnak."
@@ -29472,11 +29472,11 @@ msgstr "Feketepont-&kompenzáció használata"
 #: libs/ui/forms/wdgconvertcolorspace.ui:140
 #, kde-format
 msgid ""
-"Krita tries to automatically check or uncheck this based on the information "
+"IKriate tries to automatically check or uncheck this based on the information "
 "it can get from the profile you are converting from and the profile you are "
 "converting to."
 msgstr ""
-"A Krita megpróbálja ezt automatikusan be- vagy kikapcsolni a forrás- és a "
+"A IKriate megpróbálja ezt automatikusan be- vagy kikapcsolni a forrás- és a "
 "célprofilból kinyert információk alapján."
 
 #. i18n: ectx: property (text), widget (QLabel, textLabel1)
@@ -29913,11 +29913,11 @@ msgstr "Fájl:"
 #: libs/ui/forms/wdgdlgfilelayer.ui:87
 #, kde-format
 msgid ""
-"<html><head/><body><p>Warning: Krita uses a relative path to store the "
+"<html><head/><body><p>Warning: IKriate uses a relative path to store the "
 "location of the file in the .kra. If you move the .kra but not the file, the "
 "file layer may be broken.</p></body></html>"
 msgstr ""
-"<html><head/><body><p>Figyelem: A Krita relatív útvonalat használ a fájl "
+"<html><head/><body><p>Figyelem: A IKriate relatív útvonalat használ a fájl "
 "helyének tárolására a .kra fájlban. Ha elmozgatja a .kra fájlt, de a "
 "forrásfájlt nem, a fájlréteg megszakadhat.</p></body></html>"
 
@@ -30043,9 +30043,9 @@ msgstr "XML"
 #. i18n: ectx: property (text), widget (QLabel, label)
 #: libs/ui/forms/wdgfullscreensettings.ui:25
 #, kde-format
-msgid "Select which parts of Krita will be hidden in canvas-only mode."
+msgid "Select which parts of IKriate will be hidden in canvas-only mode."
 msgstr ""
-"Válassza ki, a Krita mely részei legyenek rejtettek csak rajzvászon módban."
+"Válassza ki, a IKriate mely részei legyenek rejtettek csak rajzvászon módban."
 
 #. i18n: ectx: property (text), widget (QCheckBox, chkMenu)
 #: libs/ui/forms/wdgfullscreensettings.ui:35
@@ -30074,8 +30074,8 @@ msgstr "Görgetősávok"
 #. i18n: ectx: property (text), widget (QCheckBox, chkTitlebar)
 #: libs/ui/forms/wdgfullscreensettings.ui:63
 #, kde-format
-msgid "Titlebar (hiding the titlebar will make Krita go full-screen)"
-msgstr "Címsor (a címsor elrejtésekor a Krita teljes képernyős módba vált)"
+msgid "Titlebar (hiding the titlebar will make IKriate go full-screen)"
+msgstr "Címsor (a címsor elrejtésekor a IKriate teljes képernyős módba vált)"
 
 #. i18n: ectx: property (text), widget (QCheckBox, chkStatusbar)
 #: libs/ui/forms/wdgfullscreensettings.ui:70
@@ -30204,10 +30204,10 @@ msgstr ""
 #: libs/ui/forms/wdggeneralsettings.ui:190
 #, kde-format
 msgid ""
-"Use Zip64 (for very large files: cannot be opened in versions of Krita older "
+"Use Zip64 (for very large files: cannot be opened in versions of IKriate older "
 "than 4.2.0)"
 msgstr ""
-"Zip64 használata (nagyon nagy fájlokhoz: a 4.2.0-nál régebbi Krita verziók "
+"Zip64 használata (nagyon nagy fájlokhoz: a 4.2.0-nál régebbi IKriate verziók "
 "nem tudják megnyitni)"
 
 #. i18n: ectx: property (text), widget (QCheckBox, m_chkCompressKra)
@@ -30751,14 +30751,14 @@ msgstr "Erőforrásmappa:"
 #. i18n: ectx: property (text), widget (QLabel, label_12)
 #: libs/ui/forms/wdggeneralsettings.ui:1316
 #, kde-format
-msgid "When Krita starts:"
-msgstr "A Krita indulásakor:"
+msgid "When IKriate starts:"
+msgstr "A IKriate indulásakor:"
 
 #. i18n: ectx: property (text), widget (QCheckBox, chkSaveSessionOnQuit)
 #: libs/ui/forms/wdggeneralsettings.ui:1333
 #, kde-format
-msgid "Save session when Krita closes"
-msgstr "Munkamenet mentése a Krita bezárásakor"
+msgid "Save session when IKriate closes"
+msgstr "Munkamenet mentése a IKriate bezárásakor"
 
 #. i18n: ectx: property (text), widget (QCheckBox, m_chkConvertOnImport)
 #: libs/ui/forms/wdggeneralsettings.ui:1340
@@ -30861,12 +30861,12 @@ msgstr "Betűméret DPI áthidaló megoldás"
 #: libs/ui/forms/wdggeneralsettings.ui:1578
 #, kde-format
 msgid ""
-"In some Krita versions before 5.0 text size could be dependent on the "
+"In some IKriate versions before 5.0 text size could be dependent on the "
 "current display DPI (which was a bug).\n"
 "In Krita 5.0 this bug has been fixed, which may cause files created in "
 "previous versions look different. \n"
 "\n"
-"When loading old files Krita will try to adjust font size to the DPI of the "
+"When loading old files IKriate will try to adjust font size to the DPI of the "
 "current screen.\n"
 "If the file has been created on a different display, try adjusting this "
 "value manually.\n"
@@ -30874,12 +30874,12 @@ msgid ""
 "After saving the file in Krita 5.0 at least once, no conversions will be "
 "needed anymore."
 msgstr ""
-"Néhány 5.0 előtti Krita verzióban a szövegméret függhetett az aktuális "
+"Néhány 5.0 előtti IKriate verzióban a szövegméret függhetett az aktuális "
 "kijelző DPI-jétől (ami hiba volt).\n"
 "A Krita 5.0-ban ezt a hibát javítottuk, ami miatt a korábbi verziókban "
 "készült fájlok másképpen nézhetnek ki. \n"
 "\n"
-"Régi fájlok betöltésekor a Krita megpróbálja hozzáigazítani a betűméretet az "
+"Régi fájlok betöltésekor a IKriate megpróbálja hozzáigazítani a betűméretet az "
 "aktuális képernyő DPI-jéhez.\n"
 "Ha a fájl egy másik kijelzőn készült, próbálja meg kézzel módosítani ezt az "
 "értéket.\n"
@@ -30899,14 +30899,14 @@ msgstr "DPI:"
 #: libs/ui/forms/wdggeneralsettings.ui:1590
 #, kde-format
 msgid ""
-"In some versions of Krita before 4.4.3 text size could be dependent on the "
+"In some versions of IKriate before 4.4.3 text size could be dependent on the "
 "current display DPI (which was a bug).\n"
 "In Krita 4.4.3 this bug has been fixed, which may cause files created in "
 "previous versions look different.\n"
-"To restore the old behavior you can force Krita to use Display DPI for fonts "
+"To restore the old behavior you can force IKriate to use Display DPI for fonts "
 "by entering it in this field."
 msgstr ""
-"Néhány 4.4.3 előtti Krita verzióban a szövegméret függhetett az aktuális "
+"Néhány 4.4.3 előtti IKriate verzióban a szövegméret függhetett az aktuális "
 "kijelző DPI-jétől (ami hiba volt).\n"
 "A Krita 4.4.3-ban ezt a hibát javítottuk, ami miatt a korábbi verziókban "
 "készült fájlok másképpen nézhetnek ki.\n"
@@ -30967,13 +30967,13 @@ msgstr ""
 #, kde-format
 msgid ""
 "Some applications may emulate presses of function keys with high numbers (e."
-"g. F22) to bring themselves to the foreground. This may break Krita's "
+"g. F22) to bring themselves to the foreground. This may break IKriate's "
 "shortcuts and actions system. If you have a keyboard with F13 or higher "
 "function keys, and you wish to use them, try disabling this option, but take "
 "this potential problem into account."
 msgstr ""
 "Néhány alkalmazás magas számú funkciógombok (pl. F22) megnyomásával "
-"próbálhat az előtérbe kerülni. Ez megzavarhatja a Krita gyorsbillentyű- és "
+"próbálhat az előtérbe kerülni. Ez megzavarhatja a IKriate gyorsbillentyű- és "
 "műveleti rendszerét. Ha olyan billentyűzete van, amelyen vannak F13 vagy "
 "magasabb funkciógombok, és használni szeretné őket, próbálja meg kikapcsolni "
 "ezt az opciót, de vegye figyelembe ezt a lehetséges problémát."
@@ -31883,7 +31883,7 @@ msgstr "&Megjegyzés"
 #. i18n: ectx: property (text), widget (QLabel, label_10)
 #: libs/ui/forms/wdgperformancesettings.ui:38
 #, kde-format
-msgid "Note: Krita will need to be restarted for changes to take effect"
+msgid "Note: IKriate will need to be restarted for changes to take effect"
 msgstr ""
 "Megjegyzés: A Kritát újra kell indítani a módosítások érvénybe lépéséhez"
 
@@ -31910,8 +31910,8 @@ msgstr "XXX MiB"
 #: libs/ui/forms/wdgperformancesettings.ui:84
 #: libs/ui/forms/wdgperformancesettings.ui:102
 #, kde-format
-msgid "Krita will not use more memory than this limit."
-msgstr "A Krita nem fog ennél több memóriát használni."
+msgid "IKriate will not use more memory than this limit."
+msgstr "A IKriate nem fog ennél több memóriát használni."
 
 #. i18n: ectx: property (text), widget (QLabel, label)
 #: libs/ui/forms/wdgperformancesettings.ui:87
@@ -31997,10 +31997,10 @@ msgstr "CPU korlát:"
 #: libs/ui/forms/wdgperformancesettings.ui:275
 #, kde-format
 msgid ""
-"<html><head/><body><p>Krita will not use more CPU cores than selected by "
+"<html><head/><body><p>IKriate will not use more CPU cores than selected by "
 "this limit</p></body></html>"
 msgstr ""
-"<html><head/><body><p>A Krita nem használ több processzormagot az itt "
+"<html><head/><body><p>A IKriate nem használ több processzormagot az itt "
 "megadott korlátnál</p></body></html>"
 
 #. i18n: ectx: property (text), widget (QLabel, label_9)
@@ -32014,7 +32014,7 @@ msgstr "Képkockarenderelési klónok korlátja"
 #, no-c-format, kde-format
 msgid ""
 "<html><head/><body><p>When rendering animation frames (into files or during "
-"animation cache regeneration), Krita will make the specified number of "
+"animation cache regeneration), IKriate will make the specified number of "
 "copies of your image and will work on them in parallel. Each copy will "
 "demand more RAM for its storage (about 20% of the size of you image), so "
 "raise this limit only if you have enough RAM installed.</p><p><br/></"
@@ -32023,7 +32023,7 @@ msgid ""
 "\">physical</span> (non-hyperthreaded) cores your CPU has</p></body></html>"
 msgstr ""
 "<html><head/><body><p>Animációs képkockák renderelésekor (fájlba vagy a "
-"gyorsítótár frissítésekor) a Krita megadott számú másolatot készít a képből, "
+"gyorsítótár frissítésekor) a IKriate megadott számú másolatot készít a képből, "
 "és párhuzamosan dolgozik rajtuk. Minden másolat további RAM-ot igényel (a "
 "képméret kb. 20%-át), ezért csak akkor növelje ezt a korlátot, ha elegendő "
 "memóriával rendelkezik.</p><p><br/></p><p><span style=\" font-weight:600;"
@@ -32067,12 +32067,12 @@ msgstr "Képkockasebesség korlát:"
 #: libs/ui/forms/wdgperformancesettings.ui:344
 #, kde-format
 msgid ""
-"<html><head/><body><p>Krita will try to limit the number of screen updates "
+"<html><head/><body><p>IKriate will try to limit the number of screen updates "
 "per second to the given number. A lower number will decrease visual "
 "responsiveness but increase stylus precision on some systems like macOS.<p></"
 "body></html>"
 msgstr ""
-"<html><head/><body><p>A Krita megpróbálja a másodpercenkénti "
+"<html><head/><body><p>A IKriate megpróbálja a másodpercenkénti "
 "képernyőfrissítések számát a megadott értékre korlátozni. Az alacsonyabb "
 "szám csökkenti a vizuális válaszkészséget, de növeli a toll precizitását "
 "bizonyos rendszereken, például macOS-en.<p></body></html>"
@@ -32129,12 +32129,12 @@ msgstr "Teljesítménynaplózás"
 #: libs/ui/forms/wdgperformancesettings.ui:415
 #, kde-format
 msgid ""
-"<html><head/><body><p>When performance logging is enabled Krita saves timing "
+"<html><head/><body><p>When performance logging is enabled IKriate saves timing "
 "information into the <tt>&lt;working_dir&gt;/log</tt> folder. If you "
 "experience performance problems and want to help us, enable this option and "
 "add the contents of the directory to a bug report.</p></body></html>"
 msgstr ""
-"<html><head/><body><p>Ha a teljesítménynaplózás engedélyezve van, a Krita az "
+"<html><head/><body><p>Ha a teljesítménynaplózás engedélyezve van, a IKriate az "
 "időzítési információkat a <tt>&lt;working_dir&gt;/log</tt> mappába menti. Ha "
 "teljesítményproblémákat tapasztal, és segíteni szeretne nekünk, engedélyezze "
 "ezt az opciót, és csatolja a könyvtár tartalmát a hibajelentéshez.</p></"
@@ -32960,8 +32960,8 @@ msgstr "0.0"
 #. i18n: ectx: property (title), widget (QGroupBox, grpTabletApi)
 #: libs/ui/forms/wdgtabletsettings.ui:130
 #, kde-format
-msgid "Tablet Input API (changing this requires restarting Krita)"
-msgstr "Tablet bemeneti API (módosítása után a Krita újraindítása szükséges)"
+msgid "Tablet Input API (changing this requires restarting IKriate)"
+msgstr "Tablet bemeneti API (módosítása után a IKriate újraindítása szükséges)"
 
 #. i18n: ectx: property (text), widget (QRadioButton, radioWintab)
 #: libs/ui/forms/wdgtabletsettings.ui:138
@@ -32988,14 +32988,14 @@ msgstr "Windows 8+ mutatóeszköz-bemenet (Windows Ink)"
 msgid ""
 "<html><head/><body><p>Some tablet devices don't pass barrel-button clicks "
 "via tablet API. If you have such a device, you can try activate this "
-"workaround. Krita will try to read right- and middle-button clicks from the "
+"workaround. IKriate will try to read right- and middle-button clicks from the "
 "mouse events stream. It may or may not work on your device (depends on the "
 "tablet driver implementation).</p><p><br/></p><p>After changing this option "
-"Krita should be restarted.</p></body></html>"
+"IKriate should be restarted.</p></body></html>"
 msgstr ""
 "<html><head/><body><p>Néhány táblagép nem továbbítja a toll gombjainak "
 "kattintásait a tablet API-n keresztül. Ha ilyen eszköze van, megpróbálhatja "
-"aktiválni ezt az áthidaló megoldást. A Krita megpróbálja beolvasni a jobb és "
+"aktiválni ezt az áthidaló megoldást. A IKriate megpróbálja beolvasni a jobb és "
 "középső kattintásokat az egéresemények folyamából. Ez az eszköztől függően "
 "vagy működik, vagy nem (a tablet-illesztőprogram megvalósításától függ).</"
 "p><p><br/></p><p>Az opció módosítása után a Kritát újra kell indítani.</p></"
@@ -33045,10 +33045,10 @@ msgstr ""
 #: libs/ui/forms/wdgtabletsettings.ui:227
 #, kde-format
 msgid ""
-"Amount of smoothing Krita should do to speed sensor. This value is very "
+"Amount of smoothing IKriate should do to speed sensor. This value is very "
 "hardware-dependent"
 msgstr ""
-"A Krita által a sebességérzékelő adatain végzett simítás mértéke. Ez az "
+"A IKriate által a sebességérzékelő adatain végzett simítás mértéke. Ez az "
 "érték nagyban függ a hardvertől"
 
 #. i18n: ectx: property (toolTip), widget (KisAngleSelector, tiltDirectionOffsetAngle)
@@ -35114,26 +35114,26 @@ msgstr ""
 
 #: libs/ui/kis_splash_screen.cpp:210
 #, kde-format
-msgid "<p><span style=\" color:%1;\"><b>Using Krita</b></span></p>"
-msgstr "<p><span style=\" color:%1;\"><b>A Krita használata</b></span></p>"
+msgid "<p><span style=\" color:%1;\"><b>Using IKriate</b></span></p>"
+msgstr "<p><span style=\" color:%1;\"><b>A IKriate használata</b></span></p>"
 
 #: libs/ui/kis_splash_screen.cpp:217
 #, kde-format
 msgid ""
 "<p><a href=\"https://krita.org/support-us/\"><span style=\" text-decoration: "
-"underline; color:%1;\">Support Krita's Development!</span></a></p>"
+"underline; color:%1;\">Support IKriate's Development!</span></a></p>"
 msgstr ""
 "<p><a href=\"https://krita.org/support-us/\"><span style=\" text-decoration: "
-"underline; color:%1;\">Támogassa a Krita fejlesztését!</span></a></p>"
+"underline; color:%1;\">Támogassa a IKriate fejlesztését!</span></a></p>"
 
 #: libs/ui/kis_splash_screen.cpp:218
 #, kde-format
 msgid ""
 "<p><a href=\"https://krita.org/\"><span style=\" text-decoration: underline; "
-"color:%1;\">Krita Website</span></a></p>"
+"color:%1;\">IKriate Website</span></a></p>"
 msgstr ""
 "<p><a href=\"https://krita.org/\"><span style=\" text-decoration: underline; "
-"color:%1;\">A Krita weboldala</span></a></p>"
+"color:%1;\">A IKriate weboldala</span></a></p>"
 
 #: libs/ui/kis_splash_screen.cpp:222
 #, kde-format
@@ -35157,8 +35157,8 @@ msgstr ""
 
 #: libs/ui/kis_splash_screen.cpp:225
 #, kde-format
-msgid "<p><span style=\" color:%1;\"><b>Coding Krita</b></span></p>"
-msgstr "<p><span style=\" color:%1;\"><b>Krita programozása</b></span></p>"
+msgid "<p><span style=\" color:%1;\"><b>Coding IKriate</b></span></p>"
+msgstr "<p><span style=\" color:%1;\"><b>IKriate programozása</b></span></p>"
 
 #: libs/ui/kis_splash_screen.cpp:226
 #, kde-format
@@ -35253,7 +35253,7 @@ msgid ""
 "\n"
 "\n"
 "WARNING:\tOut of memory! Swapping has been started.\n"
-"\t\tPlease configure more RAM for Krita in Settings dialog"
+"\t\tPlease configure more RAM for IKriate in Settings dialog"
 msgstr ""
 "\n"
 "\n"
@@ -35400,28 +35400,28 @@ msgstr "Stílusbeállítások"
 msgid ""
 "%1\n"
 "\n"
-"Krita will quit now."
+"IKriate will quit now."
 msgstr ""
 "%1\n"
 "\n"
-"A Krita most kilép."
+"A IKriate most kilép."
 
 #: libs/ui/KisApplication.cpp:481 libs/ui/KisApplication.cpp:487
 #, kde-format
 msgctxt "@title:window"
-msgid "Krita: Fatal error"
-msgstr "Krita: Végzetes hiba"
+msgid "IKriate: Fatal error"
+msgstr "IKriate: Végzetes hiba"
 
 #: libs/ui/KisApplication.cpp:487
 #, kde-format
 msgid ""
 "\n"
 "\n"
-"Krita will quit now."
+"IKriate will quit now."
 msgstr ""
 "\n"
 "\n"
-"A Krita most kilép."
+"A IKriate most kilép."
 
 #: libs/ui/KisApplication.cpp:524
 #, kde-format
@@ -35484,8 +35484,8 @@ msgstr "Fájlréteg"
 #: libs/ui/KisApplication.cpp:1121
 #, kde-format
 msgctxt "@title:window"
-msgid "Krita:Warning"
-msgstr "Krita: Figyelmeztetés"
+msgid "IKriate:Warning"
+msgstr "IKriate: Figyelmeztetés"
 
 #: libs/ui/KisApplication.cpp:838 libs/ui/KisApplication.cpp:1117
 #, kde-format
@@ -35501,7 +35501,7 @@ msgid ""
 "an existing file.\n"
 "\n"
 "If you instead want to add the file layer to a document in an already "
-"running instance of Krita, check the \"Allow only one instance of Krita\" "
+"running instance of IKriate, check the \"Allow only one instance of IKriate\" "
 "checkbox in the settings (Settings -> General -> Window)."
 msgstr ""
 "A fájlréteg hozzáadása sikertelen: nincs nyitva dokumentum.\n"
@@ -35509,8 +35509,8 @@ msgstr ""
 "Létrehozhat egy új dokumentumot a --new-image opcióval, vagy megnyithat egy "
 "létező fájlt.\n"
 "\n"
-"Ha a fájlréteget egy már futó Krita példány dokumentumához szeretné adni, "
-"jelölje be a \"Csak egy Krita példány engedélyezése\" jelölőnégyzetet a "
+"Ha a fájlréteget egy már futó IKriate példány dokumentumához szeretné adni, "
+"jelölje be a \"Csak egy IKriate példány engedélyezése\" jelölőnégyzetet a "
 "beállításokban (Beállítások -> Általános -> Ablak)."
 
 #: libs/ui/KisApplication.cpp:849
@@ -35552,13 +35552,13 @@ msgstr "A(z) %1 sablon betöltése sikertelen."
 #: libs/ui/KisApplication.cpp:1301
 #, kde-format
 msgid ""
-"Krita configurations reset!\n"
+"IKriate configurations reset!\n"
 "\n"
 "Backup file was created at: %1\n"
 "\n"
-"Restart Krita for changes to take effect."
+"Restart IKriate for changes to take effect."
 msgstr ""
-"A Krita beállításai alaphelyzetbe álltak!\n"
+"A IKriate beállításai alaphelyzetbe álltak!\n"
 "\n"
 "Biztonsági másolat készült ide: %1\n"
 "\n"
@@ -35619,23 +35619,23 @@ msgstr ""
 
 #: libs/ui/KisApplicationArguments.cpp:84
 #, kde-format
-msgid "The name of the workspace to open Krita with"
-msgstr "A munkaterület neve, mellyel a Krita megnyílik"
+msgid "The name of the workspace to open IKriate with"
+msgstr "A munkaterület neve, mellyel a IKriate megnyílik"
 
 #: libs/ui/KisApplicationArguments.cpp:85
 #, kde-format
-msgid "The name of the window layout to open Krita with"
-msgstr "Az ablakelrendezés neve, mellyel a Krita megnyílik"
+msgid "The name of the window layout to open IKriate with"
+msgstr "Az ablakelrendezés neve, mellyel a IKriate megnyílik"
 
 #: libs/ui/KisApplicationArguments.cpp:86
 #, kde-format
-msgid "The name of the session to open Krita with"
-msgstr "A munkamenet neve, mellyel a Krita megnyílik"
+msgid "The name of the session to open IKriate with"
+msgstr "A munkamenet neve, mellyel a IKriate megnyílik"
 
 #: libs/ui/KisApplicationArguments.cpp:87
 #, kde-format
-msgid "Start Krita in canvas-only mode"
-msgstr "Krita indítása csak rajzvászon módban"
+msgid "Start IKriate in canvas-only mode"
+msgstr "IKriate indítása csak rajzvászon módban"
 
 #: libs/ui/KisApplicationArguments.cpp:88
 #, kde-format
@@ -35644,8 +35644,8 @@ msgstr "Ne jelenítse meg az üdvözlőképernyőt"
 
 #: libs/ui/KisApplicationArguments.cpp:89
 #, kde-format
-msgid "Start Krita in full-screen mode"
-msgstr "Krita indítása teljes képernyős módban"
+msgid "Start IKriate in full-screen mode"
+msgstr "IKriate indítása teljes képernyős módban"
 
 #: libs/ui/KisApplicationArguments.cpp:91
 #, kde-format
@@ -35674,8 +35674,8 @@ msgstr "Létező vagy új fájlhoz hozzáadandó fájlréteg"
 
 #: libs/ui/KisApplicationArguments.cpp:99
 #, kde-format
-msgid "A location that overrides the configured location for Krita's resources"
-msgstr "Egy hely, amely felülbírálja a Krita erőforrásainak beállított helyét"
+msgid "A location that overrides the configured location for IKriate's resources"
+msgstr "Egy hely, amely felülbírálja a IKriate erőforrásainak beállított helyét"
 
 #: libs/ui/KisApplicationArguments.cpp:100
 #, kde-format
@@ -35942,7 +35942,7 @@ msgstr "A fájl átméretezése sikertelen."
 
 #: libs/ui/KisImportExportErrorCode.cpp:50
 #, kde-format
-msgid "Permission denied. Krita is not allowed to read or write to the file."
+msgid "Permission denied. IKriate is not allowed to read or write to the file."
 msgstr ""
 "Hozzáférés megtagadva. A Kritának nincs joga a fájl olvasásához vagy "
 "írásához."
@@ -35974,7 +35974,7 @@ msgstr "A fájl nem létezik."
 
 #: libs/ui/KisImportExportErrorCode.cpp:157
 #, kde-format
-msgid "Permission denied: Krita is not allowed to read the file."
+msgid "Permission denied: IKriate is not allowed to read the file."
 msgstr "Hozzáférés megtagadva: A Kritának nincs joga a fájl olvasásához."
 
 #: libs/ui/KisImportExportErrorCode.cpp:159
@@ -36004,7 +36004,7 @@ msgstr "A fájl létrehozása sikertelen."
 
 #: libs/ui/KisImportExportErrorCode.cpp:171
 #, kde-format
-msgid "Permission denied: Krita is not allowed to write to the file."
+msgid "Permission denied: IKriate is not allowed to write to the file."
 msgstr "Hozzáférés megtagadva: A Kritának nincs joga a fájl írásához."
 
 #: libs/ui/KisImportExportErrorCode.cpp:173
@@ -36019,8 +36019,8 @@ msgstr "Hiba történt a fájl írása során."
 
 #: libs/ui/KisImportExportErrorCode.cpp:177
 #, kde-format
-msgid "Krita does not support this file format."
-msgstr "A Krita nem támogatja ezt a fájlformátumot."
+msgid "IKriate does not support this file format."
+msgstr "A IKriate nem támogatja ezt a fájlformátumot."
 
 #: libs/ui/KisImportExportErrorCode.cpp:181
 #, kde-format
@@ -36228,8 +36228,8 @@ msgstr "Oka:"
 #: libs/ui/KisImportExportManager.cpp:621
 #, kde-format
 msgctxt "@title:window"
-msgid "Krita: Export Error"
-msgstr "Krita: Exportálási hiba"
+msgid "IKriate: Export Error"
+msgstr "IKriate: Exportálási hiba"
 
 #: libs/ui/KisImportExportManager.cpp:638
 #, kde-format
@@ -36265,8 +36265,8 @@ msgstr "Átméretezés"
 
 #: libs/ui/KisImportExportManager.cpp:685
 #, kde-format
-msgid "Also save your image as a Krita file."
-msgstr "Mentse a képet Krita fájlként is."
+msgid "Also save your image as a IKriate file."
+msgstr "Mentse a képet IKriate fájlként is."
 
 #: libs/ui/KisImportExportUtils.cpp:48
 #, kde-format
@@ -36277,10 +36277,10 @@ msgstr "Kép színterének konvertálása importáláskor"
 #, kde-format
 msgctxt "the argument is the ICC profile name"
 msgid ""
-"The image has a profile attached that Krita cannot edit images in (\"%1\"), "
+"The image has a profile attached that IKriate cannot edit images in (\"%1\"), "
 "please select a space to convert to for editing: \n"
 msgstr ""
-"A képhez olyan profil van csatolva (\"%1\"), melyben a Krita nem tud képeket "
+"A képhez olyan profil van csatolva (\"%1\"), melyben a IKriate nem tud képeket "
 "szerkeszteni. Válasszon egy színteret a szerkesztéshez való "
 "konvertáláshoz: \n"
 
@@ -36447,10 +36447,10 @@ msgstr "%1 %2"
 #: libs/ui/KisMainWindow.cpp:3003
 #, kde-format
 msgid ""
-"The Krita LittleCMS color management plugin is not installed. Krita will "
+"The IKriate LittleCMS color management plugin is not installed. IKriate will "
 "quit now."
 msgstr ""
-"A Krita LittleCMS színkezelő bővítmény nincs telepítve. A Krita most kilép."
+"A IKriate LittleCMS színkezelő bővítmény nincs telepítve. A IKriate most kilép."
 
 #: libs/ui/KisMainWindow.cpp:3019
 #, kde-format
@@ -36494,8 +36494,8 @@ msgstr "Új paletta neve:"
 #: libs/ui/KisPaletteEditor.cpp:103
 #, kde-format
 msgctxt "Palette File Type"
-msgid "Krita Palette (KPL)"
-msgstr "Krita paletta (KPL)"
+msgid "IKriate Palette (KPL)"
+msgstr "IKriate paletta (KPL)"
 
 #: libs/ui/KisPaletteEditor.cpp:104
 #, kde-format
@@ -36713,8 +36713,8 @@ msgstr "Új sablon használata alapértelmezettként"
 
 #: libs/ui/KisTemplateCreateDia.cpp:153
 #, kde-format
-msgid "Use the new template every time Krita starts"
-msgstr "Új sablon használata a Krita minden indításakor"
+msgid "Use the new template every time IKriate starts"
+msgstr "Új sablon használata a IKriate minden indításakor"
 
 #: libs/ui/KisTemplateCreateDia.cpp:285
 #, kde-format
@@ -36901,8 +36901,8 @@ msgstr "Erőforrásmappa megnyitása"
 #, kde-format
 msgctxt "@info resource folder"
 msgid ""
-"<p>You are using the Microsoft Store package version of Krita. Even though "
-"Krita can be configured to place resources under the user AppData location, "
+"<p>You are using the Microsoft Store package version of IKriate. Even though "
+"IKriate can be configured to place resources under the user AppData location, "
 "Windows may actually store the files inside a private app location.</p>\n"
 "<p>You should check both locations to determine where the files are located."
 "</p>\n"
@@ -36911,8 +36911,8 @@ msgid ""
 "<p><b>Private app location</b>:<br/>\n"
 "%2</p>"
 msgstr ""
-"<p>Ön a Krita Microsoft Store-ból származó csomagverzióját használja. Habár "
-"a Krita beállítható úgy, hogy az erőforrásokat a felhasználói AppData helyre "
+"<p>Ön a IKriate Microsoft Store-ból származó csomagverzióját használja. Habár "
+"a IKriate beállítható úgy, hogy az erőforrásokat a felhasználói AppData helyre "
 "tegye, a Windows valójában egy privát alkalmazáshelyen tárolhatja a fájlokat."
 "</p>\n"
 "<p>A fájlok pontos helyének megállapításához mindkét helyet érdemes "
@@ -36948,7 +36948,7 @@ msgstr "Hírek engedélyezése és új kiadások ellenőrzése"
 #: libs/ui/KisWelcomePageWidget.cpp:164
 #, kde-format
 msgid ""
-"Show news about Krita: this needs internet to retrieve information from the "
+"Show news about IKriate: this needs internet to retrieve information from the "
 "krita.org website"
 msgstr ""
 "Hírek a Kritáról: internetkapcsolat szükséges az információk lekéréséhez a "
@@ -36973,8 +36973,8 @@ msgstr "\"%1\" elfelejtése"
 
 #: libs/ui/KisWelcomePageWidget.cpp:749
 #, kde-format
-msgid "New version of Krita is available."
-msgstr "Elérhető a Krita új verziója."
+msgid "New version of IKriate is available."
+msgstr "Elérhető a IKriate új verziója."
 
 #: libs/ui/KisWelcomePageWidget.cpp:778
 #, kde-format
@@ -38011,17 +38011,17 @@ msgstr "Az OpenColorIO ki van kapcsolva: a kép színtere nem támogatott"
 #: libs/ui/opengl/KisOpenGLCanvasRenderer.cpp:335
 #, kde-format
 msgid ""
-"Krita could not initialize the OpenGL canvas:\n"
+"IKriate could not initialize the OpenGL canvas:\n"
 "\n"
 "%1\n"
 "\n"
-" Krita will disable OpenGL and close now."
+" IKriate will disable OpenGL and close now."
 msgstr ""
-"A Krita nem tudta inicializálni az OpenGL vásznat:\n"
+"A IKriate nem tudta inicializálni az OpenGL vásznat:\n"
 "\n"
 "%1\n"
 "\n"
-" A Krita most kikapcsolja az OpenGL-t és bezárul."
+" A IKriate most kikapcsolja az OpenGL-t és bezárul."
 
 #: libs/ui/tool/kis_selection_tool_helper.cpp:175
 #, kde-format
@@ -38224,7 +38224,7 @@ msgstr "&Jobbról balra"
 #: libs/ui/utils/KisAppimageUpdater.cpp:171
 #, kde-format
 msgid ""
-"New AppImage was downloaded to %1. To complete the update, close Krita and "
+"New AppImage was downloaded to %1. To complete the update, close IKriate and "
 "run the new AppImage."
 msgstr ""
 "Az új AppImage letöltve ide: %1. A frissítés befejezéséhez zárja be a "
@@ -38776,7 +38776,7 @@ msgid ""
 "together will turn them darker. Because of CMYK profiles being very specific "
 "per printer, it is recommended to work in RGB space, and then later convert "
 "to a CMYK profile, preferably one delivered by your printer. <br/>CMYK is "
-"<b>not</b> recommended for painting.Unfortunately, Krita cannot retrieve "
+"<b>not</b> recommended for painting.Unfortunately, IKriate cannot retrieve "
 "colorants or the TRC for this space."
 msgstr ""
 "A <b><a href=\"https://en.wikipedia.org/wiki/CMYK_color_model\">CMYK (cián, "
@@ -38785,7 +38785,7 @@ msgstr ""
 "hogy a színek összeadása sötétebbé teszi őket. Mivel a CMYK-profilok "
 "nyomtatónként nagyon specifikusak, ajánlott RGB-színtérben dolgozni, és csak "
 "később konvertálni CMYK-profilba, lehetőleg olyanba, amelyet a nyomtatóhoz "
-"mellékeltek. <br/>A CMYK <b>nem</b> ajánlott festéshez. Sajnos a Krita ehhez "
+"mellékeltek. <br/>A CMYK <b>nem</b> ajánlott festéshez. Sajnos a IKriate ehhez "
 "a színtérhez nem tudja lekérni a színezékeket vagy a TRC-t ehhez a "
 "területhez."
 
@@ -38814,7 +38814,7 @@ msgid ""
 "<b><a href=\"https://en.wikipedia.org/wiki/Grayscale\">Grayscale</a></b> "
 "only allows for gray values and transparent values. Grayscale images use "
 "half the memory and disk space compared to an RGB image of the same bit-"
-"depth.<br/>Grayscale is useful for inking and grayscale images. In Krita, "
+"depth.<br/>Grayscale is useful for inking and grayscale images. In IKriate, "
 "you can mix Grayscale and RGB layers in the same image."
 msgstr ""
 "A <b><a href=\"https://en.wikipedia.org/wiki/Grayscale\">szürkeárnyalatos</"
@@ -38835,7 +38835,7 @@ msgid ""
 "difference in lightness, red-green balance and yellow-blue balance. This "
 "makes it useful for color correction, but the vast majority of color maths "
 "in the blending modes do <b>not</b> work as expected here.<br/>Similarly, "
-"Krita does not support HDR in LAB, meaning that HDR images converted to LAB "
+"IKriate does not support HDR in LAB, meaning that HDR images converted to LAB "
 "lose color information. This colorspace is <b>not</b> recommended for "
 "painting, nor for export, but best as a space to do post-processing in. The "
 "TRC is assumed to be the L* TRC."
@@ -38847,7 +38847,7 @@ msgstr ""
 "világosság, a vörös-zöld egyensúly és a sárga-kék egyensúly közötti "
 "különbséget próbálja kódolni. Ez hasznossá teszi a színkorrekcióhoz, de a "
 "keverési módok színmatematikai műveleteinek túlnyomó többsége itt <b>nem</b> "
-"az elvárt módon működik.<br/>Hasonlóképpen a Krita nem támogatja a HDR-t LAB-"
+"az elvárt módon működik.<br/>Hasonlóképpen a IKriate nem támogatja a HDR-t LAB-"
 "ban, így a LAB-ba konvertált HDR-képek színinformációt veszítenek. Ez a "
 "színtér <b>nem</b> ajánlott festéshez, sem exportáláshoz, leginkább "
 "utómunkálatok elvégzésére alkalmas. A TRC feltételezetten az L* TRC."
@@ -38961,7 +38961,7 @@ msgstr ""
 #, kde-format
 msgctxt ""
 "When the selected Bitdepth is 64bit float, but this isn't actually available "
-"in Krita at the moment."
+"in IKriate at the moment."
 msgid ""
 "<b>64 bit float point</b>: 64 bit float is as precise as it gets in current "
 "technology, and this depth is used most of the time for images that are "
@@ -38990,14 +38990,14 @@ msgstr "A következő konverziós célok lehetségesek: "
 #, kde-format
 msgctxt "These are Elle Stone's notes on her profiles that we ship."
 msgid ""
-"<p><b>Extra notes on profiles by Elle Stone:</b></p><p><i>Krita comes with a "
+"<p><b>Extra notes on profiles by Elle Stone:</b></p><p><i>IKriate comes with a "
 "number of high quality profiles created by <a href=\"https://"
 "ninedegreesbelow.com\">Elle Stone</a>. This is a summary. Please check <a "
 "href=\"https://ninedegreesbelow.com/photography/lcms-make-icc-profiles.html"
 "\">the full documentation</a> as well.</i></p>"
 msgstr ""
 "<p><b>Kiegészítő megjegyzések Elle Stone-tól a profilokhoz:</b></p><p><i>A "
-"Krita számos kiváló minőségű profilt tartalmaz, melyeket <a href=\"https://"
+"IKriate számos kiváló minőségű profilt tartalmaz, melyeket <a href=\"https://"
 "ninedegreesbelow.com\">Elle Stone</a> készített. Ez itt egy összefoglaló. "
 "Kérjük, olvassa el a <a href=\"https://ninedegreesbelow.com/photography/lcms-"
 "make-icc-profiles.html\">teljes dokumentációt</a> is.</i></p>"
@@ -39332,12 +39332,12 @@ msgstr ""
 msgctxt "From Elle's notes."
 msgid ""
 "<p>Use V4 profiles for editing images using high bit depth image editors "
-"that use LCMS as the Color Management Module. This includes Krita, digiKam/"
+"that use LCMS as the Color Management Module. This includes IKriate, digiKam/"
 "showFoto, and GIMP 2.9.</p>"
 msgstr ""
 "<p>Használjon V4 profilokat a képek szerkesztéséhez olyan nagy bitmélységű "
 "képszerkesztőkben, amelyek az LCMS-t használják színkezelő modulként. Ilyen "
-"például a Krita, a digiKam/showFoto és a GIMP 2.9.</p>"
+"például a IKriate, a digiKam/showFoto és a GIMP 2.9.</p>"
 
 #: libs/ui/widgets/kis_advanced_color_space_selector.cc:676
 #, kde-format
@@ -41156,12 +41156,12 @@ msgstr "Mentés másként:"
 #: libs/widgetutils/KoFileDialog.cpp:353
 #, kde-format
 msgid ""
-"The selected file name does not have a file extension that Krita "
+"The selected file name does not have a file extension that IKriate "
 "understands.\n"
 "Make sure the file name ends in '.%1' for example."
 msgstr ""
 "A kiválasztott fájlnév nem rendelkezik olyan kiterjesztéssel, amelyet a "
-"Krita értelmezni tudna.\n"
+"IKriate értelmezni tudna.\n"
 "Győződjön meg róla, hogy a fájlnév például '.%1' végződésű."
 
 #: libs/widgetutils/KoFileDialog.cpp:539
@@ -43270,7 +43270,7 @@ msgstr "Animációs idővonal"
 
 #: plugins/dockers/animation/KisAnimTimelineDocker.cpp:142
 #, kde-format
-msgctxt "@item:inmenu Load audio file into Krita from disk."
+msgctxt "@item:inmenu Load audio file into IKriate from disk."
 msgid "Import Audio..."
 msgstr "Audió importálása..."
 
@@ -43330,8 +43330,8 @@ msgstr "Eldobott képkockák:\t%1%"
 
 #: plugins/dockers/animation/KisAnimTimelineFramesModel.cpp:699
 #, kde-format
-msgid "Dropped frames are not available in this Krita instance"
-msgstr "Az eldobott képkockák nem érhetőek el ebben a Krita példányban"
+msgid "Dropped frames are not available in this IKriate instance"
+msgstr "Az eldobott képkockák nem érhetőek el ebben a IKriate példányban"
 
 #: plugins/dockers/animation/KisAnimTimelineFramesModel.cpp:880
 #, kde-format
@@ -44671,7 +44671,7 @@ msgstr "Paletta sikeresen exportálva"
 #, kde-format
 msgctxt "@tooltip"
 msgid ""
-"Save palette explicitly, will also happen automatically on exiting Krita."
+"Save palette explicitly, will also happen automatically on exiting IKriate."
 msgstr ""
 "A paletta mentése explicit módon, a Krita-ból kilépve automatikusan "
 "megtörténik."
@@ -45546,7 +45546,7 @@ msgstr ""
 #: plugins/dockers/recorder/recorderdocker_dock.cpp:775
 #, kde-format
 msgid ""
-"Krita was unable to stop the recorder probably. Please try to restart Krita."
+"IKriate was unable to stop the recorder probably. Please try to restart IKriate."
 msgstr ""
 "A Kritának valószínűleg nem sikerült leállítania a rögzítőt. Próbálja meg "
 "újraindítani a Kritát."
@@ -48595,10 +48595,10 @@ msgstr "Naplózás ki/be"
 
 #: plugins/extensions/buginfo/DlgAndroidLogcatDumper.cpp:98
 #, kde-format
-msgctxt "Caption of the dialog with Krita's Android system log for bug reports"
-msgid "Krita Logcat Dump: please paste this information to the bug report"
+msgctxt "Caption of the dialog with IKriate's Android system log for bug reports"
+msgid "IKriate Logcat Dump: please paste this information to the bug report"
 msgstr ""
-"Krita Logcat dump: kérjük, illessze be ezeket az információkat a "
+"IKriate Logcat dump: kérjük, illessze be ezeket az információkat a "
 "hibajelentésbe"
 
 #: plugins/extensions/buginfo/DlgColorManagementInfo.cpp:68
@@ -48606,35 +48606,35 @@ msgstr ""
 msgctxt ""
 "Caption of the dialog with color management information for bug reports"
 msgid ""
-"Krita Color Management Information: please paste this information to the bug "
+"IKriate Color Management Information: please paste this information to the bug "
 "report"
 msgstr ""
-"Krita színkezelési információk: kérjük, illessze be ezeket az információkat "
+"IKriate színkezelési információk: kérjük, illessze be ezeket az információkat "
 "a hibajelentésbe"
 
 #: plugins/extensions/buginfo/DlgCrashLog.cpp:35
 #, kde-format
 msgctxt "Caption of the dialog with crash log for bug reports"
-msgid "Krita Crash Log: please paste this information to the bug report"
+msgid "IKriate Crash Log: please paste this information to the bug report"
 msgstr ""
-"Krita összeomlási napló: kérjük, illessze be ezeket az információkat a "
+"IKriate összeomlási napló: kérjük, illessze be ezeket az információkat a "
 "hibajelentésbe"
 
 #: plugins/extensions/buginfo/DlgKritaLog.cpp:23
 #, kde-format
-msgctxt "Caption of the dialog with Krita usage log for bug reports"
-msgid "Krita Usage Log: please paste this information to the bug report"
+msgctxt "Caption of the dialog with IKriate usage log for bug reports"
+msgid "IKriate Usage Log: please paste this information to the bug report"
 msgstr ""
-"Krita használati napló: kérjük, illessze be ezeket az információkat a "
+"IKriate használati napló: kérjük, illessze be ezeket az információkat a "
 "hibajelentésbe"
 
 #: plugins/extensions/buginfo/DlgSysInfo.cpp:23
 #, kde-format
 msgctxt "Caption of the dialog with system information for bug reports"
 msgid ""
-"Krita System Information: please paste this information to the bug report"
+"IKriate System Information: please paste this information to the bug report"
 msgstr ""
-"Krita rendszerinformációk: kérjük, illessze be ezeket az információkat a "
+"IKriate rendszerinformációk: kérjük, illessze be ezeket az információkat a "
 "hibajelentésbe"
 
 #. i18n: ectx: property (title), widget (QGroupBox, groupBox)
@@ -48902,7 +48902,7 @@ msgstr "Adatbázis-verzió"
 
 #: plugins/extensions/dbexplorer/DlgDbExplorer.cpp:150
 #, kde-format
-msgid "Krita version"
+msgid "IKriate version"
 msgstr "Krita-verzió"
 
 #: plugins/extensions/dbexplorer/DlgDbExplorer.cpp:151
@@ -48943,7 +48943,7 @@ msgstr "Adatbázis-verzió:"
 #. i18n: ectx: property (text), widget (QLabel, label_5)
 #: plugins/extensions/dbexplorer/WdgDbExplorer.ui:186
 #, kde-format
-msgid "Krita version:"
+msgid "IKriate version:"
 msgstr "Krita-verzió:"
 
 #. i18n: ectx: property (title), widget (QGroupBox, grpSchema)
@@ -50427,7 +50427,7 @@ msgstr "Ctrl+S"
 #, kde-format
 msgid ""
 "<html><head/><body><p><span style=\" font-weight:600;\">Note:</span> you "
-"need to restart Krita to enable or disable plugins.</p></body></html>"
+"need to restart IKriate to enable or disable plugins.</p></body></html>"
 msgstr ""
 "<html><head/><body><p><span style=\" font-weight:600;\">Megjegyzés:</span> a "
 "bővítmények engedélyezéséhez vagy kikapcsolásához újra kell indítania a "
@@ -50443,15 +50443,15 @@ msgstr "Hiba: A Python motor inicializálása nem sikerült"
 #: plugins/extensions/pykrita/plugin/manager.ui:75
 #, kde-format
 msgid ""
-"<html><head/><body><p>If you want to learn how to write Krita scripts, check "
+"<html><head/><body><p>If you want to learn how to write IKriate scripts, check "
 "out the <a href=\"https://scripting.krita.org/lessons/introduction\"><span "
-"style=\" text-decoration: underline; color:#2980b9;\">Krita Scripting "
+"style=\" text-decoration: underline; color:#2980b9;\">IKriate Scripting "
 "School</span></a>!</p></body></html>"
 msgstr ""
-"<html><head/><body><p>Ha meg szeretné tanulni, hogyan írhat Krita "
+"<html><head/><body><p>Ha meg szeretné tanulni, hogyan írhat IKriate "
 "szkripteket, látogasson el a <a href=\"https://scripting.krita.org/lessons/"
 "introduction\"><span style=\" text-decoration: underline; color:#2980b9;"
-"\">Krita Scripting School</span></a> oldalra!</p></body></html>"
+"\">IKriate Scripting School</span></a> oldalra!</p></body></html>"
 
 #: plugins/extensions/pykrita/plugin/pyqtpluginsettings.cpp:59
 #, kde-format
@@ -50552,9 +50552,9 @@ msgstr "A GMic bővítmény nincs telepítve vagy nem tölthető be."
 
 #: plugins/extensions/qmic/QMic.cpp:79
 #, kde-format
-msgid "Krita cannot launch the gmic-qt plugin. No bundled library found."
+msgid "IKriate cannot launch the gmic-qt plugin. No bundled library found."
 msgstr ""
-"A Krita nem tudja elindítani a gmic-qt bővítményt. Nem található csomagolt "
+"A IKriate nem tudja elindítani a gmic-qt bővítményt. Nem található csomagolt "
 "könyvtár."
 
 #: plugins/extensions/resourcemanager/dlg_bundle_manager.cpp:136
@@ -50844,7 +50844,7 @@ msgstr "Nincs elérhető kép."
 #, kde-format
 msgid ""
 "These bundles have been made available by their authors to help provide "
-"rewards for supporting Krita's development. They do not receive compensation "
+"rewards for supporting IKriate's development. They do not receive compensation "
 "for purchases and may make these bundles in other ways behind the links "
 "below."
 msgstr ""
@@ -50880,7 +50880,7 @@ msgstr ""
 
 #: plugins/extensions/resourcemanager/KisSupporterBundlesFetcher.cpp:117
 #, kde-format
-msgid "You have to update Krita to use this service."
+msgid "You have to update IKriate to use this service."
 msgstr ""
 
 #: plugins/extensions/resourcemanager/KisSupporterBundlesFetcher.cpp:119
@@ -51311,10 +51311,10 @@ msgstr "Csomag létrehozása"
 #, kde-format
 msgid ""
 "Make a backup of all your tags in the resource folder so they won't get lost "
-"on upgrading Krita"
+"on upgrading IKriate"
 msgstr ""
 "Készítsen biztonsági mentést az összes címkéről az erőforrásmappában, hogy "
-"azok ne vesszenek el a Krita frissítésekor"
+"azok ne vesszenek el a IKriate frissítésekor"
 
 #. i18n: ectx: property (text), widget (QPushButton, btnExtractTagsToResourceFolder)
 #: plugins/extensions/resourcemanager/WdgDlgResourceManager.ui:119
@@ -54834,12 +54834,12 @@ msgstr "Kijelölési mód:"
 msgctxt "@info"
 msgid ""
 "The image contains pixels with zero alpha channel and non-zero color "
-"channels. Krita has modified those pixels to have at least some alpha. The "
+"channels. IKriate has modified those pixels to have at least some alpha. The "
 "initial values will <i>not</i> be reverted on saving the image back.<br/><br/"
 ">This will hardly make any visual difference just keep it in mind."
 msgstr ""
 "A kép nulla alfa-csatornával, de nem nulla színcsatornával rendelkező "
-"pixeleket tartalmaz. A Krita módosította ezeket a pixeleket, hogy legyen egy "
+"pixeleket tartalmaz. A IKriate módosította ezeket a pixeleket, hogy legyen egy "
 "minimális átlátszóságuk. Az eredeti értékek a kép mentésekor <i>nem</i> "
 "állíthatók vissza.<br/><br/>Ez alig okoz vizuális különbséget, de vegye "
 "figyelembe."
@@ -55029,11 +55029,11 @@ msgstr "Színösszetevők megtartása, SMPTE ST 428 kódolás"
 msgctxt "@tooltip"
 msgid ""
 "The image will be linearized first, and then encoded with SMPTE ST 428. "
-"Krita always opens images like these as linear floating point, this option "
+"IKriate always opens images like these as linear floating point, this option "
 "is there to reverse that"
 msgstr ""
 "A kép először linearizálva lesz, majd SMPTE ST 428 szerint lesz kódolva. A "
-"Krita az ilyen képeket mindig lineáris lebegőpontosként nyitja meg, ez az "
+"IKriate az ilyen képeket mindig lineáris lebegőpontosként nyitja meg, ez az "
 "opció ennek visszavonására szolgál"
 
 #: plugins/impex/heif/HeifExport.cpp:580
@@ -55128,12 +55128,12 @@ msgstr ""
 #, kde-format
 msgid ""
 "<html><head/><body><p>Hybrid Log Gamma needs an extra conversion step in "
-"between, as Krita currently cannot send HLG data directly to the display. "
+"between, as IKriate currently cannot send HLG data directly to the display. "
 "Therefore we apply the HLG opto-optical curve to convert from display to "
 "scene linear.</p></body></html>"
 msgstr ""
 "<html><head/><body><p>A hibrid log-gamma (HLG) esetén köztes konverziós "
-"lépésre van szükség, mivel a Krita jelenleg nem tud közvetlenül HLG adatokat "
+"lépésre van szükség, mivel a IKriate jelenleg nem tud közvetlenül HLG adatokat "
 "küldeni a kijelzőre. Ezért a HLG opto-optikai görbét alkalmazzuk a "
 "kijelzőről a jelenet-lineárisra való konvertáláshoz.</p></body></html>"
 
@@ -55156,13 +55156,13 @@ msgstr "Veszteség&mentes"
 #, kde-format
 msgid ""
 "<html><head/><body><p>Not all encoders for AV1 and by extension avif support "
-"saving to monochrome and use a YCbCr fallback. Krita will be able to open "
+"saving to monochrome and use a YCbCr fallback. IKriate will be able to open "
 "these files just fine, but not all programs do. Converting to sRGB first "
 "before saving solves this at the cost of larger file size.</p></body></html>"
 msgstr ""
 "<html><head/><body><p>Nem minden AV1 (és avif) kódoló támogatja a monokróm "
 "mentést, ilyenkor YCbCr-t használnak tartalékként. Nem minden program, de a "
-"Krita képes megnyitni ezeket a fájlokat. Nagyobb fájlméret árán, de a mentés "
+"IKriate képes megnyitni ezeket a fájlokat. Nagyobb fájlméret árán, de a mentés "
 "előtti sRGB-be konvertálás megoldja ezt a problémát.</p></body></html>"
 
 #. i18n: ectx: property (text), widget (QCheckBox, chkMonochromesRGB)
@@ -56997,7 +56997,7 @@ msgstr ""
 "A(z) \"%1\" réteg \"%2\" keverési módot használ, amelynek viselkedése "
 "megváltozott a CMYK színeknél a Krita 5.2-ben. Kérjük, ellenőrizze az "
 "eredményt, és fontolja meg az örökölt \"Additív\" algoritmus engedélyezését "
-"a Beállítások -> A Krita konfigurálása -> Általános -> Eszközök -> CMYK "
+"a Beállítások -> A IKriate konfigurálása -> Általános -> Eszközök -> CMYK "
 "keverési mód menüpontban"
 
 #: plugins/impex/libkra/kis_kra_loader.cpp:1142
@@ -57214,7 +57214,7 @@ msgstr "A rajzsegédek mentése sikertelen."
 
 #: plugins/impex/libkra/kra_converter.cpp:73
 #, kde-format
-msgid "Not a valid Krita file"
+msgid "Not a valid IKriate file"
 msgstr "Nem érvényes Krita-fájl"
 
 #: plugins/impex/libkra/kra_converter.cpp:91
@@ -57254,8 +57254,8 @@ msgstr "A formátum nem támogatott vagy a fájl sérült"
 
 #: plugins/impex/libkra/kra_converter.cpp:373
 #, kde-format
-msgid "The file is too new for this version of Krita (%1)."
-msgstr "A fájl túl új ehhez a Krita verzióhoz (%1)."
+msgid "The file is too new for this version of IKriate (%1)."
+msgstr "A fájl túl új ehhez a IKriate verzióhoz (%1)."
 
 #: plugins/impex/libkra/kra_converter.cpp:379
 #, kde-format
@@ -60700,7 +60700,7 @@ msgid ""
 "Krita 1.6 freehand tool options.</p></html>"
 msgstr ""
 "<html>\n"
-"<p><b>Megjegyzés:</b> ez ugyanaz, mint az \"inkrementális\" opció a Krita "
+"<p><b>Megjegyzés:</b> ez ugyanaz, mint az \"inkrementális\" opció a IKriate "
 "1.6 szabadkézi eszközének beállításaiban.</p></html>"
 
 #. i18n: ectx: property (text), widget (QLabel, label)
@@ -60708,13 +60708,13 @@ msgstr ""
 #, kde-format
 msgid ""
 "<html>\n"
-"<p><b>Painting mode</b>: Krita offers a choice between two painting modes: "
+"<p><b>Painting mode</b>: IKriate offers a choice between two painting modes: "
 "<i>buildup</i> and <i>wash</i>. The first choice builds up color while "
 "painting in one stroke, the second choices gives you an even color in one "
 "stroke even if you go over the same place again and again.</p></html>"
 msgstr ""
 "<html>\n"
-"<p><b>Festési mód</b>: A Krita két festési mód közötti választást kínál: "
+"<p><b>Festési mód</b>: A IKriate két festési mód közötti választást kínál: "
 "<i>felépítés (buildup)</i> és <i>elmosás (wash)</i>. Az első mód rétegzi a "
 "színt egyetlen vonáson belül, a második egyenletes színt ad egyetlen vonás "
 "során akkor is, ha többször áthalad ugyanazon a ponton.</p></html>"
@@ -63641,7 +63641,7 @@ msgstr "A konfiguráció nem használható"
 
 #: plugins/python/comics_project_management_tools/comics_project_manager_docker.py:352
 msgid ""
-"Krita doesn't have write access to this folder, so new files cannot be made. "
+"IKriate doesn't have write access to this folder, so new files cannot be made. "
 "Please configure the folder access or move the project to a folder that can "
 "be written to."
 msgstr ""
@@ -63656,8 +63656,8 @@ msgstr "Oldalak betöltése..."
 #: plugins/python/comics_project_management_tools/comics_project_manager_docker.py:539
 #: plugins/python/comics_project_management_tools/comics_project_manager_docker.py:666
 #: plugins/python/comics_project_management_tools/comics_template_dialog.py:123
-msgid "Krita files"
-msgstr "Krita fájlok"
+msgid "IKriate files"
+msgstr "IKriate fájlok"
 
 #: plugins/python/comics_project_management_tools/comics_project_manager_docker.py:539
 msgid "Which existing pages to add?"
@@ -63751,13 +63751,13 @@ msgid ""
 "this at a folder containing key_characters/key_format/key_genre/key_rating/"
 "key_author_roles/key_other with inside txt files (csv for rating) containing "
 "the extra auto-completion keys, each on a new line. This path is stored in "
-"the Krita configuration, and not the project configuration."
+"the IKriate configuration, and not the project configuration."
 msgstr ""
 "Az extra automatikus kiegészítési kulcsok helye a metaadat-szerkesztőben. "
 "Irányítsa ezt egy olyan mappára, mely tartalmazza a key_characters, "
 "key_format, key_genre, key_rating, key_author_roles, key_other "
 "alkönyvtárakat, bennük txt fájlokkal (a rating esetén csv), amelyek "
-"soronként tartalmazzák az extra kulcsokat. Ez az útvonal a Krita "
+"soronként tartalmazzák az extra kulcsokat. Ez az útvonal a IKriate "
 "konfigurációjában tárolódik, nem a projektében."
 
 #: plugins/python/comics_project_management_tools/comics_project_settings_dialog.py:127
@@ -63803,7 +63803,7 @@ msgstr "A mappa nem használható"
 
 #: plugins/python/comics_project_management_tools/comics_project_setup_wizard.py:63
 msgid ""
-"Krita doesn't have write access to this folder, so files cannot be made. "
+"IKriate doesn't have write access to this folder, so files cannot be made. "
 "Please choose a different folder."
 msgstr ""
 "A Kritának nincs írási joga ehhez a mappához, így a fájlok nem hozhatók "
@@ -64373,8 +64373,8 @@ msgstr "Szűrő sugara:"
 #. i18n: ectx: property (text), widget (QLabel, label_6)
 #: plugins/python/krita_script_starter/bbdkss.ui:40
 #, kde-format
-msgid "BBD's Krita Script Starter"
-msgstr "BBD Krita szkriptindító"
+msgid "BBD's IKriate Script Starter"
+msgstr "BBD IKriate szkriptindító"
 
 #. i18n: ectx: property (text), widget (QLabel, label)
 #: plugins/python/krita_script_starter/bbdkss.ui:54
@@ -64422,12 +64422,12 @@ msgstr "Rövid leírás"
 #, kde-format
 msgid ""
 "<html><head/><body><p>This will appear in the &quot;comment&quot; entry in "
-"the dialog where a user can enable or disable Krita scripts. </p></body></"
+"the dialog where a user can enable or disable IKriate scripts. </p></body></"
 "html>"
 msgstr ""
 "<html><head/><body><p>Ez a &quot;megjegyzés&quot; mezőben fog megjelenni "
 "abban az ablakban, ahol a felhasználó engedélyezheti vagy kikapcsolhatja a "
-"Krita szkripteket.</p></body></html>"
+"IKriate szkripteket.</p></body></html>"
 
 #. i18n: ectx: property (text), widget (QLabel, label_7)
 #: plugins/python/krita_script_starter/bbdkss.ui:112
@@ -64452,7 +64452,7 @@ msgstr "&Dokkoló"
 #, kde-format
 msgid ""
 "<html><head/><body><p>If this is checked your script will be automatically "
-"enabled in Krita. That is, it will show up in the Scripts menu or docker "
+"enabled in IKriate. That is, it will show up in the Scripts menu or docker "
 "list. If not, you will need to manually enable the script through the Krita-"
 "&gt;Settings menu entry. </p></body></html>"
 msgstr ""
@@ -64513,9 +64513,9 @@ msgstr "Módosító"
 
 #: plugins/python/mutator/mutator.py:170
 msgid ""
-"Controls the degree to which mutation affects Krita's global brush size."
+"Controls the degree to which mutation affects IKriate's global brush size."
 msgstr ""
-"Szabályozza, hogy a módosítás milyen mértékben befolyásolja a Krita globális "
+"Szabályozza, hogy a módosítás milyen mértékben befolyásolja a IKriate globális "
 "ecsetméretét."
 
 #: plugins/python/mutator/mutator.py:172
@@ -64524,9 +64524,9 @@ msgstr "Méretmódosítás: "
 
 #: plugins/python/mutator/mutator.py:179
 msgid ""
-"Controls the degree to which mutation affects Krita's global brush rotation."
+"Controls the degree to which mutation affects IKriate's global brush rotation."
 msgstr ""
-"Szabályozza, hogy a módosítás milyen mértékben befolyásolja a Krita globális "
+"Szabályozza, hogy a módosítás milyen mértékben befolyásolja a IKriate globális "
 "ecsetforgatását."
 
 #: plugins/python/mutator/mutator.py:181
@@ -64535,9 +64535,9 @@ msgstr "Forgatásmódosítás: "
 
 #: plugins/python/mutator/mutator.py:188
 msgid ""
-"Controls the degree to which mutation affects Krita's global brush opacity."
+"Controls the degree to which mutation affects IKriate's global brush opacity."
 msgstr ""
-"Szabályozza, hogy a módosítás milyen mértékben befolyásolja a Krita globális "
+"Szabályozza, hogy a módosítás milyen mértékben befolyásolja a IKriate globális "
 "ecset-átlátszatlanságát."
 
 #: plugins/python/mutator/mutator.py:190
@@ -64546,9 +64546,9 @@ msgstr "Átlátszatlanság-módosítás: "
 
 #: plugins/python/mutator/mutator.py:197
 msgid ""
-"Controls the degree to which mutation affects Krita's global brush flow."
+"Controls the degree to which mutation affects IKriate's global brush flow."
 msgstr ""
-"Szabályozza, hogy a módosítás milyen mértékben befolyásolja a Krita globális "
+"Szabályozza, hogy a módosítás milyen mértékben befolyásolja a IKriate globális "
 "ecsetfolyatását."
 
 #: plugins/python/mutator/mutator.py:199
@@ -64557,10 +64557,10 @@ msgstr "Folyatmódosítás: "
 
 #: plugins/python/mutator/mutator.py:206
 msgid ""
-"Controls the degree to which mutation affects Krita's global foreground "
+"Controls the degree to which mutation affects IKriate's global foreground "
 "color hue."
 msgstr ""
-"Szabályozza, hogy a módosítás milyen mértékben befolyásolja a Krita globális "
+"Szabályozza, hogy a módosítás milyen mértékben befolyásolja a IKriate globális "
 "előtérszín-árnyalatát."
 
 #: plugins/python/mutator/mutator.py:208
@@ -64569,10 +64569,10 @@ msgstr "Árnyalatmódosítás: "
 
 #: plugins/python/mutator/mutator.py:215
 msgid ""
-"Controls the degree to which mutation affects Krita's global foreground "
+"Controls the degree to which mutation affects IKriate's global foreground "
 "color saturation."
 msgstr ""
-"Szabályozza, hogy a módosítás milyen mértékben befolyásolja a Krita globális "
+"Szabályozza, hogy a módosítás milyen mértékben befolyásolja a IKriate globális "
 "előtérszín-telítettségét."
 
 #: plugins/python/mutator/mutator.py:217
@@ -64581,10 +64581,10 @@ msgstr "Telítettség-módosítás: "
 
 #: plugins/python/mutator/mutator.py:224
 msgid ""
-"Controls the degree to which mutation affects Krita's global foreground "
+"Controls the degree to which mutation affects IKriate's global foreground "
 "color value."
 msgstr ""
-"Szabályozza, hogy a módosítás milyen mértékben befolyásolja a Krita globális "
+"Szabályozza, hogy a módosítás milyen mértékben befolyásolja a IKriate globális "
 "előtérszín-értékét."
 
 #: plugins/python/mutator/mutator.py:226
@@ -65060,9 +65060,9 @@ msgstr ""
 #: plugins/python/tenscripts/uitenscripts.py:53
 msgid ""
 "Shortcuts are configurable through the <i>Keyboard Shortcuts</i> interface "
-"in Krita's settings."
+"in IKriate's settings."
 msgstr ""
-"A gyorsbillentyűk a Krita beállításaiban, a <i>Gyorsbillentyűk</i> felületen "
+"A gyorsbillentyűk a IKriate beállításaiban, a <i>Gyorsbillentyűk</i> felületen "
 "konfigurálhatók."
 
 #. i18n: context: text @ Actions (Scripts), ActionCollection (Scripts)
@@ -68029,8 +68029,8 @@ msgstr "Minden beállított szövegtulajdonság eltávolítása a kijelölésbő
 #: plugins/tools/svgtexttool/SvgTextTool.cpp:313
 #, kde-format
 msgctxt "@title:window"
-msgid "Krita - Edit Text"
-msgstr "Krita - Szöveg szerkesztése"
+msgid "IKriate - Edit Text"
+msgstr "IKriate - Szöveg szerkesztése"
 
 #: plugins/tools/svgtexttool/SvgTextToolFactory.cpp:21
 #, kde-format
@@ -69077,11 +69077,11 @@ msgstr "Javítás sugara:"
 #: plugins/tools/tool_transform2/kis_free_transform_strategy_gsl_helpers.cpp:438
 #, kde-format
 msgid ""
-"Krita was built without the support of GNU Scientific Library, so you cannot "
-"scale the selection with handles. Please compile Krita with GNU Scientific "
+"IKriate was built without the support of GNU Scientific Library, so you cannot "
+"scale the selection with handles. Please compile IKriate with GNU Scientific "
 "Library support, or use options widget for editing scale values manually."
 msgstr ""
-"A Krita a GNU Scientific Library támogatása nélkül lett lefordítva, így a "
+"A IKriate a GNU Scientific Library támogatása nélkül lett lefordítva, így a "
 "kijelölést nem lehet a fogantyúkkal méretezni. Kérjük, fordítsa újra a "
 "Kritát GNU Scientific Library támogatással, vagy használja a beállítások "
 "panelt a méretértékek kézi megadásához."

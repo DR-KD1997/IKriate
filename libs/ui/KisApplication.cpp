@@ -478,13 +478,13 @@ bool KisApplication::registerResources()
 #endif
 
     if (!KisResourceCacheDb::initialize(databaseLocation)) {
-        QMessageBox::critical(qApp->activeWindow(), i18nc("@title:window", "Krita: Fatal error"), i18n("%1\n\nKrita will quit now.", KisResourceCacheDb::lastError()));
+        QMessageBox::critical(qApp->activeWindow(), i18nc("@title:window", "IKriate: Fatal error"), i18n("%1\n\nKrita will quit now.", KisResourceCacheDb::lastError()));
     }
 
     KisResourceLocator::LocatorError r = KisResourceLocator::instance()->initialize(KoResourcePaths::getApplicationRoot() + "/share/krita");
     connect(KisResourceLocator::instance(), SIGNAL(progressMessage(const QString&)), this, SLOT(setSplashScreenLoadingText(const QString&)));
     if (r != KisResourceLocator::LocatorError::Ok && qApp->inherits("KisApplication")) {
-        QMessageBox::critical(qApp->activeWindow(), i18nc("@title:window", "Krita: Fatal error"), KisResourceLocator::instance()->errorMessages().join('\n') + i18n("\n\nKrita will quit now."));
+        QMessageBox::critical(qApp->activeWindow(), i18nc("@title:window", "IKriate: Fatal error"), KisResourceLocator::instance()->errorMessages().join('\n') + i18n("\n\nKrita will quit now."));
         return false;
     }
     return true;
@@ -522,7 +522,7 @@ bool KisApplication::start(const KisApplicationArguments &args)
 
     if (isWow64() && !cfg.readEntry("WarnedAbout32Bits", false)) {
         QMessageBox::information(qApp->activeWindow(),
-                                 i18nc("@title:window", "Krita: Warning"),
+                                 i18nc("@title:window", "IKriate: Warning"),
                                  i18n("You are running a 32 bits build on a 64 bits Windows.\n"
                                       "This is not recommended.\n"
                                       "Please download and install the x64 build instead."));
@@ -571,7 +571,7 @@ bool KisApplication::start(const KisApplicationArguments &args)
     KConfigGroup group(KSharedConfig::openConfig(), "theme");
 #ifndef Q_OS_HAIKU
     Digikam::ThemeManager themeManager;
-    themeManager.setCurrentTheme(group.readEntry("Theme", "Krita dark"));
+    themeManager.setCurrentTheme(group.readEntry("Theme", "Classic Dark"));
 #endif
 
     ResetStarting resetStarting(d->splashScreen, args.filenames().count()); // remove the splash when done
@@ -836,18 +836,18 @@ bool KisApplication::start(const KisApplicationArguments &args)
                                     d->mainWindow->viewManager()->activeNode());
             }
             else{
-                QMessageBox::warning(qApp->activeWindow(), i18nc("@title:window", "Krita:Warning"),
+                QMessageBox::warning(qApp->activeWindow(), i18nc("@title:window", "IKriate:Warning"),
                                             i18n("Cannot add %1 as a file layer: the file does not exist.", fileLayer->path()));
             }
         }
         else if (this->isRunning()){
-            QMessageBox::warning(qApp->activeWindow(), i18nc("@title:window", "Krita:Warning"),
+            QMessageBox::warning(qApp->activeWindow(), i18nc("@title:window", "IKriate:Warning"),
                                 i18n("Cannot add the file layer: no document is open.\n\n"
 "You can create a new document using the --new-image option, or you can open an existing file.\n\n"
-"If you instead want to add the file layer to a document in an already running instance of Krita, check the \"Allow only one instance of Krita\" checkbox in the settings (Settings -> General -> Window)."));
+"If you instead want to add the file layer to a document in an already running instance of IKriate, check the \"Allow only one instance of IKriate\" checkbox in the settings (Settings -> General -> Window)."));
         }
         else {
-            QMessageBox::warning(qApp->activeWindow(), i18nc("@title:window", "Krita: Warning"),
+            QMessageBox::warning(qApp->activeWindow(), i18nc("@title:window", "IKriate: Warning"),
                                 i18n("Cannot add the file layer: no document is open.\n"
                                      "You can either create a new file using the --new-image option, or you can open an existing file."));
         }
@@ -1101,7 +1101,7 @@ void KisApplication::executeRemoteArguments(QByteArray message, KisMainWindow *m
     if (!args.fileLayer().isEmpty()){
         if (argsCount > 0  && !documentCreated){
             //arg was passed but document was not created so don't add the file layer.
-            QMessageBox::warning(mainWindow, i18nc("@title:window", "Krita:Warning"),
+            QMessageBox::warning(mainWindow, i18nc("@title:window", "IKriate:Warning"),
                                             i18n("Couldn't open file %1",args.filenames().at(argsCount - 1)));
         }
         else if (mainWindow->viewManager()->image()){
@@ -1115,12 +1115,12 @@ void KisApplication::executeRemoteArguments(QByteArray message, KisMainWindow *m
                                     d->mainWindow->viewManager()->activeNode());
             }
             else{
-                QMessageBox::warning(mainWindow, i18nc("@title:window", "Krita:Warning"),
+                QMessageBox::warning(mainWindow, i18nc("@title:window", "IKriate:Warning"),
                                             i18n("Cannot add %1 as a file layer: the file does not exist.", fileLayer->path()));
             }
         }
         else {
-            QMessageBox::warning(mainWindow, i18nc("@title:window", "Krita:Warning"),
+            QMessageBox::warning(mainWindow, i18nc("@title:window", "IKriate:Warning"),
                                             i18n("Cannot add the file layer: no document is open."));
         }
     }

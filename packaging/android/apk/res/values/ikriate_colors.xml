@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-FileCopyrightText: 2026 IKriate contributors
+     SPDX-License-Identifier: CC0-1.0 -->
+<resources>
+    <!-- Matches the default IKriate skin background, so the launch screen,
+         the system splash and the first IKriate frame blend together. -->
+    <color name="ikriate_launch_background">#17181B</color>
+</resources>

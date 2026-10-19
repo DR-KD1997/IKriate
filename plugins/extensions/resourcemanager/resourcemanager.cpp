@@ -46,7 +46,8 @@ ResourceManager::ResourceManager(QObject *parent, const QVariantList &)
     addAction("manage_resources", action);
     connect(action, SIGNAL(triggered()), this, SLOT(slotManageResources()));
 
-#ifdef Q_OS_ANDROID
+// IKriate: the supporter bundles are the Krita Foundation's Play Store products.
+#if defined(Q_OS_ANDROID) && defined(IKRIATE_ENABLE_KRITA_DONATIONS)
     action = new KisAction(i18n("Get More Resources..."), this);
     addAction("manage_supporter_bundles", action);
     connect(action, &QAction::triggered, this, &ResourceManager::slotManageSupporterBundles);

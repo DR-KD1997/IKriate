@@ -435,10 +435,10 @@ namespace GSL
     {
         QMessageBox::warning(qApp->activeWindow(),
                              i18nc("@title:window", "IKriate"),
-                             i18n("Krita was built without the support "
+                             i18n("IKriate was built without the support "
                                   "of GNU Scientific Library, so you cannot scale "
                                   "the selection with handles. Please compile "
-                                  "Krita with GNU Scientific Library support, or use "
+                                  "IKriate with GNU Scientific Library support, or use "
                                   "options widget for editing scale values manually."));
     }
 

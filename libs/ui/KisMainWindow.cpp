@@ -109,6 +109,8 @@
 
 #include "ikriate/IkInterfaceManager.h"
 #include "ikriate/IkSkinManager.h"
+#include "ikriate/IkHomeScreen.h"
+#include "ikriate/IkNewCanvasDialog.h"
 #include <KisUsageLogger.h>
 #include <brushengine/kis_paintop_settings.h>
 #include "dialogs/kis_about_application.h"
@@ -382,7 +384,7 @@ KisMainWindow::KisMainWindow(QUuid uuid)
     IkSkinManager::instance()->prepareActiveScheme();
     KConfigGroup group( KSharedConfig::openConfig(), "theme");
 #ifndef Q_OS_HAIKU
-    d->themeManager = new Digikam::ThemeManager(group.readEntry("Theme", "Krita dark"), this);
+    d->themeManager = new Digikam::ThemeManager(group.readEntry("Theme", "Classic Dark"), this);
 #endif
     d->windowStateConfig = KSharedConfig::openConfig()->group("MainWindow");
 
@@ -543,13 +545,22 @@ KisMainWindow::KisMainWindow(QUuid uuid)
 
     createActions();
 
-    // IKriate: selectable interface layouts (Classic / Minimal / Radial),
-    // Brush Studio and Interface & Skins. Creates its actions before the
-    // XMLGUI file is loaded below so they appear in the menus.
+    // IKriate: selectable interface layouts (Desktop / Kriate / Minimal),
+    // brush library and settings. Creates its actions before the XMLGUI file
+    // is loaded below so they appear in the menus.
     new IkInterfaceManager(this);
 
     // the welcome screen needs to grab actions...so make sure this line goes after the createAction() so they exist
     d->welcomePage->setMainWindow(this);
+
+    // IKriate: the home screen (gallery, settings) replaces the welcome page.
+    {
+        IkHomeScreen *home = new IkHomeScreen(this);
+        d->widgetStack->removeWidget(d->welcomeScroller);
+        d->welcomeScroller->hide();
+        d->widgetStack->insertWidget(0, home);
+        d->widgetStack->setCurrentIndex(0);
+    }
 
     d->recentFiles->setRecentFilesModel(&KisRecentDocumentsModelWrapper::instance()->model());
 
@@ -1860,9 +1871,8 @@ void KisMainWindow::showWelcomeScreen(bool show)
 
 void KisMainWindow::slotFileNew()
 {
-    KisDlgCreateNewDocument* dlg = new KisDlgCreateNewDocument(this);
-    dlg->exec();
-    dlg->deleteLater();
+    // IKriate: the compact New Canvas sheet; it links to the full dialog.
+    IkNewCanvasDialog::showNewCanvas(this);
 }
 
 void KisMainWindow::slotImportFile()
@@ -2958,7 +2968,7 @@ void KisMainWindow::configChanged()
 
     KConfigGroup group( KSharedConfig::openConfig(), "theme");
 #ifndef Q_OS_HAIKU
-    d->themeManager->setCurrentTheme(group.readEntry("Theme", "Krita dark"));
+    d->themeManager->setCurrentTheme(group.readEntry("Theme", "Classic Dark"));
 #endif
     d->actionManager()->updateGUI();
 
@@ -3023,7 +3033,7 @@ void KisMainWindow::checkSanity()
     // print error if the lcms engine is not available
     if (!KoColorSpaceEngineRegistry::instance()->contains("icc")) {
         // need to wait 1 event since exiting here would not work.
-        m_errorMessage = i18n("The Krita LittleCMS color management plugin is not installed. Krita will quit now.");
+        m_errorMessage = i18n("The IKriate LittleCMS color management plugin is not installed. IKriate will quit now.");
         m_dieOnError = true;
         QTimer::singleShot(0, this, SLOT(showErrorAndDie()));
         return;
@@ -3196,6 +3206,8 @@ void KisMainWindow::createActions()
     connect(d->mdiPreviousWindow, SIGNAL(triggered()), d->mdiArea, SLOT(activatePreviousSubWindow()));
 
 #ifdef Q_OS_ANDROID
+    // IKriate: no supporter products (see KisAndroidDonations.cpp).
+#ifdef IKRIATE_ENABLE_KRITA_DONATIONS
     d->showDonationManagementDialog = actionManager->createAction("manage_donations");
     connect(d->showDonationManagementDialog,
             &QAction::triggered,
@@ -3215,6 +3227,7 @@ void KisMainWindow::createActions()
                 &KisMainWindow::slotShowDonationManagementDialog,
                 Qt::QueuedConnection);
     }
+#endif
 #if KRITA_QT_HAS_ANDROID_QPLATFORMSCREEN_DENSITY_ADJUSTMENT
     KisAndroidScaling *androidScaling = KisAndroidScaling::instance();
     if (androidScaling && androidScaling->isSupported()) {

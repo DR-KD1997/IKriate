@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="DefaultTheme" parent="android:Theme.Material">
+        <item name="android:windowBackground">@drawable/ikriate_launch</item>
+        <!-- Android 12+ system splash: same background, so the hand-over to the
+             launch screen and then to IKriate is seamless. -->
+        <item name="android:windowSplashScreenBackground">@color/ikriate_launch_background</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground</item>
+        <item name="android:windowOptOutEdgeToEdgeEnforcement">true</item>
+    </style>
+</resources>

@@ -70,7 +70,7 @@ KisImportExportErrorCode KraConverter::buildImage(QIODevice *io)
     m_store = KoStore::createStore(io, KoStore::Read, "", KoStore::Zip);
 
     if (m_store->bad()) {
-        m_doc->setErrorMessage(i18n("Not a valid Krita file"));
+        m_doc->setErrorMessage(i18n("Not a valid IKriate file"));
         return ImportExportCodes::FileFormatIncorrect;
     }
 
@@ -370,7 +370,7 @@ KisImportExportErrorCode KraConverter::loadXML(const QDomDocument &doc, KoStore 
     
     if (syntaxVersion > 2) {
         errUI << "The file is too new for this version of Krita:" << syntaxVersion;
-        m_doc->setErrorMessage(i18n("The file is too new for this version of Krita (%1).", syntaxVersion));
+        m_doc->setErrorMessage(i18n("The file is too new for this version of IKriate (%1).", syntaxVersion));
         return ImportExportCodes::FormatFeaturesUnsupported;
     }
 

@@ -156,7 +156,7 @@ DlgBundleManager::DlgBundleManager(QWidget *parent)
     m_ui->bnEdit->setText(i18nc("In bundle manager; press button to edit existing bundle", "Edit Bundle"));
     connect(m_ui->bnEdit, SIGNAL(clicked(bool)), SLOT(editBundle()));
 
-#ifdef Q_OS_ANDROID
+#if defined(Q_OS_ANDROID) && defined(IKRIATE_ENABLE_KRITA_DONATIONS)
     connect(m_ui->bnSupport, &QPushButton::clicked, this, &DlgBundleManager::slotShowSupporterBundlesDialog);
 #else
     m_ui->bnSupport->hide();

@@ -107,6 +107,10 @@
 
 
             <meta-data android:name="android.app.lib_name" android:value="krita"/>
+            <!-- IKriate: keep the launch screen up until the first screen is drawn
+                 (hidden from IkLaunchScreen::hide()). -->
+            <meta-data android:name="android.app.splash_screen_drawable" android:resource="@drawable/ikriate_launch"/>
+            <meta-data android:name="android.app.splash_screen_sticky" android:value="true"/>
             <meta-data android:name="android.app.qt_sources_resource_id" android:resource="@array/qt_sources"/>
             <meta-data android:name="android.app.repository" android:value="default"/>
             <meta-data android:name="android.app.qt_libs_resource_id" android:resource="@array/qt_libs"/>
@@ -161,6 +165,5 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="com.android.vending.BILLING" />
 
 </manifest>

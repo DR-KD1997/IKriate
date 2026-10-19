@@ -618,7 +618,7 @@ bool KisImportExportManager::askUserAboutExportConfiguration(
 
         error += "</ul>";
 
-        QMessageBox::critical(KisPart::instance()->currentMainwindow(), i18nc("@title:window", "Krita: Export Error"), error);
+        QMessageBox::critical(KisPart::instance()->currentMainwindow(), i18nc("@title:window", "IKriate: Export Error"), error);
         return false;
     }
 
@@ -682,7 +682,7 @@ bool KisImportExportManager::askUserAboutExportConfiguration(
 
         QCheckBox *chkAlsoAsKra = 0;
         if (showWarnings && !warnings.isEmpty()) {
-            chkAlsoAsKra = new QCheckBox(i18n("Also save your image as a Krita file."));
+            chkAlsoAsKra = new QCheckBox(i18n("Also save your image as a IKriate file."));
             chkAlsoAsKra->setChecked(KisConfig(true).readEntry<bool>("AlsoSaveAsKra", false));
             layout->addWidget(chkAlsoAsKra);
         }

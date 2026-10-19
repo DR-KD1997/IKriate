@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+  <!-- IKriate: colour picker icon (three overlapping colour discs). CC0. -->
+  <circle cx="12" cy="8.5" r="6" fill="#E5484D" fill-opacity="0.9"/>
+  <circle cx="8.2" cy="14.8" r="6" fill="#30A46C" fill-opacity="0.9"/>
+  <circle cx="15.8" cy="14.8" r="6" fill="#3E63DD" fill-opacity="0.9"/>
+  <circle cx="12" cy="12.9" r="2.4" fill="#F5D90A"/>
+</svg>

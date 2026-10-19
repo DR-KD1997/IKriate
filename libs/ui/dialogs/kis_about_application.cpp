@@ -32,7 +32,8 @@ public:
 KisAboutApplication::KisAboutApplication(QWidget *parent)
     : KoDialog(parent)
 {
-    setWindowTitle(i18n("About Krita"));
+    // IKRIATE-REBRAND: skip (this dialog credits the Krita project by name)
+    setWindowTitle(i18n("About IKriate"));
     setButtons(KoDialog::Close);
 
     WdgAboutApplication *wdgTab = new WdgAboutApplication(this);
@@ -47,6 +48,9 @@ KisAboutApplication::KisAboutApplication(QWidget *parent)
                           "<head/>"
                           "<body>"
                           "<h1 align=\"center\">Created By</h1></p>"
+                          "<p>IKriate is an independent, unofficial derivative of Krita and is not "
+                          "affiliated with or endorsed by the Krita Foundation. It is built on the work of "
+                          "the Krita developers:</p>"
                           "<p>");
 
     QFile fileDevelopers(":/developers.txt");
@@ -89,18 +93,24 @@ KisAboutApplication::KisAboutApplication(QWidget *parent)
 
     wdgTab->lblTranslators->setText(translatorHtml);
 
-    QString sponsors = i18n(
+    // IKriate has no sponsors of its own; Krita's sponsors supported Krita,
+    // not this derivative, so their logos are not shown. Credit the origin instead.
+    QString origin = i18n(
         "<html><head/><body>"
-        "<h1 align=\"center\">Development Fund</h1>"
-        "<p align=\"center\"> <a href=\"https://intel.com\"><img src=\":/intel.png\"></a> "
-        "<h2 align=\"center\">One Time Sponsors</h2>"
-        "<p align=\"center\"> <a href=\"https://www.unrealengine.com/en-US/megagrants\"><img src=\":/epic.png\"></a> "
-        "<p align=\"center\"> <a href=\"http://brokenrul.es/\"><img src=\":/broken_rules.png\"></a> "
-        "<p align=\"center\"> <a href=\"https://game-chuck.com/\"><img src=\":/gamechuck.png\"></a> "
-        "<p align=\"center\"> <a href=\"https://www.fosshub.com/Krita.html\"><img src=\":/fosshub.png\"></a> "
-        "<p align=\"center\"> <a href=\"http://www.asifa-hollywood.org/\"><img src=\":/asifa.png\"></a> "
+        "<h1 align=\"center\">Based on Krita</h1>"
+        "<p>IKriate is a modified version of Krita, the free and open source painting "
+        "application developed by the Krita community and the Krita Foundation.</p>"
+        "<p>IKriate is an independent project. It is not affiliated with, sponsored by or "
+        "endorsed by the Krita Foundation, and \"Krita\" is used here only to identify the "
+        "software IKriate is derived from.</p>"
+        "<p>Please report problems with IKriate to the IKriate project, not to the Krita developers: "
+        "<a href=\"https://github.com/DR-KD1997/IKriate/issues\">github.com/DR-KD1997/IKriate</a></p>"
+        "<p>To learn about the original application, visit "
+        "<a href=\"https://krita.org\">krita.org</a>.</p>"
         "</body></html>");
-    wdgTab->lblKickstarter->setText(sponsors);
+    wdgTab->lblKickstarter->setText(origin);
+    wdgTab->tabWidget->setTabText(wdgTab->tabWidget->indexOf(wdgTab->lblKickstarter->parentWidget()),
+                                  i18nc("About dialog tab", "Origin"));
 
     QString credits = i18n("<html>"
                           "<head/>"
@@ -125,7 +135,7 @@ KisAboutApplication::KisAboutApplication(QWidget *parent)
         }
         credits.chop(2);
     }
-    credits.append(i18n(".</p><p><i>For supporting Krita development with advice, icons, brush sets and more.</i></p></body></html>"));
+    credits.append(i18n(".</p><p><i>For supporting the development of Krita, which IKriate is based on, with advice, icons, brush sets and more.</i></p></body></html>"));
 
     wdgTab->lblCredits->setText(credits);
 
@@ -133,19 +143,21 @@ KisAboutApplication::KisAboutApplication(QWidget *parent)
                            "<head/>"
                            "<body>"
                            "<h1 align=\"center\"><b>Your Rights</b></h1>"
-                           "<p>Krita is released under the GNU General Public License (version 3 or any later version).</p>"
+                           "<p>IKriate is released under the GNU General Public License (version 3 or any later version), "
+                           "like Krita, the application it is based on.</p>"
                            "<p>This license grants people a number of freedoms:</p>"
                            "<ul>"
-                           "<li>You are free to use Krita, for any purpose</li>"
-                           "<li>You are free to distribute Krita</li>"
-                           "<li>You can study how Krita works and change it</li>"
-                           "<li>You can distribute changed versions of Krita</li>"
+                           "<li>You are free to use IKriate, for any purpose</li>"
+                           "<li>You are free to distribute IKriate</li>"
+                           "<li>You can study how IKriate works and change it</li>"
+                           "<li>You can distribute changed versions of IKriate</li>"
                            "</ul>"
-                           "<p>The Krita Foundation and its projects on krita.org are <b>committed</b> to preserving Krita as free software.</p>"
+                           "<p>The source code of this version is available at "
+                           "<a href=\"https://github.com/DR-KD1997/IKriate\">github.com/DR-KD1997/IKriate</a>.</p>"
                            "<h1 align=\"center\">Your artwork</h1>"
-                           "<p>What you create with Krita is your sole property. All your artwork is free for you to use as you like.</p>"
-                           "<p>That means that Krita can be used commercially, for any purpose. There are no restrictions whatsoever.</p>"
-                           "<p>Krita’s GNU GPL license guarantees you this freedom. Nobody is ever permitted to take it away, in contrast "
+                           "<p>What you create with IKriate is your sole property. All your artwork is free for you to use as you like.</p>"
+                           "<p>That means that IKriate can be used commercially, for any purpose. There are no restrictions whatsoever.</p>"
+                           "<p>The GNU GPL license guarantees you this freedom. Nobody is ever permitted to take it away, in contrast "
                            "to trial or educational versions of commercial software that will forbid your work in commercial situations.</p>"
                            "<br/><hr/><pre>");
 
@@ -167,8 +179,8 @@ KisAboutApplication::KisAboutApplication(QWidget *parent)
         QString thirdPartyHtml = i18n("<html>"
                                       "<head/>"
                                       "<body>"
-                                      "<h1 align=\"center\"><b>Third-party Libraries used by Krita</b></h1>"
-                                      "<p>Krita is built on the following free software libraries:</p><p><ul>");
+                                      "<h1 align=\"center\"><b>Third-party Libraries used by IKriate</b></h1>"
+                                      "<p>IKriate is built on the following free software libraries:</p><p><ul>");
 
         Q_FOREACH (const QString &lib, thirdPartyText.readAll().split('\n', Qt::SkipEmptyParts)) {
 

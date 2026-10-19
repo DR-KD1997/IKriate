@@ -54,6 +54,7 @@
 #include "KisUiFont.h"
 #include "input/KisQtWidgetsTweaker.h"
 #include "kis_splash_screen.h"
+#include "ikriate/IkLaunchScreen.h"
 #include "config-qt-patches-present.h"
 
 #ifdef Q_OS_ANDROID
@@ -660,6 +661,8 @@ if (!qEnvironmentVariableIsEmpty("KRITA_OPENGL_DEBUG")) {
 
     // first create the application so we can create a pixmap
     KisApplication app(key, argc, argv);
+    // IKriate: keep the Android launch logo up until the first screen is ready.
+    IkLaunchScreen::install();
 
 #if defined Q_OS_WIN && QT_VERSION > QT_VERSION_CHECK(6, 0, 0)
     const bool forceWinTab = !KisConfig::useWin8PointerInputNoApp(&kritarc);
@@ -727,7 +730,7 @@ if (!qEnvironmentVariableIsEmpty("KRITA_OPENGL_DEBUG")) {
                             KritaVersionWrapper::versionString(true),
                             "", // TODO: "short description" needs new string exception
                             KAboutLicense::GPL,
-                            i18nc("@info:credit", "IKriate is based on Krita. © 1999–2026 The Krita Developers"));
+                            i18nc("@info:credit", "IKriate is based on Krita. © 1999–2026 The IKriate Developers"));
     aboutData.setHomepage(QStringLiteral("https://github.com/DR-KD1997/IKriate"));
     aboutData.setBugAddress("https://github.com/DR-KD1997/IKriate/issues");
     aboutData.setOrganizationDomain("krita.org");
@@ -812,10 +815,13 @@ if (!qEnvironmentVariableIsEmpty("KRITA_OPENGL_DEBUG")) {
     app.installEventFilter(KisQtWidgetsTweaker::instance());
     app.setDesktopFileName(QStringLiteral("org.kde.krita"));
 
+#ifndef Q_OS_ANDROID
+    // IKriate: on Android the system launch screen stays up instead.
     if (!args.noSplash()) {
         QWidget *splash = new KisSplashScreen();
         app.setSplashScreen(splash);
     }
+#endif
 
 #if defined Q_OS_WIN
     KisConfig cfg(false);
@@ -825,7 +831,7 @@ if (!qEnvironmentVariableIsEmpty("KRITA_OPENGL_DEBUG")) {
         if (osVersion.majorVersion() < QOperatingSystemVersion::Windows7.majorVersion()) {
             if (cfg.readEntry("WarnedAboutUnsupportedWindows", false)) {
                 QMessageBox::information(nullptr,
-                                         i18nc("@title:window", "Krita: Warning"),
+                                         i18nc("@title:window", "IKriate: Warning"),
                                          i18n("You are running an unsupported version of Windows: %1.\n"
                                               "This is not recommended. Do not report any bugs.\n"
                                               "Please update to a supported version of Windows: Windows 7, 8, 8.1 or 10.", osVersion.name()));

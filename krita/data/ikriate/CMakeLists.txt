@@ -3,6 +3,8 @@
 
 # Bundled interface skins. Users add their own to <user data>/ikriate/skins.
 install(FILES
+    skins/ikriate-dark.ikskin
+    skins/ikriate-light.ikskin
     skins/ikriate-charcoal.ikskin
     skins/ikriate-paper.ikskin
     skins/ikriate-midnight.ikskin

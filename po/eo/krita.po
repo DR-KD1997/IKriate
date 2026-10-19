@@ -1046,8 +1046,8 @@ msgstr "Parolvezikoj de Pipro & Karoto"
 #. i18n: Display name of resource, see context: [path-to-resources]/[resource-type]/[resource-filename]
 #, kde-format
 msgctxt "./krita/data/symbols/preset_icons.svg"
-msgid "Krita Brush Preset Icon Library"
-msgstr "Krita Peniko Antaŭmetita Piktogramo-Biblioteko"
+msgid "IKriate Brush Preset Icon Library"
+msgstr "IKriate Peniko Antaŭmetita Piktogramo-Biblioteko"
 
 #. i18n: Display name of resource, see context: [path-to-resources]/[resource-type]/[resource-filename]
 #, kde-format
@@ -8309,10 +8309,10 @@ msgstr "Malfermu Dosierujon de Rimedoj"
 #, kde-format
 msgctxt "action"
 msgid ""
-"Opens a file browser at the location Krita saves resources such as brushes "
+"Opens a file browser at the location IKriate saves resources such as brushes "
 "to."
 msgstr ""
-"Malfermas dosier-retumilon ĉe la loko kie Krita konservas rimedojn ekz. "
+"Malfermas dosier-retumilon ĉe la loko kie IKriate konservas rimedojn ekz. "
 "penikojn."
 
 #. i18n: context: text @ Action (windows_cascade), Actions (General), ActionCollection (Krita)
@@ -8525,8 +8525,8 @@ msgstr "Baskuligi Tablet Erarserĉilon"
 #: krita/krita.action:167 krita/krita.action:169 krita/krita.action:170
 #, kde-format
 msgctxt "action"
-msgid "Show Krita log for bug reports."
-msgstr "Montru Krita protokolon por cimraportoj."
+msgid "Show IKriate log for bug reports."
+msgstr "Montru IKriate protokolon por cimraportoj."
 
 #. i18n: context: text @ Action (sysinfo), Actions (General), ActionCollection (Krita)
 #. i18n: context: toolTip @ Action (sysinfo), Actions (General), ActionCollection (Krita)
@@ -15848,8 +15848,8 @@ msgstr "Agordoj"
 #: krita/kritamenu.action:1775
 #, kde-format
 msgctxt "action"
-msgid "&Configure Krita..."
-msgstr "Agordi &Krita..."
+msgid "&Configure IKriate..."
+msgstr "Agordi &IKriate..."
 
 #. i18n: context: toolTip @ Action (options_configure), Actions (Settings), ActionCollection (Menu)
 #. i18n: context: iconText @ Action (options_configure), Actions (Settings), ActionCollection (Menu)
@@ -15858,8 +15858,8 @@ msgstr "Agordi &Krita..."
 #: krita/kritamenu.action:1777 krita/kritamenu.action:1778
 #, kde-format
 msgctxt "action"
-msgid "Configure Krita"
-msgstr "Agordi Krita"
+msgid "Configure IKriate"
+msgstr "Agordi IKriate"
 
 #. i18n: context: text @ Action (manage_bundles), Actions (Settings), ActionCollection (Menu)
 #: krita/kritamenu.action:1787
@@ -16083,8 +16083,8 @@ msgstr "Helpo"
 #: krita/kritamenu.action:1933
 #, kde-format
 msgctxt "action"
-msgid "Krita &Handbook"
-msgstr "Krita &Manlibro"
+msgid "IKriate &Handbook"
+msgstr "IKriate &Manlibro"
 
 #. i18n: context: toolTip @ Action (help_contents), Actions (Help), ActionCollection (Menu)
 #. i18n: context: iconText @ Action (help_contents), Actions (Help), ActionCollection (Menu)
@@ -16093,8 +16093,8 @@ msgstr "Krita &Manlibro"
 #: krita/kritamenu.action:1935 krita/kritamenu.action:1936
 #, kde-format
 msgctxt "action"
-msgid "Krita Handbook"
-msgstr "Krita Manlibro"
+msgid "IKriate Handbook"
+msgstr "IKriate Manlibro"
 
 #. i18n: context: text @ Action (help_report_bug), Actions (Help), ActionCollection (Menu)
 #: krita/kritamenu.action:1943
@@ -16117,8 +16117,8 @@ msgstr "Raporti Cimon"
 #: krita/kritamenu.action:1953
 #, kde-format
 msgctxt "action"
-msgid "&About Krita"
-msgstr "&Pri Krita"
+msgid "&About IKriate"
+msgstr "&Pri IKriate"
 
 #. i18n: context: toolTip @ Action (help_about_app), Actions (Help), ActionCollection (Menu)
 #. i18n: context: iconText @ Action (help_about_app), Actions (Help), ActionCollection (Menu)
@@ -16127,8 +16127,8 @@ msgstr "&Pri Krita"
 #: krita/kritamenu.action:1955 krita/kritamenu.action:1956
 #, kde-format
 msgctxt "action"
-msgid "About Krita"
-msgstr "Pri Krita"
+msgid "About IKriate"
+msgstr "Pri IKriate"
 
 #. i18n: context: text @ Action (help_about_kde), Actions (Help), ActionCollection (Menu)
 #: krita/kritamenu.action:1963
@@ -16449,15 +16449,15 @@ msgstr "Ŝanĝi ortangulon"
 #: krita/main.cc:723
 #, kde-format
 msgctxt "@info:credit"
-msgid "© 1999–2026 The Krita Developers"
+msgid "© 1999–2026 The IKriate Developers"
 msgstr ""
 
 #: krita/main.cc:820 libs/ui/KisApplication.cpp:523
 #: libs/ui/KisApplication.cpp:848
 #, kde-format
 msgctxt "@title:window"
-msgid "Krita: Warning"
-msgstr "Krita: Averto"
+msgid "IKriate: Warning"
+msgstr "IKriate: Averto"
 
 #: krita/main.cc:821
 #, kde-format
@@ -19331,7 +19331,7 @@ msgstr "Opcitaj Limoj"
 msgctxt "@tooltip"
 msgid ""
 "Adjusts glyphs so they align by their optical bounds. Doesn't do anything in "
-"Krita."
+"IKriate."
 msgstr ""
 
 #: libs/flake/text/KoOpenTypeFeatureInfoFactory.cpp:77
@@ -19505,7 +19505,7 @@ msgstr "Optika grandeco"
 msgctxt "@tooltip"
 msgid ""
 "Indicates how much the font is suitable for its current size. Does nothing "
-"in Krita."
+"in IKriate."
 msgstr ""
 
 #: libs/flake/text/KoOpenTypeFeatureInfoFactory.cpp:131
@@ -21135,8 +21135,8 @@ msgstr "Konverti al Vojo"
 #: libs/global/kis_assert.cpp:82
 #, kde-format
 msgctxt "@title:window"
-msgid "Krita: Internal Error"
-msgstr "Krita: Interna Eraro"
+msgid "IKriate: Internal Error"
+msgstr "IKriate: Interna Eraro"
 
 #: libs/global/kis_dom_utils.cpp:128
 #, kde-format
@@ -22651,8 +22651,8 @@ msgstr "Biblioteko Adobe Brush"
 #: libs/koplugin/KisMimeDatabase.cpp:184
 #, kde-format
 msgctxt "description of a file type"
-msgid "Krita Brush Preset"
-msgstr "Krita Peniko Antaŭmetita"
+msgid "IKriate Brush Preset"
+msgstr "IKriate Peniko Antaŭmetita"
 
 #: libs/koplugin/KisMimeDatabase.cpp:189
 #, kde-format
@@ -22663,8 +22663,8 @@ msgstr "Mia Peniko"
 #: libs/koplugin/KisMimeDatabase.cpp:194
 #, kde-format
 msgctxt "description of a file type"
-msgid "Krita Assistant"
-msgstr "Krita Asistanto"
+msgid "IKriate Assistant"
+msgstr "IKriate Asistanto"
 
 #: libs/koplugin/KisMimeDatabase.cpp:199
 #, kde-format
@@ -22717,8 +22717,8 @@ msgstr "Kolora Paletro"
 #: libs/koplugin/KisMimeDatabase.cpp:239
 #, kde-format
 msgctxt "description of a file type"
-msgid "Krita Color Palette"
-msgstr "Krita Koloro-Paletro"
+msgid "IKriate Color Palette"
+msgstr "IKriate Koloro-Paletro"
 
 #: libs/koplugin/KisMimeDatabase.cpp:244
 #, kde-format
@@ -22741,50 +22741,50 @@ msgstr "GIMP-Ŝablonoj"
 #: libs/koplugin/KisMimeDatabase.cpp:259
 #, kde-format
 msgctxt "description of a file type"
-msgid "Krita Resource Bundle"
-msgstr "Krita Rimeda Pako"
+msgid "IKriate Resource Bundle"
+msgstr "IKriate Rimeda Pako"
 
 #: libs/koplugin/KisMimeDatabase.cpp:264
 #, kde-format
 msgctxt "description of a file type"
-msgid "Krita Workspace"
-msgstr "Krita Laborspaco"
+msgid "IKriate Workspace"
+msgstr "IKriate Laborspaco"
 
 #: libs/koplugin/KisMimeDatabase.cpp:269
 #, kde-format
 msgctxt "description of a file type"
-msgid "Krita Window Layout"
-msgstr "Krita Fenestra Aranĝo"
+msgid "IKriate Window Layout"
+msgstr "IKriate Fenestra Aranĝo"
 
 #: libs/koplugin/KisMimeDatabase.cpp:274
 #, kde-format
 msgctxt "description of a file type"
-msgid "Krita Session"
-msgstr "Krita Seanco"
+msgid "IKriate Session"
+msgstr "IKriate Seanco"
 
 #: libs/koplugin/KisMimeDatabase.cpp:279
 #, kde-format
 msgctxt "description of a file type"
-msgid "Krita Taskset"
-msgstr "Krita Taskset"
+msgid "IKriate Taskset"
+msgstr "IKriate Taskset"
 
 #: libs/koplugin/KisMimeDatabase.cpp:284
 #, kde-format
 msgctxt "description of a file type"
-msgid "Krita Reference Image Collection"
-msgstr "Krita Referenca Bilda Kolekto"
+msgid "IKriate Reference Image Collection"
+msgstr "IKriate Referenca Bilda Kolekto"
 
 #: libs/koplugin/KisMimeDatabase.cpp:289
 #, kde-format
 msgctxt "description of a file type"
-msgid "Krita Gamut Mask"
-msgstr "Krita Gamut Masko"
+msgid "IKriate Gamut Mask"
+msgstr "IKriate Gamut Masko"
 
 #: libs/koplugin/KisMimeDatabase.cpp:294
 #, kde-format
 msgctxt "description of a file type"
-msgid "Krita Shortcut Scheme"
-msgstr "Krita Ŝparvoja Skemo"
+msgid "IKriate Shortcut Scheme"
+msgstr "IKriate Ŝparvoja Skemo"
 
 #: libs/koplugin/KisMimeDatabase.cpp:299
 #, kde-format
@@ -22825,8 +22825,8 @@ msgstr "SeExpr-skriptopakaĵo"
 #: libs/koplugin/KisMimeDatabase.cpp:334
 #, kde-format
 msgctxt "description of a file type"
-msgid "Krita Archival Image Format"
-msgstr "Krita Arkiva Bilda Formato"
+msgid "IKriate Archival Image Format"
+msgstr "IKriate Arkiva Bilda Formato"
 
 #: libs/koplugin/KisMimeDatabase.cpp:339
 #, kde-format
@@ -22885,8 +22885,8 @@ msgstr "Aldonu la nomon de la ilo uzata por kreado kaj la modifdaton"
 
 #: libs/metadata/kis_meta_data_filter_p.cc:98
 #, kde-format
-msgid "Krita %1"
-msgstr "Krita %1"
+msgid "IKriate %1"
+msgstr "IKriate %1"
 
 #: libs/metadata/kis_meta_data_merge_strategy_p.cc:38
 #, kde-format
@@ -24263,16 +24263,16 @@ msgstr "Lokaj Rimedoj"
 #: plugins/tools/tool_transform2/kis_free_transform_strategy_gsl_helpers.cpp:437
 #, kde-format
 msgctxt "@title:window"
-msgid "Krita"
-msgstr "Krita"
+msgid "IKriate"
+msgstr "IKriate"
 
 #: libs/resources/KisResourceCacheDb.cpp:353
 #, kde-format
 msgid ""
-"The resource database scheme has changed. Krita will backup your database "
+"The resource database scheme has changed. IKriate will backup your database "
 "and create a new database."
 msgstr ""
-"La rimeda datumbaza skemo ŝanĝiĝis. Krita sekurkopios vian datumbazon kaj "
+"La rimeda datumbaza skemo ŝanĝiĝis. IKriate sekurkopios vian datumbazon kaj "
 "kreos novan datumbazon."
 
 #: libs/resources/KisResourceLocator.cpp:106
@@ -24305,8 +24305,8 @@ msgstr "Ne eblis sinkronigi ĝisdatigitan tipar-registrejon kun la datumbazo"
 #: libs/resources/KisResourceLocator.cpp:1044
 #, kde-format
 msgid ""
-"Krita is running for the first time. Initialization will take some time."
-msgstr "Krita kuras unuafoje. Iniciatigo daŭros iom da tempo."
+"IKriate is running for the first time. Initialization will take some time."
+msgstr "IKriate kuras unuafoje. Iniciatigo daŭros iom da tempo."
 
 #: libs/resources/KisResourceLocator.cpp:1051
 #, kde-format
@@ -25458,19 +25458,19 @@ msgstr "Malsukcesis krei labordosierujon, certigu, ke vi havas skribpermeson"
 #: libs/ui/animation/KisDlgImportVideoAnimation.cpp:182
 #, kde-format
 msgctxt "Title for a messagebox"
-msgid "Krita"
+msgid "IKriate"
 msgstr "Krito"
 
 #: libs/ui/animation/KisDlgImportVideoAnimation.cpp:183
 #, kde-format
 msgid ""
-"Warning: you are trying to import more than 100 frames into Krita.\n"
+"Warning: you are trying to import more than 100 frames into IKriate.\n"
 "\n"
 "This means you might be overloading your system.\n"
 "If you want to edit a clip larger than 100 frames, consider using a real "
 "video editor, like Kdenlive (https://kdenlive.org)."
 msgstr ""
-"Averto: vi provas importi pli ol 100 kadrojn en Krita.\n"
+"Averto: vi provas importi pli ol 100 kadrojn en IKriate.\n"
 "\n"
 "Ĉi tio signifas, ke vi eble troŝarĝas vian sistemon.\n"
 "Se vi volas redakti klipo pli grandan ol 100 kadrojn, konsideru uzi realan "
@@ -25585,10 +25585,10 @@ msgstr ""
 #, kde-format
 msgctxt "part of warning in video importer."
 msgid ""
-"Krita does not support the video transfer curve (%1), it will be loaded as "
+"IKriate does not support the video transfer curve (%1), it will be loaded as "
 "linear."
 msgstr ""
-"Krita ne subtenas la videotransigan kurbon (%1), ĝi estos ŝargata kiel "
+"IKriate ne subtenas la videotransigan kurbon (%1), ĝi estos ŝargata kiel "
 "lineara."
 
 #: libs/ui/animation/KisDlgImportVideoAnimation.cpp:553
@@ -26572,12 +26572,12 @@ msgstr "Sentemeco"
 #, kde-format
 msgid ""
 "How sensitive should the duplicate frame filter be when determining\n"
-"which frames are added to Krita.\n"
-"The higher the sensitivity, the more frames are added to Krita."
+"which frames are added to IKriate.\n"
+"The higher the sensitivity, the more frames are added to IKriate."
 msgstr ""
 "Kiom sentema devus esti la duplikata kadra filtrilo kiam oni determinas\n"
-"kiuj kadroj estas aldonitaj al Krita.\n"
-"Ju pli alta estas la sentemo, des pli da kadroj estas aldonitaj al Krita."
+"kiuj kadroj estas aldonitaj al IKriate.\n"
+"Ju pli alta estas la sentemo, des pli da kadroj estas aldonitaj al IKriate."
 
 #. i18n: ectx: property (text), widget (QLabel, importDocumentLabel)
 #: libs/ui/animation/VideoImportDialog.ui:325
@@ -26912,7 +26912,7 @@ msgstr "Neniu"
 #, kde-format
 msgid ""
 "WARNING: HDR mode was activated on surface working in 8-bit mode!\n"
-"Please activate 10-bit mode in Krita's Preferences dialog and restart Krita "
+"Please activate 10-bit mode in IKriate's Preferences dialog and restart IKriate "
 "to avoid color banding!"
 msgstr ""
 
@@ -27083,8 +27083,8 @@ msgstr "Bilda Centro"
 
 #: libs/ui/dialogs/kis_about_application.cpp:35
 #, kde-format
-msgid "About Krita"
-msgstr "Pri Krita"
+msgid "About IKriate"
+msgstr "Pri IKriate"
 
 #: libs/ui/dialogs/kis_about_application.cpp:46
 #, kde-format
@@ -27154,41 +27154,41 @@ msgstr "<html><head/><body><h1 align=\"center\">Dankon Al</h1><p>"
 #: libs/ui/dialogs/kis_about_application.cpp:128
 #, kde-format
 msgid ""
-".</p><p><i>For supporting Krita development with advice, icons, brush sets "
+".</p><p><i>For supporting IKriate development with advice, icons, brush sets "
 "and more.</i></p></body></html>"
 msgstr ""
-".</p><p><i>Por subteni la disvolviĝon de Krita per konsiloj, piktogramoj, "
+".</p><p><i>Por subteni la disvolviĝon de IKriate per konsiloj, piktogramoj, "
 "penikoroj kaj pli.</i></p></body></html>"
 
 #: libs/ui/dialogs/kis_about_application.cpp:132
 #, kde-format
 msgid ""
-"<html><head/><body><h1 align=\"center\"><b>Your Rights</b></h1><p>Krita is "
+"<html><head/><body><h1 align=\"center\"><b>Your Rights</b></h1><p>IKriate is "
 "released under the GNU General Public License (version 3 or any later "
 "version).</p><p>This license grants people a number of freedoms:</"
-"p><ul><li>You are free to use Krita, for any purpose</li><li>You are free to "
-"distribute Krita</li><li>You can study how Krita works and change it</"
-"li><li>You can distribute changed versions of Krita</li></ul><p>The Krita "
+"p><ul><li>You are free to use IKriate, for any purpose</li><li>You are free to "
+"distribute IKriate</li><li>You can study how IKriate works and change it</"
+"li><li>You can distribute changed versions of IKriate</li></ul><p>The IKriate "
 "Foundation and its projects on krita.org are <b>committed</b> to preserving "
-"Krita as free software.</p><h1 align=\"center\">Your artwork</h1><p>What you "
-"create with Krita is your sole property. All your artwork is free for you to "
-"use as you like.</p><p>That means that Krita can be used commercially, for "
-"any purpose. There are no restrictions whatsoever.</p><p>Krita’s GNU GPL "
+"IKriate as free software.</p><h1 align=\"center\">Your artwork</h1><p>What you "
+"create with IKriate is your sole property. All your artwork is free for you to "
+"use as you like.</p><p>That means that IKriate can be used commercially, for "
+"any purpose. There are no restrictions whatsoever.</p><p>IKriate’s GNU GPL "
 "license guarantees you this freedom. Nobody is ever permitted to take it "
 "away, in contrast to trial or educational versions of commercial software "
 "that will forbid your work in commercial situations.</p><br/><hr/><pre>"
 msgstr ""
-"<html><head/><body><h1 align=\"center\"><b>Viaj Rajtoj</b></h1><p>Krita "
+"<html><head/><body><h1 align=\"center\"><b>Viaj Rajtoj</b></h1><p>IKriate "
 "estas liberigita sub la Ĝenerala Publika Permesilo de GNU (versio 3 aŭ ajna "
 "posta versio).</p><p>Tiu permesilo donas al homoj kelkajn liberecojn:</"
-"p><ul><li>Vi rajtas uzi Krita, por ajna celo</li><li>Vi estas libera; "
-"distribui Krita</li><li>Vi povas studi kiel Krita funkcias kaj ŝanĝi ĝin</"
-"li><li>Vi povas distribui ŝanĝitajn versiojn de Krita</li></ul><p>La Krita "
+"p><ul><li>Vi rajtas uzi IKriate, por ajna celo</li><li>Vi estas libera; "
+"distribui IKriate</li><li>Vi povas studi kiel IKriate funkcias kaj ŝanĝi ĝin</"
+"li><li>Vi povas distribui ŝanĝitajn versiojn de IKriate</li></ul><p>La IKriate "
 "Fondaĵo kaj ĝiaj projektoj ĉe krita.org estas <b>engaĝitaj</b> konservi "
-"Krita kiel libera programaro.</p><h1 align=\"center\">Via artaĵo</h1><p>Kion "
-"vi kreas per Krita estas via sola posedaĵo. Ĉiuj viaj artaĵoj estas liberaj "
-"por vi uzi laŭplaĉe.</p><p>Tio signifas, ke Krita povas esti uzata komerce, "
-"por ajna celo. Estas neniuj limigoj.</p><p>La permesilo GNU GPL de Krita "
+"IKriate kiel libera programaro.</p><h1 align=\"center\">Via artaĵo</h1><p>Kion "
+"vi kreas per IKriate estas via sola posedaĵo. Ĉiuj viaj artaĵoj estas liberaj "
+"por vi uzi laŭplaĉe.</p><p>Tio signifas, ke IKriate povas esti uzata komerce, "
+"por ajna celo. Estas neniuj limigoj.</p><p>La permesilo GNU GPL de IKriate "
 "garantias al vi ĉi tiun liberecon. Neniu iam rajtas forpreni ĝin, kontraste "
 "al provaj aŭ edukaj versioj de komerca programaro, kiuj malpermesos vian "
 "laboron en komercaj situacioj.</p><br/><hr/><pre>"
@@ -27197,11 +27197,11 @@ msgstr ""
 #, kde-format
 msgid ""
 "<html><head/><body><h1 align=\"center\"><b>Third-party Libraries used by "
-"Krita</b></h1><p>Krita is built on the following free software libraries:</"
+"IKriate</b></h1><p>IKriate is built on the following free software libraries:</"
 "p><p><ul>"
 msgstr ""
 "<html><head/><body><h1 align=\"center\"><b>Triapartaj Bibliotekoj uzataj de "
-"Krita</b></h1><p>Krita estas konstruita sur la jenaj liberprogramaraj "
+"IKriate</b></h1><p>IKriate estas konstruita sur la jenaj liberprogramaraj "
 "bibliotekoj :</p><p><ul>"
 
 #: libs/ui/dialogs/kis_delayed_save_dialog.cpp:57
@@ -27279,11 +27279,11 @@ msgstr "Filtrilo: %1"
 #: libs/ui/dialogs/kis_dlg_hlg_import.ui:20
 #, kde-format
 msgid ""
-"<html><head/><body><p>This is an Hybrid Log Gamma image. Krita does not "
+"<html><head/><body><p>This is an Hybrid Log Gamma image. IKriate does not "
 "support sending HLG to the monitor, so for import it is recommended to "
 "convert from scene linear to display linear.</p></body></html>"
 msgstr ""
-"<html><head/><body><p>Ĉi tio estas bildo de Hybrid Log Gamma. Krita ne "
+"<html><head/><body><p>Ĉi tio estas bildo de Hybrid Log Gamma. IKriate ne "
 "subtenas sendi HLG al la ekrano, do por importo rekomendas konverti de sceno "
 "lineara al ekrano lineara.</p></body></html>"
 
@@ -27713,8 +27713,8 @@ msgstr "Montri seancan administranton"
 
 #: libs/ui/dialogs/kis_dlg_preferences.cc:569
 #, kde-format
-msgid "You will need to Restart Krita for the changes to take an effect."
-msgstr "Noto: Vi devos restarti Krita por ke la ŝanĝoj efektiviĝu."
+msgid "You will need to Restart IKriate for the changes to take an effect."
+msgstr "Noto: Vi devos restarti IKriate por ke la ŝanĝoj efektiviĝu."
 
 #: libs/ui/dialogs/kis_dlg_preferences.cc:575
 #, kde-format
@@ -27742,8 +27742,8 @@ msgstr "Elekti Permane"
 #, kde-format
 msgctxt "@info resource folder"
 msgid ""
-"<p>You are using the Microsoft Store package version of Krita. Even though "
-"Krita can be configured to place resources under the user AppData location, "
+"<p>You are using the Microsoft Store package version of IKriate. Even though "
+"IKriate can be configured to place resources under the user AppData location, "
 "Windows may actually store the files inside a private app location.</p>\n"
 "<p>You should check both locations to determine where the files are located."
 "</p>\n"
@@ -27752,7 +27752,7 @@ msgid ""
 "<p><b>Private app location</b> (<a href=\"copyprivate\">Copy</a>):<br/>\n"
 "%2</p>"
 msgstr ""
-"<p>Vi uzas la Microsoft Store-pakaĵversion de Krita. Kvankam Krita povas "
+"<p>Vi uzas la Microsoft Store-pakaĵversion de IKriate. Kvankam IKriate povas "
 "esti agordita por meti rimedojn sub la lokon de la uzanto AppData, Vindozo "
 "efektive povas konservi la dosierojn ene de privata aplika loko.</p>\n"
 "<p>Vi devus kontroli ambaŭ lokojn por determini kie troviĝas la dosieroj.</"
@@ -27840,7 +27840,7 @@ msgstr "Koloradministrado"
 msgid ""
 "<p>Enabling canvas color management automatically creates a separate native "
 "surface for the canvas. It might cause performance issues on some systems.</"
-"p><p>If color management is disabled, Krita will render the canvas into the "
+"p><p>If color management is disabled, IKriate will render the canvas into the "
 "surface of the main window, which is considered sRGB. It will cause two "
 "limitations:<ol>    <li>the color gamut will be limited to sRGB</li>    "
 "<li>color proofing mode will be limited to \"use global display settings"
@@ -28083,7 +28083,7 @@ msgstr ""
 #, kde-format
 msgctxt "@info:tooltip"
 msgid ""
-"<p>If you are using Krita on X11 or XWayland and experience slowness, try "
+"<p>If you are using IKriate on X11 or XWayland and experience slowness, try "
 "switching between EGL and GLX</p>"
 msgstr ""
 
@@ -28139,8 +28139,8 @@ msgstr "<b>Averto:</b> nuna ekrano ne subtenas HDR-bildigon"
 
 #: libs/ui/dialogs/kis_dlg_preferences.cc:2510
 #, kde-format
-msgid "Configure Krita"
-msgstr "Agordi Krita"
+msgid "Configure IKriate"
+msgstr "Agordi IKriate"
 
 #: libs/ui/dialogs/kis_dlg_preferences.cc:2527
 #, kde-format
@@ -28346,10 +28346,10 @@ msgstr ""
 msgctxt "@info:tooltip"
 msgid ""
 "The amount of time during which the strokes will be kept unmerged. When a "
-"stroke becomes old enough, Krita will try to merge it"
+"stroke becomes old enough, IKriate will try to merge it"
 msgstr ""
 "La tempokvanto dum kiu la strekoj estas tenataj nekunfanditaj. Kiam streko "
-"sufiĉe aĝiĝas, Krita provos ties kunfandadon"
+"sufiĉe aĝiĝas, IKriate provos ties kunfandadon"
 
 #: libs/ui/dialogs/KisDlgConfigureCumulativeUndo.cpp:60
 #, kde-format
@@ -28360,10 +28360,10 @@ msgstr "Atendi antaŭ ol kunfandi batojn:"
 #, kde-format
 msgctxt "@info:tooltip"
 msgid ""
-"The number of last strokes that Krita will not merge (even if they are old "
+"The number of last strokes that IKriate will not merge (even if they are old "
 "enough)"
 msgstr ""
-"La nombro da lastaj strekoj, kiujn Krita ne kunfandos (eĉ se ili estas "
+"La nombro da lastaj strekoj, kiujn IKriate ne kunfandos (eĉ se ili estas "
 "sufiĉe malnovaj)"
 
 #: libs/ui/dialogs/KisDlgConfigureCumulativeUndo.cpp:70
@@ -28406,20 +28406,20 @@ msgstr "Maksimuma grupdaŭro:"
 #: libs/ui/dialogs/KisDlgConfigureCumulativeUndo.cpp:101
 #, kde-format
 msgid ""
-"Cumulative Undo allows Krita to merge undo actions and make undo history "
-"cleaner. Krita will still keep a few latest actions unmerged according to "
+"Cumulative Undo allows IKriate to merge undo actions and make undo history "
+"cleaner. IKriate will still keep a few latest actions unmerged according to "
 "\"Wait before merging strokes\" and \"Exclude last strokes from merge\" "
 "options. Whenever an action gets outdated using the time limit and this "
-"action is not excluded using \"Exclude last strokes from merge\", Krita will "
+"action is not excluded using \"Exclude last strokes from merge\", IKriate will "
 "try  to merge this action into a group. The groups are formed using \"Max "
 "group strokes delay\" and \"Max group duration\" options."
 msgstr ""
-"Akumula Malfaro permesas al Krita kunfandi malfar-agojn kaj igi malfaran "
-"historion pli pura. Krita ankoraŭ konservos kelkajn lastajn agojn "
+"Akumula Malfaro permesas al IKriate kunfandi malfar-agojn kaj igi malfaran "
+"historion pli pura. IKriate ankoraŭ konservos kelkajn lastajn agojn "
 "nekunfanditaj laŭ opcioj \"Atendu antaŭ kunfandi strekojn\" kaj \"Ekskludi "
 "lastajn strekojn el kunfandado\". Kiam ajn ago malnoviĝas uzante la "
 "tempolimon kaj ĉi tiu ago ne estas ekskludita per \"Ekskludi lastajn "
-"strekojn el kunfandado\", Krita provos kunfandi ĉi tiun agon en grupon. La "
+"strekojn el kunfandado\", IKriate provos kunfandi ĉi tiun agon en grupon. La "
 "grupoj estas formitaj per la opcioj \"Maksimuma grupa strekoprokrasto\" kaj "
 "\"Maksimuma grupo-daŭro\"."
 
@@ -28645,8 +28645,8 @@ msgstr "Ŝlosita"
 #: libs/ui/dialogs/KisDonationManagementDialog.ui:53
 #, kde-format
 msgid ""
-"No supporter benefits available on this version of Krita.\n"
-"You can still support Krita by donating."
+"No supporter benefits available on this version of IKriate.\n"
+"You can still support IKriate by donating."
 msgstr ""
 
 #. i18n: ectx: property (text), widget (QPushButton, m_btnNoBenefitsSupport)
@@ -28735,7 +28735,7 @@ msgstr ""
 #. i18n: ectx: property (windowTitle), widget (QDialog, KisRecoverNamedAutosaveDialog)
 #: libs/ui/dialogs/KisRecoverNamedAutosaveDialog.ui:21 libs/ui/wdgsplash.ui:309
 #, kde-format
-msgid "Krita"
+msgid "IKriate"
 msgstr "Krito"
 
 #. i18n: ectx: property (text), widget (QRadioButton, rbOpenAutosave)
@@ -28871,8 +28871,8 @@ msgstr "Uzanto Manlibro"
 #: libs/ui/forms/KisWelcomePage.ui:525 libs/ui/KisWelcomePageWidget.cpp:364
 #: plugins/extensions/resourcemanager/KisSupporterBundleWidget.ui:173
 #, kde-format
-msgid "Support Krita"
-msgstr "Subteni Krita"
+msgid "Support IKriate"
+msgstr "Subteni IKriate"
 
 #. i18n: ectx: property (text), widget (QLabel, poweredByKDELink)
 #: libs/ui/forms/KisWelcomePage.ui:615 libs/ui/KisWelcomePageWidget.cpp:373
@@ -28901,8 +28901,8 @@ msgstr "Uzantkomunumo"
 #. i18n: ectx: property (text), widget (QLabel, kritaWebsiteLink)
 #: libs/ui/forms/KisWelcomePage.ui:966 libs/ui/KisWelcomePageWidget.cpp:367
 #, kde-format
-msgid "Krita Website"
-msgstr "Krita Retejo"
+msgid "IKriate Website"
+msgstr "IKriate Retejo"
 
 #. i18n: ectx: property (text), widget (QLabel, recentDocumentsLabel)
 #: libs/ui/forms/KisWelcomePage.ui:1041
@@ -28942,8 +28942,8 @@ msgstr "Novaĵoj-opcioj"
 #. i18n: ectx: property (text), widget (QLabel, versionNotificationLabel)
 #: libs/ui/forms/KisWelcomePage.ui:1377
 #, kde-format
-msgid "Krita Version X.X.X Available"
-msgstr "Krita Versio X.X.X Havebla"
+msgid "IKriate Version X.X.X Available"
+msgstr "IKriate Versio X.X.X Havebla"
 
 #. i18n: ectx: property (text), widget (QPushButton, bnVersionUpdate)
 #: libs/ui/forms/KisWelcomePage.ui:1428
@@ -28994,7 +28994,7 @@ msgid ""
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body>\n"
 "<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-"
-"right:0px; -qt-block-indent:0; text-indent:0px;\">Krita is an open source "
+"right:0px; -qt-block-indent:0; text-indent:0px;\">IKriate is an open source "
 "and community-driven tool for digital artists everywhere.<br />Progress is "
 "made possible thanks to ongoing support from our community of <a href="
 "\"https://docs.krita.org/en/contributors_manual.html\">contributors</a>, <a "
@@ -29008,7 +29008,7 @@ msgstr ""
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body>\n"
 "<p style=\"margin-top:12px; margin-bottom:12px; margin-left:0px; margin-"
-"right:0px; -qt-block -indent:0; text-indent:0px;\">Krita estas malfermfonta "
+"right:0px; -qt-block -indent:0; text-indent:0px;\">IKriate estas malfermfonta "
 "kaj komunuma ilo por ciferecaj artistoj ĉie.<br />Progreso estas ebligita "
 "danke al daŭra subteno de nia komunumo de <a href=\"https://docs.krita.org/"
 "en/contributors_manual.html\">kontribuantoj</a>, sponsoroj, kaj <a href="
@@ -29017,7 +29017,7 @@ msgstr ""
 #. i18n: ectx: property (text), widget (QLabel, lblAndroidSupporter)
 #: libs/ui/forms/KisWelcomePage.ui:1659
 #, kde-format
-msgid "Krita is made possible thanks to ongoing support from people like you!"
+msgid "IKriate is made possible thanks to ongoing support from people like you!"
 msgstr ""
 
 #. i18n: ectx: property (text), widget (QPushButton, bnAndroidSupporterManage)
@@ -29030,8 +29030,8 @@ msgstr ""
 #: libs/ui/forms/KisWelcomePage.ui:1717 libs/ui/KisWelcomePageWidget.cpp:844
 #, fuzzy, kde-format
 #| msgid "Support Krita"
-msgid "Support Krita!"
-msgstr "Subteni Krita"
+msgid "Support IKriate!"
+msgstr "Subteni IKriate"
 
 #. i18n: ectx: property (text), widget (QLabel, lblLastPrintedDesc)
 #: libs/ui/forms/koDocumentInfoAboutWidget.ui:28
@@ -29237,7 +29237,7 @@ msgstr "Pri"
 #. i18n: ectx: attribute (title), widget (QWidget, authorsTab)
 #: libs/ui/forms/wdgaboutapplication.ui:35
 #, kde-format
-msgctxt "Heading for the list of Krita authors/developers"
+msgctxt "Heading for the list of IKriate authors/developers"
 msgid "Authors"
 msgstr "Aŭtoroj"
 
@@ -29282,11 +29282,11 @@ msgstr "Apliki Profilon"
 #, kde-format
 msgid ""
 "The image data you want to paste does not have an ICM profile associated "
-"with it. If you do not select a profile, Krita will assume that the image "
+"with it. If you do not select a profile, IKriate will assume that the image "
 "data is encoded in the import profile defined in the Settings dialog."
 msgstr ""
 "La bildaj datumoj, kiujn vi volas alglui, ne havas ICM-profilon asociitan "
-"kun ĝi. Se vi ne elektas profilon, Krita supozos, ke la bildaj datumoj estas "
+"kun ĝi. Se vi ne elektas profilon, IKriate supozos, ke la bildaj datumoj estas "
 "koditaj en la importprofilo difinita en la dialogo Agordoj."
 
 #. i18n: ectx: property (text), widget (QLabel, lblProfile)
@@ -29441,8 +29441,8 @@ msgstr "Uzi defaŭltan kolormodelon por novaj bildoj"
 #. i18n: ectx: property (title), widget (QGroupBox, grpPasteBehaviour)
 #: libs/ui/forms/wdgcolorsettings.ui:77 libs/ui/forms/wdggeneralsettings.ui:250
 #, kde-format
-msgid "When Pasting Into Krita From Other Applications"
-msgstr "Algluante en Krita De Aliaj Aplikoj"
+msgid "When Pasting Into IKriate From Other Applications"
+msgstr "Algluante en IKriate De Aliaj Aplikoj"
 
 #. i18n: ectx: property (text), widget (QRadioButton, radioPasteWeb)
 #: libs/ui/forms/wdgcolorsettings.ui:83
@@ -29465,7 +29465,7 @@ msgstr "Demand&i ĉiufoje"
 #. i18n: ectx: property (text), widget (QLabel, textLabel1_2_2)
 #: libs/ui/forms/wdgcolorsettings.ui:104
 #, kde-format
-msgid "Note: When copying/pasting inside Krita color info is always preserved."
+msgid "Note: When copying/pasting inside IKriate color info is always preserved."
 msgstr ""
 "Noto: Kiam oni kopias/algluas enen Krita-kolorinformojn ĉiam konserviĝas."
 
@@ -29746,11 +29746,11 @@ msgstr "Uzi Blackpoint-&Kompenson"
 #: libs/ui/forms/wdgconvertcolorspace.ui:140
 #, kde-format
 msgid ""
-"Krita tries to automatically check or uncheck this based on the information "
+"IKriate tries to automatically check or uncheck this based on the information "
 "it can get from the profile you are converting from and the profile you are "
 "converting to."
 msgstr ""
-"Krita provas aŭtomate kontroli aŭ malmarki ĉi tion surbaze de la informoj, "
+"IKriate provas aŭtomate kontroli aŭ malmarki ĉi tion surbaze de la informoj, "
 "kiujn ĝi povas ricevi de la profilo, de kiu vi konvertas, kaj la profilo, al "
 "kiu vi konvertas."
 
@@ -30185,11 +30185,11 @@ msgstr "Dosiero:"
 #: libs/ui/forms/wdgdlgfilelayer.ui:87
 #, kde-format
 msgid ""
-"<html><head/><body><p>Warning: Krita uses a relative path to store the "
+"<html><head/><body><p>Warning: IKriate uses a relative path to store the "
 "location of the file in the .kra. If you move the .kra but not the file, the "
 "file layer may be broken.</p></body></html>"
 msgstr ""
-"<html><head/><body><p>Averto: Krita uzas relativan vojon por konservi la "
+"<html><head/><body><p>Averto: IKriate uzas relativan vojon por konservi la "
 "lokon de la dosiero en la .kra. Se vi movas la .kra sed ne la dosieron, la "
 "dosiertavolo povas esti rompita.</p></body></html>"
 
@@ -30315,8 +30315,8 @@ msgstr "XMP"
 #. i18n: ectx: property (text), widget (QLabel, label)
 #: libs/ui/forms/wdgfullscreensettings.ui:25
 #, kde-format
-msgid "Select which parts of Krita will be hidden in canvas-only mode."
-msgstr "Elekti kiuj partoj de Krita estos kaŝitaj en nur kanvasa reĝimo."
+msgid "Select which parts of IKriate will be hidden in canvas-only mode."
+msgstr "Elekti kiuj partoj de IKriate estos kaŝitaj en nur kanvasa reĝimo."
 
 #. i18n: ectx: property (text), widget (QCheckBox, chkMenu)
 #: libs/ui/forms/wdgfullscreensettings.ui:35
@@ -30345,8 +30345,8 @@ msgstr "Rulumbaroj"
 #. i18n: ectx: property (text), widget (QCheckBox, chkTitlebar)
 #: libs/ui/forms/wdgfullscreensettings.ui:63
 #, kde-format
-msgid "Titlebar (hiding the titlebar will make Krita go full-screen)"
-msgstr "Titolbreto (kaŝi la titolbreton igos Krita plenekranan)"
+msgid "Titlebar (hiding the titlebar will make IKriate go full-screen)"
+msgstr "Titolbreto (kaŝi la titolbreton igos IKriate plenekranan)"
 
 #. i18n: ectx: property (text), widget (QCheckBox, chkStatusbar)
 #: libs/ui/forms/wdgfullscreensettings.ui:70
@@ -30475,11 +30475,11 @@ msgstr ""
 #: libs/ui/forms/wdggeneralsettings.ui:190
 #, kde-format
 msgid ""
-"Use Zip64 (for very large files: cannot be opened in versions of Krita older "
+"Use Zip64 (for very large files: cannot be opened in versions of IKriate older "
 "than 4.2.0)"
 msgstr ""
 "Uzu Zip64 (por tre grandaj dosieroj: ne povas esti malfermita en versioj de "
-"Krita pli malnovaj ol 4.2.0)"
+"IKriate pli malnovaj ol 4.2.0)"
 
 #. i18n: ectx: property (text), widget (QCheckBox, m_chkCompressKra)
 #: libs/ui/forms/wdggeneralsettings.ui:197
@@ -31010,14 +31010,14 @@ msgstr "Rimeda Dosierujo:"
 #. i18n: ectx: property (text), widget (QLabel, label_12)
 #: libs/ui/forms/wdggeneralsettings.ui:1316
 #, kde-format
-msgid "When Krita starts:"
-msgstr "Kiam Krita komenciĝas:"
+msgid "When IKriate starts:"
+msgstr "Kiam IKriate komenciĝas:"
 
 #. i18n: ectx: property (text), widget (QCheckBox, chkSaveSessionOnQuit)
 #: libs/ui/forms/wdggeneralsettings.ui:1333
 #, kde-format
-msgid "Save session when Krita closes"
-msgstr "Konservi seancon kiam Krita fermiĝas"
+msgid "Save session when IKriate closes"
+msgstr "Konservi seancon kiam IKriate fermiĝas"
 
 #. i18n: ectx: property (text), widget (QCheckBox, m_chkConvertOnImport)
 #: libs/ui/forms/wdggeneralsettings.ui:1340
@@ -31120,12 +31120,12 @@ msgstr "Tiparo DPI-solucio"
 #: libs/ui/forms/wdggeneralsettings.ui:1578
 #, kde-format
 msgid ""
-"In some Krita versions before 5.0 text size could be dependent on the "
+"In some IKriate versions before 5.0 text size could be dependent on the "
 "current display DPI (which was a bug).\n"
 "In Krita 5.0 this bug has been fixed, which may cause files created in "
 "previous versions look different. \n"
 "\n"
-"When loading old files Krita will try to adjust font size to the DPI of the "
+"When loading old files IKriate will try to adjust font size to the DPI of the "
 "current screen.\n"
 "If the file has been created on a different display, try adjusting this "
 "value manually.\n"
@@ -31133,12 +31133,12 @@ msgid ""
 "After saving the file in Krita 5.0 at least once, no conversions will be "
 "needed anymore."
 msgstr ""
-"En kelkaj Krita versioj antaŭ 5.0 tekstgrandeco povus esti dependa de la "
+"En kelkaj IKriate versioj antaŭ 5.0 tekstgrandeco povus esti dependa de la "
 "nuna ekrana DPI (kiu estis cimo).\n"
 "En Krita 5.0 ĉi tiu cimo estis riparita, kio povas kaŭzi dosierojn kreitajn "
 "en antaŭaj versioj aspekti malsama. \n"
 "\n"
-"Kiam ŝargas malnovajn dosierojn Krita provos ĝustigi tiparon al la DPI de la "
+"Kiam ŝargas malnovajn dosierojn IKriate provos ĝustigi tiparon al la DPI de la "
 "nuna ekrano.\n"
 "Se la dosiero estis kreita sur alia ekrano, provu ĝustigi ĉi tiun valoron "
 "permane.\n"
@@ -31158,18 +31158,18 @@ msgstr "DPI:"
 #: libs/ui/forms/wdggeneralsettings.ui:1590
 #, kde-format
 msgid ""
-"In some versions of Krita before 4.4.3 text size could be dependent on the "
+"In some versions of IKriate before 4.4.3 text size could be dependent on the "
 "current display DPI (which was a bug).\n"
 "In Krita 4.4.3 this bug has been fixed, which may cause files created in "
 "previous versions look different.\n"
-"To restore the old behavior you can force Krita to use Display DPI for fonts "
+"To restore the old behavior you can force IKriate to use Display DPI for fonts "
 "by entering it in this field."
 msgstr ""
-"En iuj versioj de Krita antaŭ 4.4.3 tekstgrandeco povus esti dependa de la "
+"En iuj versioj de IKriate antaŭ 4.4.3 tekstgrandeco povus esti dependa de la "
 "aktuala ekrana DPI (kiu estis cimo).\n"
 "En Krita 4.4.3 ĉi tiu cimo estis riparita, kio povas kaŭzi ke dosieroj "
 "kreitaj en antaŭaj versioj aspektas alie.\n"
-"Por restarigi la malnovan konduton, vi povas devigi Krita uzi Display DPI "
+"Por restarigi la malnovan konduton, vi povas devigi IKriate uzi Display DPI "
 "por tiparoj enigante ĝin en ĉi tiu kampo."
 
 #. i18n: ectx: property (title), widget (QGroupBox, groupBox_51)
@@ -31225,7 +31225,7 @@ msgstr "Kaŝi docker-rulumbretojn se kinetika rulumo estas ebligita"
 #, kde-format
 msgid ""
 "Some applications may emulate presses of function keys with high numbers (e."
-"g. F22) to bring themselves to the foreground. This may break Krita's "
+"g. F22) to bring themselves to the foreground. This may break IKriate's "
 "shortcuts and actions system. If you have a keyboard with F13 or higher "
 "function keys, and you wish to use them, try disabling this option, but take "
 "this potential problem into account."
@@ -32133,8 +32133,8 @@ msgstr "Memo&ri"
 #. i18n: ectx: property (text), widget (QLabel, label_10)
 #: libs/ui/forms/wdgperformancesettings.ui:38
 #, kde-format
-msgid "Note: Krita will need to be restarted for changes to take effect"
-msgstr "Noto: Krita devos esti rekomencita por ke ŝanĝoj efektiviĝu"
+msgid "Note: IKriate will need to be restarted for changes to take effect"
+msgstr "Noto: IKriate devos esti rekomencita por ke ŝanĝoj efektiviĝu"
 
 #. i18n: ectx: property (title), widget (QGroupBox, groupBox)
 #: libs/ui/forms/wdgperformancesettings.ui:55
@@ -32159,8 +32159,8 @@ msgstr "XXX MiB"
 #: libs/ui/forms/wdgperformancesettings.ui:84
 #: libs/ui/forms/wdgperformancesettings.ui:102
 #, kde-format
-msgid "Krita will not use more memory than this limit."
-msgstr "Krita ne uzos pli da memoro ol ĉi tiu limo."
+msgid "IKriate will not use more memory than this limit."
+msgstr "IKriate ne uzos pli da memoro ol ĉi tiu limo."
 
 #. i18n: ectx: property (text), widget (QLabel, label)
 #: libs/ui/forms/wdgperformancesettings.ui:87
@@ -32246,10 +32246,10 @@ msgstr "CPU-Limo:"
 #: libs/ui/forms/wdgperformancesettings.ui:275
 #, kde-format
 msgid ""
-"<html><head/><body><p>Krita will not use more CPU cores than selected by "
+"<html><head/><body><p>IKriate will not use more CPU cores than selected by "
 "this limit</p></body></html>"
 msgstr ""
-"<html><head/><body><p>Krita ne uzos pli da CPU-kernoj ol elektitaj per ĉi "
+"<html><head/><body><p>IKriate ne uzos pli da CPU-kernoj ol elektitaj per ĉi "
 "tiu limo</p></body></html>"
 
 #. i18n: ectx: property (text), widget (QLabel, label_9)
@@ -32263,7 +32263,7 @@ msgstr "Frame Rendering Klonoj Limo"
 #, no-c-format, kde-format
 msgid ""
 "<html><head/><body><p>When rendering animation frames (into files or during "
-"animation cache regeneration), Krita will make the specified number of "
+"animation cache regeneration), IKriate will make the specified number of "
 "copies of your image and will work on them in parallel. Each copy will "
 "demand more RAM for its storage (about 20% of the size of you image), so "
 "raise this limit only if you have enough RAM installed.</p><p><br/></"
@@ -32272,7 +32272,7 @@ msgid ""
 "\">physical</span> (non-hyperthreaded) cores your CPU has</p></body></html>"
 msgstr ""
 "<html><head/><body><p>Kiam prezentas animaciajn kadrojn (en dosierojn aŭ dum "
-"animacia kaŝmemorregenerado), Krita faros la specifitan nombron da kopioj de "
+"animacia kaŝmemorregenerado), IKriate faros la specifitan nombron da kopioj de "
 "via bildo kaj laboros pri ili paralele. Ĉiu kopio postulos pli da RAM por "
 "sia konservejo (ĉirkaŭ 20% de la grandeco de via bildo), do altigu ĉi tiun "
 "limon nur se vi havas sufiĉe da RAM instalita.</p><p><br/></p><p><span style="
@@ -32319,12 +32319,12 @@ msgstr "Kadra tempo:"
 #: libs/ui/forms/wdgperformancesettings.ui:344
 #, kde-format
 msgid ""
-"<html><head/><body><p>Krita will try to limit the number of screen updates "
+"<html><head/><body><p>IKriate will try to limit the number of screen updates "
 "per second to the given number. A lower number will decrease visual "
 "responsiveness but increase stylus precision on some systems like macOS.<p></"
 "body></html>"
 msgstr ""
-"<html><head/><body><p>Krita provos limigi la nombron da ekranaj ĝisdatigoj "
+"<html><head/><body><p>IKriate provos limigi la nombron da ekranaj ĝisdatigoj "
 "sekundo al la donita nombro. Pli malalta nombro malpliigos vidan respondecon "
 "sed pliigos la precizecon de la grifelo ĉe iuj sistemoj kiel macOS.<p></"
 "body></html>"
@@ -32381,12 +32381,12 @@ msgstr "Registrado de rendimento"
 #: libs/ui/forms/wdgperformancesettings.ui:415
 #, kde-format
 msgid ""
-"<html><head/><body><p>When performance logging is enabled Krita saves timing "
+"<html><head/><body><p>When performance logging is enabled IKriate saves timing "
 "information into the <tt>&lt;working_dir&gt;/log</tt> folder. If you "
 "experience performance problems and want to help us, enable this option and "
 "add the contents of the directory to a bug report.</p></body></html>"
 msgstr ""
-"<html><head/><body><p>Kiam agado protokolo estas ebligita Krita konservas "
+"<html><head/><body><p>Kiam agado protokolo estas ebligita IKriate konservas "
 "tempinformojn en la dosierujon <tt>&lt;working_dir&gt;/log</tt>. Se vi "
 "spertas problemojn pri rendimento kaj volas helpi nin, ebligu ĉi tiun opcion "
 "kaj aldonu la enhavon de la dosierujo al raporto pri eraro.</p></body></html>"
@@ -33206,8 +33206,8 @@ msgstr "0.0"
 #. i18n: ectx: property (title), widget (QGroupBox, grpTabletApi)
 #: libs/ui/forms/wdgtabletsettings.ui:130
 #, kde-format
-msgid "Tablet Input API (changing this requires restarting Krita)"
-msgstr "Tablet Input API (ŝanĝi ĉi tion postulas rekomenci Krita)"
+msgid "Tablet Input API (changing this requires restarting IKriate)"
+msgstr "Tablet Input API (ŝanĝi ĉi tion postulas rekomenci IKriate)"
 
 #. i18n: ectx: property (text), widget (QRadioButton, radioWintab)
 #: libs/ui/forms/wdgtabletsettings.ui:138
@@ -33234,17 +33234,17 @@ msgstr "Vindoza 8+ Montrilo-Enigo (Vindoza Inko)"
 msgid ""
 "<html><head/><body><p>Some tablet devices don't pass barrel-button clicks "
 "via tablet API. If you have such a device, you can try activate this "
-"workaround. Krita will try to read right- and middle-button clicks from the "
+"workaround. IKriate will try to read right- and middle-button clicks from the "
 "mouse events stream. It may or may not work on your device (depends on the "
 "tablet driver implementation).</p><p><br/></p><p>After changing this option "
-"Krita should be restarted.</p></body></html>"
+"IKriate should be restarted.</p></body></html>"
 msgstr ""
 "<html><head/><body><p>Kelkaj tabuletaj aparatoj ne pasas barelbutonajn "
 "klakojn per tableta API. Se vi havas tian aparaton, vi povas provi aktivigi "
-"ĉi tiun solvon. Krita provos legi dekstren kaj mezbutonajn klakojn de la "
+"ĉi tiun solvon. IKriate provos legi dekstren kaj mezbutonajn klakojn de la "
 "musa eventofluo. Ĝi eble aŭ ne funkcias ĉe via aparato (dependas de la "
 "efektivigo de la tabuleta pelilo).</p><p><br/></p><p>Post ŝanĝi ĉi tiun "
-"opcion Krita devus esti rekomencita.</p></body></html>"
+"opcion IKriate devus esti rekomencita.</p></body></html>"
 
 #. i18n: ectx: property (text), widget (QCheckBox, chkUseRightMiddleClickWorkaround)
 #: libs/ui/forms/wdgtabletsettings.ui:180
@@ -33286,10 +33286,10 @@ msgstr ""
 #: libs/ui/forms/wdgtabletsettings.ui:227
 #, kde-format
 msgid ""
-"Amount of smoothing Krita should do to speed sensor. This value is very "
+"Amount of smoothing IKriate should do to speed sensor. This value is very "
 "hardware-dependent"
 msgstr ""
-"Kvanto da glatiĝo devas fari Krita por rapidigi sensilon. Ĉi tiu valoro tre "
+"Kvanto da glatiĝo devas fari IKriate por rapidigi sensilon. Ĉi tiu valoro tre "
 "dependas de aparataro"
 
 #. i18n: ectx: property (toolTip), widget (KisAngleSelector, tiltDirectionOffsetAngle)
@@ -35365,8 +35365,8 @@ msgstr ""
 
 #: libs/ui/kis_splash_screen.cpp:210
 #, kde-format
-msgid "<p><span style=\" color:%1;\"><b>Using Krita</b></span></p>"
-msgstr "<p><span style=\" color:%1;\"><b>Uzante Krita</b></span></p>"
+msgid "<p><span style=\" color:%1;\"><b>Using IKriate</b></span></p>"
+msgstr "<p><span style=\" color:%1;\"><b>Uzante IKriate</b></span></p>"
 
 #: libs/ui/kis_splash_screen.cpp:217
 #, fuzzy, kde-format
@@ -35376,7 +35376,7 @@ msgstr "<p><span style=\" color:%1;\"><b>Uzante Krita</b></span></p>"
 #| "a></p>"
 msgid ""
 "<p><a href=\"https://krita.org/support-us/\"><span style=\" text-decoration: "
-"underline; color:%1;\">Support Krita's Development!</span></a></p>"
+"underline; color:%1;\">Support IKriate's Development!</span></a></p>"
 msgstr ""
 "<p><a href=\"https://scripting.krita.org/lessons/introduction\"><span style="
 "\" text-decoration: underline; color:%1;\">Scripting School</span ></a></p>"
@@ -35389,7 +35389,7 @@ msgstr ""
 #| "a></p>"
 msgid ""
 "<p><a href=\"https://krita.org/\"><span style=\" text-decoration: underline; "
-"color:%1;\">Krita Website</span></a></p>"
+"color:%1;\">IKriate Website</span></a></p>"
 msgstr ""
 "<p><a href=\"https://scripting.krita.org/lessons/introduction\"><span style="
 "\" text-decoration: underline; color:%1;\">Scripting School</span ></a></p>"
@@ -35423,8 +35423,8 @@ msgstr ""
 
 #: libs/ui/kis_splash_screen.cpp:225
 #, kde-format
-msgid "<p><span style=\" color:%1;\"><b>Coding Krita</b></span></p>"
-msgstr "<p><span style=\" color:%1;\"><b>Kodigo Krita</b></span></p>"
+msgid "<p><span style=\" color:%1;\"><b>Coding IKriate</b></span></p>"
+msgstr "<p><span style=\" color:%1;\"><b>Kodigo IKriate</b></span></p>"
 
 #: libs/ui/kis_splash_screen.cpp:226
 #, fuzzy, kde-format
@@ -35531,12 +35531,12 @@ msgid ""
 "\n"
 "\n"
 "WARNING:\tOut of memory! Swapping has been started.\n"
-"\t\tPlease configure more RAM for Krita in Settings dialog"
+"\t\tPlease configure more RAM for IKriate in Settings dialog"
 msgstr ""
 "\n"
 "\n"
 "AVERTO:\tMemoro mankas! Interŝanĝo estis komencita.\n"
-"\t\tBonvolu agordi pli da RAM por Krita en Agorda dialogo"
+"\t\tBonvolu agordi pli da RAM por IKriate en Agorda dialogo"
 
 #: libs/ui/kis_statusbar.cc:338
 #, kde-format
@@ -35671,28 +35671,28 @@ msgstr "Stila Folio"
 msgid ""
 "%1\n"
 "\n"
-"Krita will quit now."
+"IKriate will quit now."
 msgstr ""
 "%1\n"
 "\n"
-"Krita ĉesos nun."
+"IKriate ĉesos nun."
 
 #: libs/ui/KisApplication.cpp:481 libs/ui/KisApplication.cpp:487
 #, kde-format
 msgctxt "@title:window"
-msgid "Krita: Fatal error"
-msgstr "Krita: Mortiga eraro"
+msgid "IKriate: Fatal error"
+msgstr "IKriate: Mortiga eraro"
 
 #: libs/ui/KisApplication.cpp:487
 #, kde-format
 msgid ""
 "\n"
 "\n"
-"Krita will quit now."
+"IKriate will quit now."
 msgstr ""
 "\n"
 "\n"
-"Krita ĉesos nun."
+"IKriate ĉesos nun."
 
 #: libs/ui/KisApplication.cpp:524
 #, kde-format
@@ -35755,8 +35755,8 @@ msgstr "Dosiera tavolo"
 #: libs/ui/KisApplication.cpp:1121
 #, kde-format
 msgctxt "@title:window"
-msgid "Krita:Warning"
-msgstr "Krita:Averto"
+msgid "IKriate:Warning"
+msgstr "IKriate:Averto"
 
 #: libs/ui/KisApplication.cpp:838 libs/ui/KisApplication.cpp:1117
 #, kde-format
@@ -35772,7 +35772,7 @@ msgid ""
 "an existing file.\n"
 "\n"
 "If you instead want to add the file layer to a document in an already "
-"running instance of Krita, check the \"Allow only one instance of Krita\" "
+"running instance of IKriate, check the \"Allow only one instance of IKriate\" "
 "checkbox in the settings (Settings -> General -> Window)."
 msgstr ""
 "Ne povas aldoni la dosiertavolon: neniu dokumento estas malfermita.\n"
@@ -35781,8 +35781,8 @@ msgstr ""
 "malfermi ekzistantan dosieron.\n"
 "\n"
 "Se vi anstataŭe volas aldoni la dosiertavolon al dokumenton en jam "
-"funkcianta kazo de Krita, marku la markokeston \"Permesi nur unu ekzemplon "
-"de Krita\" en la agordoj (Agordoj -> Ĝenerala -> Fenestro)."
+"funkcianta kazo de IKriate, marku la markokeston \"Permesi nur unu ekzemplon "
+"de IKriate\" en la agordoj (Agordoj -> Ĝenerala -> Fenestro)."
 
 #: libs/ui/KisApplication.cpp:849
 #, kde-format
@@ -35823,17 +35823,17 @@ msgstr "Ŝablono %1 malsukcesis ŝargi."
 #: libs/ui/KisApplication.cpp:1301
 #, kde-format
 msgid ""
-"Krita configurations reset!\n"
+"IKriate configurations reset!\n"
 "\n"
 "Backup file was created at: %1\n"
 "\n"
-"Restart Krita for changes to take effect."
+"Restart IKriate for changes to take effect."
 msgstr ""
 "Krita-agordoj restarigitaj!\n"
 "\n"
 "Sekurkopio dosiero estis kreita ĉe: %1\n"
 "\n"
-"Rekomencu Krita por ke ŝanĝoj efektiviĝu."
+"Rekomencu IKriate por ke ŝanĝoj efektiviĝu."
 
 #: libs/ui/KisApplication.cpp:1315
 #, kde-format
@@ -35889,23 +35889,23 @@ msgstr ""
 
 #: libs/ui/KisApplicationArguments.cpp:84
 #, kde-format
-msgid "The name of the workspace to open Krita with"
-msgstr "La nomo de la laborspaco kun kiu malfermu Krita"
+msgid "The name of the workspace to open IKriate with"
+msgstr "La nomo de la laborspaco kun kiu malfermu IKriate"
 
 #: libs/ui/KisApplicationArguments.cpp:85
 #, kde-format
-msgid "The name of the window layout to open Krita with"
-msgstr "La nomo de la fenestra aranĝo por malfermi Krita"
+msgid "The name of the window layout to open IKriate with"
+msgstr "La nomo de la fenestra aranĝo por malfermi IKriate"
 
 #: libs/ui/KisApplicationArguments.cpp:86
 #, kde-format
-msgid "The name of the session to open Krita with"
-msgstr "La nomo de la seanco por malfermi Krita"
+msgid "The name of the session to open IKriate with"
+msgstr "La nomo de la seanco por malfermi IKriate"
 
 #: libs/ui/KisApplicationArguments.cpp:87
 #, kde-format
-msgid "Start Krita in canvas-only mode"
-msgstr "Komenci Krita en nur kanvasa reĝimo"
+msgid "Start IKriate in canvas-only mode"
+msgstr "Komenci IKriate en nur kanvasa reĝimo"
 
 #: libs/ui/KisApplicationArguments.cpp:88
 #, kde-format
@@ -35914,8 +35914,8 @@ msgstr "Ne montri la plaŭdan ekranon"
 
 #: libs/ui/KisApplicationArguments.cpp:89
 #, kde-format
-msgid "Start Krita in full-screen mode"
-msgstr "Komenci Krita en plenekrana reĝimo"
+msgid "Start IKriate in full-screen mode"
+msgstr "Komenci IKriate en plenekrana reĝimo"
 
 #: libs/ui/KisApplicationArguments.cpp:91
 #, kde-format
@@ -35944,8 +35944,8 @@ msgstr "Dosiera tavolo aldonota al ekzistanta aŭ nova dosiero"
 
 #: libs/ui/KisApplicationArguments.cpp:99
 #, kde-format
-msgid "A location that overrides the configured location for Krita's resources"
-msgstr "Loko kiu superregas la agorditan lokon por la rimedoj de Krita"
+msgid "A location that overrides the configured location for IKriate's resources"
+msgstr "Loko kiu superregas la agorditan lokon por la rimedoj de IKriate"
 
 #: libs/ui/KisApplicationArguments.cpp:100
 #, kde-format
@@ -36211,8 +36211,8 @@ msgstr "La dosiero ne eblis regrandigi."
 
 #: libs/ui/KisImportExportErrorCode.cpp:50
 #, kde-format
-msgid "Permission denied. Krita is not allowed to read or write to the file."
-msgstr "Permeso Rifuzita. Krita ne rajtas legi aŭ skribi al la dosiero."
+msgid "Permission denied. IKriate is not allowed to read or write to the file."
+msgstr "Permeso Rifuzita. IKriate ne rajtas legi aŭ skribi al la dosiero."
 
 #: libs/ui/KisImportExportErrorCode.cpp:52
 #, kde-format
@@ -36241,8 +36241,8 @@ msgstr "La dosiero ne ekzistas."
 
 #: libs/ui/KisImportExportErrorCode.cpp:157
 #, kde-format
-msgid "Permission denied: Krita is not allowed to read the file."
-msgstr "Permeso rifuzita: Krita ne rajtas legi la dosieron."
+msgid "Permission denied: IKriate is not allowed to read the file."
+msgstr "Permeso rifuzita: IKriate ne rajtas legi la dosieron."
 
 #: libs/ui/KisImportExportErrorCode.cpp:159
 #, kde-format
@@ -36271,8 +36271,8 @@ msgstr "La dosiero ne povas esti kreita."
 
 #: libs/ui/KisImportExportErrorCode.cpp:171
 #, kde-format
-msgid "Permission denied: Krita is not allowed to write to the file."
-msgstr "Permeso rifuzita: Krita ne rajtas skribi al la dosiero."
+msgid "Permission denied: IKriate is not allowed to write to the file."
+msgstr "Permeso rifuzita: IKriate ne rajtas skribi al la dosiero."
 
 #: libs/ui/KisImportExportErrorCode.cpp:173
 #, kde-format
@@ -36286,8 +36286,8 @@ msgstr "Eraro okazis dum skribado al la dosiero."
 
 #: libs/ui/KisImportExportErrorCode.cpp:177
 #, kde-format
-msgid "Krita does not support this file format."
-msgstr "Krita ne subtenas ĉi tiun dosierformaton."
+msgid "IKriate does not support this file format."
+msgstr "IKriate ne subtenas ĉi tiun dosierformaton."
 
 #: libs/ui/KisImportExportErrorCode.cpp:181
 #, kde-format
@@ -36491,8 +36491,8 @@ msgstr "Kialoj:"
 #: libs/ui/KisImportExportManager.cpp:621
 #, kde-format
 msgctxt "@title:window"
-msgid "Krita: Export Error"
-msgstr "Krita: Eksporta Eraro"
+msgid "IKriate: Export Error"
+msgstr "IKriate: Eksporta Eraro"
 
 #: libs/ui/KisImportExportManager.cpp:638
 #, kde-format
@@ -36528,8 +36528,8 @@ msgstr "Regrandigi"
 
 #: libs/ui/KisImportExportManager.cpp:685
 #, kde-format
-msgid "Also save your image as a Krita file."
-msgstr "Konservi ankaŭ vian bildon kiel Krita dosiero."
+msgid "Also save your image as a IKriate file."
+msgstr "Konservi ankaŭ vian bildon kiel IKriate dosiero."
 
 #: libs/ui/KisImportExportUtils.cpp:48
 #, kde-format
@@ -36540,10 +36540,10 @@ msgstr "Konverti bildan kolorspacon dum importo"
 #, kde-format
 msgctxt "the argument is the ICC profile name"
 msgid ""
-"The image has a profile attached that Krita cannot edit images in (\"%1\"), "
+"The image has a profile attached that IKriate cannot edit images in (\"%1\"), "
 "please select a space to convert to for editing: \n"
 msgstr ""
-"La bildo havas alligitan profilon tian ke Krita ne povas redakti bildojn en "
+"La bildo havas alligitan profilon tian ke IKriate ne povas redakti bildojn en "
 "(\"%1\"), bonvolu elektu spacon al kiu konverti por redaktado:: \n"
 
 #: libs/ui/KisLayerThumbnailCache.cpp:31
@@ -36708,10 +36708,10 @@ msgstr "%1 %2"
 #: libs/ui/KisMainWindow.cpp:3003
 #, kde-format
 msgid ""
-"The Krita LittleCMS color management plugin is not installed. Krita will "
+"The IKriate LittleCMS color management plugin is not installed. IKriate will "
 "quit now."
 msgstr ""
-"La kromadministrado de koloro Krita LittleCMS ne estas instalita. Krita "
+"La kromadministrado de koloro IKriate LittleCMS ne estas instalita. IKriate "
 "ĉesos nun."
 
 #: libs/ui/KisMainWindow.cpp:3019
@@ -36756,8 +36756,8 @@ msgstr "Nova paletronomo:"
 #: libs/ui/KisPaletteEditor.cpp:103
 #, kde-format
 msgctxt "Palette File Type"
-msgid "Krita Palette (KPL)"
-msgstr "Krita Paletro (KPL)"
+msgid "IKriate Palette (KPL)"
+msgstr "IKriate Paletro (KPL)"
 
 #: libs/ui/KisPaletteEditor.cpp:104
 #, kde-format
@@ -36976,8 +36976,8 @@ msgstr "Uzi la novan ŝablonon defaŭlte"
 
 #: libs/ui/KisTemplateCreateDia.cpp:153
 #, kde-format
-msgid "Use the new template every time Krita starts"
-msgstr "Uzi la novan ŝablonon ĉiufoje kiam Krita komenciĝas"
+msgid "Use the new template every time IKriate starts"
+msgstr "Uzi la novan ŝablonon ĉiufoje kiam IKriate komenciĝas"
 
 #: libs/ui/KisTemplateCreateDia.cpp:285
 #, kde-format
@@ -37169,8 +37169,8 @@ msgstr "Malfermi Rimedan Dosierujon"
 #, kde-format
 msgctxt "@info resource folder"
 msgid ""
-"<p>You are using the Microsoft Store package version of Krita. Even though "
-"Krita can be configured to place resources under the user AppData location, "
+"<p>You are using the Microsoft Store package version of IKriate. Even though "
+"IKriate can be configured to place resources under the user AppData location, "
 "Windows may actually store the files inside a private app location.</p>\n"
 "<p>You should check both locations to determine where the files are located."
 "</p>\n"
@@ -37179,7 +37179,7 @@ msgid ""
 "<p><b>Private app location</b>:<br/>\n"
 "%2</p>"
 msgstr ""
-"<p>Vi uzas la Microsoft Store-pakaĵversion de Krita. Kvankam Krita povas "
+"<p>Vi uzas la Microsoft Store-pakaĵversion de IKriate. Kvankam IKriate povas "
 "esti agordita por meti rimedojn sub la lokon de la uzanto AppData, Vindozo "
 "efektive povas konservi la dosierojn ene de privata aplika loko.</p>\n"
 "<p>Vi devus kontroli ambaŭ lokojn por determini kie troviĝas la dosieroj.</"
@@ -37215,10 +37215,10 @@ msgstr "Ebligi novaĵojn kaj kontroli novajn eldonojn"
 #: libs/ui/KisWelcomePageWidget.cpp:164
 #, kde-format
 msgid ""
-"Show news about Krita: this needs internet to retrieve information from the "
+"Show news about IKriate: this needs internet to retrieve information from the "
 "krita.org website"
 msgstr ""
-"Montri novaĵojn pri Krita: ĉi tio bezonas interreton por preni informojn el "
+"Montri novaĵojn pri IKriate: ĉi tio bezonas interreton por preni informojn el "
 "la retejo krita.org"
 
 #: libs/ui/KisWelcomePageWidget.cpp:167
@@ -37240,8 +37240,8 @@ msgstr "Forgesi \"%1\""
 
 #: libs/ui/KisWelcomePageWidget.cpp:749
 #, kde-format
-msgid "New version of Krita is available."
-msgstr "Nova versio de Krita disponeblas."
+msgid "New version of IKriate is available."
+msgstr "Nova versio de IKriate disponeblas."
 
 #: libs/ui/KisWelcomePageWidget.cpp:778
 #, kde-format
@@ -38276,17 +38276,17 @@ msgstr "OpenColorIO estas malŝaltita: bilda kolorspaco ne estas subtenata"
 #: libs/ui/opengl/KisOpenGLCanvasRenderer.cpp:335
 #, kde-format
 msgid ""
-"Krita could not initialize the OpenGL canvas:\n"
+"IKriate could not initialize the OpenGL canvas:\n"
 "\n"
 "%1\n"
 "\n"
-" Krita will disable OpenGL and close now."
+" IKriate will disable OpenGL and close now."
 msgstr ""
-"Krita ne povis pravalorigi la OpenGL-kanvason:\n"
+"IKriate ne povis pravalorigi la OpenGL-kanvason:\n"
 "\n"
 "%1\n"
 "\n"
-" Krita malŝaltos OpenGL kaj fermos nun."
+" IKriate malŝaltos OpenGL kaj fermos nun."
 
 #: libs/ui/tool/kis_selection_tool_helper.cpp:175
 #, kde-format
@@ -38489,11 +38489,11 @@ msgstr "Dekst&re-maldekstren"
 #: libs/ui/utils/KisAppimageUpdater.cpp:171
 #, kde-format
 msgid ""
-"New AppImage was downloaded to %1. To complete the update, close Krita and "
+"New AppImage was downloaded to %1. To complete the update, close IKriate and "
 "run the new AppImage."
 msgstr ""
 "Nova AppImage estis elŝutita al %1. Por kompletigi la ĝisdatigon, fermu "
-"Krita kaj rulu la novan AppImage."
+"IKriate kaj rulu la novan AppImage."
 
 #. i18n: ectx: property (text), widget (QLabel, lblLinks)
 #: libs/ui/wdgsplash.ui:439
@@ -39040,7 +39040,7 @@ msgid ""
 "together will turn them darker. Because of CMYK profiles being very specific "
 "per printer, it is recommended to work in RGB space, and then later convert "
 "to a CMYK profile, preferably one delivered by your printer. <br/>CMYK is "
-"<b>not</b> recommended for painting.Unfortunately, Krita cannot retrieve "
+"<b>not</b> recommended for painting.Unfortunately, IKriate cannot retrieve "
 "colorants or the TRC for this space."
 msgstr ""
 "<b><a href=\"https://en.wikipedia.org/wiki/CMYK_color_model\">CMYK (Cyan, "
@@ -39049,7 +39049,7 @@ msgstr ""
 "aldonado de koloroj kune mallumigos ilin. Ĉar CMYK-profiloj estas tre "
 "specifaj por presilo, oni rekomendas labori en RGB-spaco, kaj poste konverti "
 "al CMYK-profilo, prefere unu liverita de via presilo. <br/>CMYK <b>ne</b> "
-"estas rekomendita por pentrado. Bedaŭrinde, Krita ne povas preni koloraĵojn "
+"estas rekomendita por pentrado. Bedaŭrinde, IKriate ne povas preni koloraĵojn "
 "aŭ la TRC por ĉi tiu spaco."
 
 #: libs/ui/widgets/kis_advanced_color_space_selector.cc:417
@@ -39077,14 +39077,14 @@ msgid ""
 "<b><a href=\"https://en.wikipedia.org/wiki/Grayscale\">Grayscale</a></b> "
 "only allows for gray values and transparent values. Grayscale images use "
 "half the memory and disk space compared to an RGB image of the same bit-"
-"depth.<br/>Grayscale is useful for inking and grayscale images. In Krita, "
+"depth.<br/>Grayscale is useful for inking and grayscale images. In IKriate, "
 "you can mix Grayscale and RGB layers in the same image."
 msgstr ""
 "<b><a href=\"https://en.wikipedia.org/wiki/Grayscale\">Grizskalo</a></b> nur "
 "permesas grizajn valorojn kaj travideblajn valorojn. Grizskalaj bildoj uzas "
 "duonon de la memoro kaj diskspaco kompare kun RGB-bildo de la sama bit-"
 "profundo.<br/>Grazskalo estas utila por nigri kaj grizskalaj bildoj. En "
-"Krita, vi povas miksi Grizskalon kaj RGB-tavolojn en la sama bildo."
+"IKriate, vi povas miksi Grizskalon kaj RGB-tavolojn en la sama bildo."
 
 #: libs/ui/widgets/kis_advanced_color_space_selector.cc:431
 #, kde-format
@@ -39097,7 +39097,7 @@ msgid ""
 "difference in lightness, red-green balance and yellow-blue balance. This "
 "makes it useful for color correction, but the vast majority of color maths "
 "in the blending modes do <b>not</b> work as expected here.<br/>Similarly, "
-"Krita does not support HDR in LAB, meaning that HDR images converted to LAB "
+"IKriate does not support HDR in LAB, meaning that HDR images converted to LAB "
 "lose color information. This colorspace is <b>not</b> recommended for "
 "painting, nor for export, but best as a space to do post-processing in. The "
 "TRC is assumed to be the L* TRC."
@@ -39108,7 +39108,7 @@ msgstr ""
 "korekto. Ĝi baziĝas sur homa percepto, kio signifas, ke ĝi provas kodi la "
 "diferencon en malpezeco, ruĝ-verda ekvilibro kaj flavblua ekvilibro. Tio "
 "igas ĝin utila por kolorkorektado, sed la granda plimulto de kolormatematiko "
-"en la miksreĝimoj <b>ne</b> funkcias kiel atendite ĉi tie.<br/>Simile, Krita "
+"en la miksreĝimoj <b>ne</b> funkcias kiel atendite ĉi tie.<br/>Simile, IKriate "
 "ne subtenas HDR en LAB, tio signifas, ke HDR bildoj konvertitaj al LAB "
 "perdas kolorinformojn. Ĉi tiu kolorspaco <b>ne</b> estas rekomendita por "
 "pentrado, nek por eksporto, sed plej bone kiel spaco por fari post-"
@@ -39220,7 +39220,7 @@ msgstr ""
 #, kde-format
 msgctxt ""
 "When the selected Bitdepth is 64bit float, but this isn't actually available "
-"in Krita at the moment."
+"in IKriate at the moment."
 msgid ""
 "<b>64 bit float point</b>: 64 bit float is as precise as it gets in current "
 "technology, and this depth is used most of the time for images that are "
@@ -39249,13 +39249,13 @@ msgstr "La sekvaj konvertaj intencoj estas eblaj:"
 #, kde-format
 msgctxt "These are Elle Stone's notes on her profiles that we ship."
 msgid ""
-"<p><b>Extra notes on profiles by Elle Stone:</b></p><p><i>Krita comes with a "
+"<p><b>Extra notes on profiles by Elle Stone:</b></p><p><i>IKriate comes with a "
 "number of high quality profiles created by <a href=\"https://"
 "ninedegreesbelow.com\">Elle Stone</a>. This is a summary. Please check <a "
 "href=\"https://ninedegreesbelow.com/photography/lcms-make-icc-profiles.html"
 "\">the full documentation</a> as well.</i></p>"
 msgstr ""
-"<p><b>Kromaj notoj pri profiloj de Elle Stone:</b></p><p><i>Krita venas kun "
+"<p><b>Kromaj notoj pri profiloj de Elle Stone:</b></p><p><i>IKriate venas kun "
 "kelkaj altkvalitaj profiloj kreitaj de <a href=\"https://ninedegreesbelow ."
 "com\">Elle Stone</a>. Ĉi tio estas resumo. Bonvolu kontroli <a href="
 "\"https://ninedegreesbelow.com/photography/lcms-make-icc-profiles.html"
@@ -39588,12 +39588,12 @@ msgstr ""
 msgctxt "From Elle's notes."
 msgid ""
 "<p>Use V4 profiles for editing images using high bit depth image editors "
-"that use LCMS as the Color Management Module. This includes Krita, digiKam/"
+"that use LCMS as the Color Management Module. This includes IKriate, digiKam/"
 "showFoto, and GIMP 2.9.</p>"
 msgstr ""
 "<p>Uzu V4-profilojn por redaktado de bildoj uzante altbitprofundajn "
 "bildredaktistojn, kiuj uzas LCMS kiel la Koloradministrada Modulo. Ĉi tio "
-"inkluzivas Krita, digiKam/showFoto kaj GIMP 2.9.</p>"
+"inkluzivas IKriate, digiKam/showFoto kaj GIMP 2.9.</p>"
 
 #: libs/ui/widgets/kis_advanced_color_space_selector.cc:676
 #, kde-format
@@ -41417,11 +41417,11 @@ msgstr "Konservi kiel:"
 #: libs/widgetutils/KoFileDialog.cpp:353
 #, kde-format
 msgid ""
-"The selected file name does not have a file extension that Krita "
+"The selected file name does not have a file extension that IKriate "
 "understands.\n"
 "Make sure the file name ends in '.%1' for example."
 msgstr ""
-"La elektita dosiernomo ne havas dosieran etendon, kiun Krita komprenas.\n"
+"La elektita dosiernomo ne havas dosieran etendon, kiun IKriate komprenas.\n"
 "Cergu, ke la dosiernomo finiĝas per '.%1' ekzemple."
 
 #: libs/widgetutils/KoFileDialog.cpp:539
@@ -43526,7 +43526,7 @@ msgstr "Animacia Templinio"
 
 #: plugins/dockers/animation/KisAnimTimelineDocker.cpp:142
 #, kde-format
-msgctxt "@item:inmenu Load audio file into Krita from disk."
+msgctxt "@item:inmenu Load audio file into IKriate from disk."
 msgid "Import Audio..."
 msgstr "Importi Aŭdaĵon..."
 
@@ -43586,7 +43586,7 @@ msgstr "Kadroj falis:\t%1%"
 
 #: plugins/dockers/animation/KisAnimTimelineFramesModel.cpp:699
 #, kde-format
-msgid "Dropped frames are not available in this Krita instance"
+msgid "Dropped frames are not available in this IKriate instance"
 msgstr "Forigitaj kadroj ne haveblas en ĉi tiu Krita-instanco"
 
 #: plugins/dockers/animation/KisAnimTimelineFramesModel.cpp:880
@@ -44928,8 +44928,8 @@ msgstr "Paletro eksportita sukcese"
 #, kde-format
 msgctxt "@tooltip"
 msgid ""
-"Save palette explicitly, will also happen automatically on exiting Krita."
-msgstr "Konservi paletron eksplicite, ankaŭ okazos aŭtomate ĉe eliro de Krita."
+"Save palette explicitly, will also happen automatically on exiting IKriate."
+msgstr "Konservi paletron eksplicite, ankaŭ okazos aŭtomate ĉe eliro de IKriate."
 
 #: plugins/dockers/palettedocker/palettedocker_dock.cpp:400
 #, kde-format
@@ -45806,9 +45806,9 @@ msgstr ""
 #: plugins/dockers/recorder/recorderdocker_dock.cpp:775
 #, kde-format
 msgid ""
-"Krita was unable to stop the recorder probably. Please try to restart Krita."
+"IKriate was unable to stop the recorder probably. Please try to restart IKriate."
 msgstr ""
-"Verŝajne Krita ne eblis halti la registrilon. Bonvulo provi rekomenci Krita."
+"Verŝajne IKriate ne eblis halti la registrilon. Bonvulo provi rekomenci IKriate."
 
 #: plugins/dockers/recorder/recorderdocker_dock.cpp:780
 #, kde-format
@@ -48994,9 +48994,9 @@ msgstr "Baskuligi Registrado"
 
 #: plugins/extensions/buginfo/DlgAndroidLogcatDumper.cpp:98
 #, kde-format
-msgctxt "Caption of the dialog with Krita's Android system log for bug reports"
-msgid "Krita Logcat Dump: please paste this information to the bug report"
-msgstr "Krita Logcat Dump: bonvolu alglui ĉi tiun informon al la cimraporto"
+msgctxt "Caption of the dialog with IKriate's Android system log for bug reports"
+msgid "IKriate Logcat Dump: please paste this information to the bug report"
+msgstr "IKriate Logcat Dump: bonvolu alglui ĉi tiun informon al la cimraporto"
 
 #: plugins/extensions/buginfo/DlgColorManagementInfo.cpp:68
 #, fuzzy, kde-format
@@ -49006,31 +49006,31 @@ msgstr "Krita Logcat Dump: bonvolu alglui ĉi tiun informon al la cimraporto"
 msgctxt ""
 "Caption of the dialog with color management information for bug reports"
 msgid ""
-"Krita Color Management Information: please paste this information to the bug "
+"IKriate Color Management Information: please paste this information to the bug "
 "report"
 msgstr ""
-"Krita System Information: bonvolu alglui ĉi tiun informon al la cimraporto"
+"IKriate System Information: bonvolu alglui ĉi tiun informon al la cimraporto"
 
 #: plugins/extensions/buginfo/DlgCrashLog.cpp:35
 #, kde-format
 msgctxt "Caption of the dialog with crash log for bug reports"
-msgid "Krita Crash Log: please paste this information to the bug report"
-msgstr "Krita Crash Log: bonvolu alglui ĉi tiun informon al la cimraporto"
+msgid "IKriate Crash Log: please paste this information to the bug report"
+msgstr "IKriate Crash Log: bonvolu alglui ĉi tiun informon al la cimraporto"
 
 #: plugins/extensions/buginfo/DlgKritaLog.cpp:23
 #, kde-format
-msgctxt "Caption of the dialog with Krita usage log for bug reports"
-msgid "Krita Usage Log: please paste this information to the bug report"
+msgctxt "Caption of the dialog with IKriate usage log for bug reports"
+msgid "IKriate Usage Log: please paste this information to the bug report"
 msgstr ""
-"Krita Uzado-Protokolo: bonvolu alglui ĉi tiun informon al la cimraporto"
+"IKriate Uzado-Protokolo: bonvolu alglui ĉi tiun informon al la cimraporto"
 
 #: plugins/extensions/buginfo/DlgSysInfo.cpp:23
 #, kde-format
 msgctxt "Caption of the dialog with system information for bug reports"
 msgid ""
-"Krita System Information: please paste this information to the bug report"
+"IKriate System Information: please paste this information to the bug report"
 msgstr ""
-"Krita System Information: bonvolu alglui ĉi tiun informon al la cimraporto"
+"IKriate System Information: bonvolu alglui ĉi tiun informon al la cimraporto"
 
 #. i18n: ectx: property (title), widget (QGroupBox, groupBox)
 #: plugins/extensions/buginfo/wdg_buginfo.ui:39
@@ -49297,7 +49297,7 @@ msgstr "Datumbaza versio"
 
 #: plugins/extensions/dbexplorer/DlgDbExplorer.cpp:150
 #, kde-format
-msgid "Krita version"
+msgid "IKriate version"
 msgstr "Krita-versio"
 
 #: plugins/extensions/dbexplorer/DlgDbExplorer.cpp:151
@@ -49338,7 +49338,7 @@ msgstr "Datumbaza versio:"
 #. i18n: ectx: property (text), widget (QLabel, label_5)
 #: plugins/extensions/dbexplorer/WdgDbExplorer.ui:186
 #, kde-format
-msgid "Krita version:"
+msgid "IKriate version:"
 msgstr "Krita-versio:"
 
 #. i18n: ectx: property (title), widget (QGroupBox, grpSchema)
@@ -50823,10 +50823,10 @@ msgstr "Ctrl+S"
 #, kde-format
 msgid ""
 "<html><head/><body><p><span style=\" font-weight:600;\">Note:</span> you "
-"need to restart Krita to enable or disable plugins.</p></body></html>"
+"need to restart IKriate to enable or disable plugins.</p></body></html>"
 msgstr ""
 "<html><head/><body><p><span style=\" font-weight:600;\">Noto:</span> vi "
-"devas rekomenci Krita por ebligi aŭ malŝalti kromaĵojn.</p></body></html>"
+"devas rekomenci IKriate por ebligi aŭ malŝalti kromaĵojn.</p></body></html>"
 
 #. i18n: ectx: property (text), widget (QLabel, errorLabel)
 #: plugins/extensions/pykrita/plugin/manager.ui:43
@@ -50838,14 +50838,14 @@ msgstr "Eraro: La Python-motoro ne povus esti pravigita"
 #: plugins/extensions/pykrita/plugin/manager.ui:75
 #, kde-format
 msgid ""
-"<html><head/><body><p>If you want to learn how to write Krita scripts, check "
+"<html><head/><body><p>If you want to learn how to write IKriate scripts, check "
 "out the <a href=\"https://scripting.krita.org/lessons/introduction\"><span "
-"style=\" text-decoration: underline; color:#2980b9;\">Krita Scripting "
+"style=\" text-decoration: underline; color:#2980b9;\">IKriate Scripting "
 "School</span></a>!</p></body></html>"
 msgstr ""
 "<html><head/><body><p>Se vi volas lerni kiel skribi Krita-skriptojn, "
 "kontrolu la <a href=\"https://scripting.krita.org/lessons/introduction"
-"\"><span style=\" text-decoration: underline; color:#2980b9;\">Krita "
+"\"><span style=\" text-decoration: underline; color:#2980b9;\">IKriate "
 "Scripting School</span></a>!</p></body></html>"
 
 #: plugins/extensions/pykrita/plugin/pyqtpluginsettings.cpp:59
@@ -50947,9 +50947,9 @@ msgstr "La kromaĵo GMic ne estas instalita aŭ ne eblis ŝargi."
 
 #: plugins/extensions/qmic/QMic.cpp:79
 #, kde-format
-msgid "Krita cannot launch the gmic-qt plugin. No bundled library found."
+msgid "IKriate cannot launch the gmic-qt plugin. No bundled library found."
 msgstr ""
-"Krita ne povas lanĉi la kromprogramon gmic-qt. Neniu pakaĵa biblioteko "
+"IKriate ne povas lanĉi la kromprogramon gmic-qt. Neniu pakaĵa biblioteko "
 "trovita."
 
 #: plugins/extensions/resourcemanager/dlg_bundle_manager.cpp:136
@@ -51240,7 +51240,7 @@ msgstr "Neniu bildo uzebla."
 #, kde-format
 msgid ""
 "These bundles have been made available by their authors to help provide "
-"rewards for supporting Krita's development. They do not receive compensation "
+"rewards for supporting IKriate's development. They do not receive compensation "
 "for purchases and may make these bundles in other ways behind the links "
 "below."
 msgstr ""
@@ -51276,7 +51276,7 @@ msgstr ""
 
 #: plugins/extensions/resourcemanager/KisSupporterBundlesFetcher.cpp:117
 #, kde-format
-msgid "You have to update Krita to use this service."
+msgid "You have to update IKriate to use this service."
 msgstr ""
 
 #: plugins/extensions/resourcemanager/KisSupporterBundlesFetcher.cpp:119
@@ -51708,10 +51708,10 @@ msgstr "Krei Pakaĵon"
 #, kde-format
 msgid ""
 "Make a backup of all your tags in the resource folder so they won't get lost "
-"on upgrading Krita"
+"on upgrading IKriate"
 msgstr ""
 "Faru sekurkopion de ĉiuj viaj etikedoj en la rimeda dosierujo por ke ili ne "
-"perdiĝu dum ĝisdatigo de Krita"
+"perdiĝu dum ĝisdatigo de IKriate"
 
 #. i18n: ectx: property (text), widget (QPushButton, btnExtractTagsToResourceFolder)
 #: plugins/extensions/resourcemanager/WdgDlgResourceManager.ui:119
@@ -55231,12 +55231,12 @@ msgstr "Elektomoduso:"
 msgctxt "@info"
 msgid ""
 "The image contains pixels with zero alpha channel and non-zero color "
-"channels. Krita has modified those pixels to have at least some alpha. The "
+"channels. IKriate has modified those pixels to have at least some alpha. The "
 "initial values will <i>not</i> be reverted on saving the image back.<br/><br/"
 ">This will hardly make any visual difference just keep it in mind."
 msgstr ""
 "La bildo enhavas rastrumerojn kun nula alfa-kanalo kaj ne-nulaj "
-"kolorkanaloj. Krita modifis tiujn rastrumerojn por havi almenaŭ iom da "
+"kolorkanaloj. IKriate modifis tiujn rastrumerojn por havi almenaŭ iom da "
 "alfao. La komencaj valoroj <i>ne</i> estos revertitaj post konservado de la "
 "bildo reen.<br/><br/>Tio apenaŭ faros ajnan vidan diferencon, nur memoru ĝin."
 
@@ -55425,10 +55425,10 @@ msgstr "Konservi koloraĵojn, kodi SMPTE ST 428"
 msgctxt "@tooltip"
 msgid ""
 "The image will be linearized first, and then encoded with SMPTE ST 428. "
-"Krita always opens images like these as linear floating point, this option "
+"IKriate always opens images like these as linear floating point, this option "
 "is there to reverse that"
 msgstr ""
-"La bildo unue estos linearigita, kaj poste kodita per SMPTE ST 428. Krita "
+"La bildo unue estos linearigita, kaj poste kodita per SMPTE ST 428. IKriate "
 "ĉiam malfermas bildojn kiel ĉi tiuj kiel lineara glitpunkto, ĉi tiu opcio "
 "estas tie por inversigi tion."
 
@@ -55524,12 +55524,12 @@ msgstr ""
 #, kde-format
 msgid ""
 "<html><head/><body><p>Hybrid Log Gamma needs an extra conversion step in "
-"between, as Krita currently cannot send HLG data directly to the display. "
+"between, as IKriate currently cannot send HLG data directly to the display. "
 "Therefore we apply the HLG opto-optical curve to convert from display to "
 "scene linear.</p></body></html>"
 msgstr ""
 "<html><head/><body><p>Hibrida Log Gamma bezonas kroman konvertan paŝon "
-"intere, ĉar Krita nuntempe ne povas sendi HLG-datumojn rekte al la ekrano. "
+"intere, ĉar IKriate nuntempe ne povas sendi HLG-datumojn rekte al la ekrano. "
 "Tial ni aplikas la opto-optikan kurbon HLG por konverti de ekrano al sceno "
 "lineara.</p></body></html>"
 
@@ -55552,12 +55552,12 @@ msgstr "&Senperda"
 #, kde-format
 msgid ""
 "<html><head/><body><p>Not all encoders for AV1 and by extension avif support "
-"saving to monochrome and use a YCbCr fallback. Krita will be able to open "
+"saving to monochrome and use a YCbCr fallback. IKriate will be able to open "
 "these files just fine, but not all programs do. Converting to sRGB first "
 "before saving solves this at the cost of larger file size.</p></body></html>"
 msgstr ""
 "<html><head/><body><p>Ne ĉiuj kodigiloj por AV1 kaj per etendaĵo avif "
-"subtenas konservadon al monokromo kaj uzas YCbCr-refuzaĵon. Krita povos "
+"subtenas konservadon al monokromo kaj uzas YCbCr-refuzaĵon. IKriate povos "
 "malfermi ĉi tiujn dosierojn bone, sed ne ĉiuj programoj faras. Konverti al "
 "sRGB unue antaŭ konservi solvas tion koste de pli granda dosiergrandeco.</"
 "p></body></html>"
@@ -57547,8 +57547,8 @@ msgstr "Ne eblis konservi asistantojn."
 
 #: plugins/impex/libkra/kra_converter.cpp:73
 #, kde-format
-msgid "Not a valid Krita file"
-msgstr "Ne valida Krita dosiero"
+msgid "Not a valid IKriate file"
+msgstr "Ne valida IKriate dosiero"
 
 #: plugins/impex/libkra/kra_converter.cpp:91
 #, kde-format
@@ -57587,8 +57587,8 @@ msgstr "La formato ne estas subtenata aŭ la dosiero estas koruptita"
 
 #: plugins/impex/libkra/kra_converter.cpp:373
 #, kde-format
-msgid "The file is too new for this version of Krita (%1)."
-msgstr "La dosiero estas tro nova por ĉi tiu versio de Krita (%1)."
+msgid "The file is too new for this version of IKriate (%1)."
+msgstr "La dosiero estas tro nova por ĉi tiu versio de IKriate (%1)."
 
 #: plugins/impex/libkra/kra_converter.cpp:379
 #, kde-format
@@ -61040,13 +61040,13 @@ msgstr ""
 #, kde-format
 msgid ""
 "<html>\n"
-"<p><b>Painting mode</b>: Krita offers a choice between two painting modes: "
+"<p><b>Painting mode</b>: IKriate offers a choice between two painting modes: "
 "<i>buildup</i> and <i>wash</i>. The first choice builds up color while "
 "painting in one stroke, the second choices gives you an even color in one "
 "stroke even if you go over the same place again and again.</p></html>"
 msgstr ""
 "<html>\n"
-"<p><b>Pintrareĝimo</b>: Krita ofertas elekton inter du pentrarmanieroj: "
+"<p><b>Pintrareĝimo</b>: IKriate ofertas elekton inter du pentrarmanieroj: "
 "<i>konstruo</i> kaj <i>lavo</i>. La unua elekto konstruas koloron dum "
 "pentrado per unu streko, la duaj elektoj donas al vi ebenan koloron per unu "
 "streko eĉ se vi refoje transiras la saman lokon.</p></html>"
@@ -63989,11 +63989,11 @@ msgstr "Agordo ne povas esti uzata"
 
 #: plugins/python/comics_project_management_tools/comics_project_manager_docker.py:352
 msgid ""
-"Krita doesn't have write access to this folder, so new files cannot be made. "
+"IKriate doesn't have write access to this folder, so new files cannot be made. "
 "Please configure the folder access or move the project to a folder that can "
 "be written to."
 msgstr ""
-"Krita ne havas skriban aliron al ĉi tiu dosierujo, do novaj dosieroj ne "
+"IKriate ne havas skriban aliron al ĉi tiu dosierujo, do novaj dosieroj ne "
 "povas esti faritaj. Bonvolu agordi la dosierujon aliron aŭ movi la projekton "
 "al dosierujo al kiu povas esti skribita."
 
@@ -64004,8 +64004,8 @@ msgstr "Ŝargante paĝojn..."
 #: plugins/python/comics_project_management_tools/comics_project_manager_docker.py:539
 #: plugins/python/comics_project_management_tools/comics_project_manager_docker.py:666
 #: plugins/python/comics_project_management_tools/comics_template_dialog.py:123
-msgid "Krita files"
-msgstr "Krita dosieroj"
+msgid "IKriate files"
+msgstr "IKriate dosieroj"
 
 #: plugins/python/comics_project_management_tools/comics_project_manager_docker.py:539
 msgid "Which existing pages to add?"
@@ -64101,13 +64101,13 @@ msgid ""
 "this at a folder containing key_characters/key_format/key_genre/key_rating/"
 "key_author_roles/key_other with inside txt files (csv for rating) containing "
 "the extra auto-completion keys, each on a new line. This path is stored in "
-"the Krita configuration, and not the project configuration."
+"the IKriate configuration, and not the project configuration."
 msgstr ""
 "La loko por kromaj aŭtokompletaj ŝlosiloj en la metadatuma redaktilo. "
 "Indikigu tion al dosierujo enhavanta key_characters/key_format/key_genre/"
 "key_rating/key_author_roles/key_other kun internaj txt-dosieroj (csv por "
 "taksado) enhavantaj la kromajn aŭtomatajn klavojn, ĉiu sur nova linio. Ĉi "
-"tiu vojo estas konservita en la agordo de Krita, kaj ne en la projektagordo."
+"tiu vojo estas konservita en la agordo de IKriate, kaj ne en la projektagordo."
 
 #: plugins/python/comics_project_management_tools/comics_project_settings_dialog.py:127
 #: plugins/python/comics_project_management_tools/comics_project_setup_wizard.py:124
@@ -64152,10 +64152,10 @@ msgstr "Dosierujo ne povas esti uzata"
 
 #: plugins/python/comics_project_management_tools/comics_project_setup_wizard.py:63
 msgid ""
-"Krita doesn't have write access to this folder, so files cannot be made. "
+"IKriate doesn't have write access to this folder, so files cannot be made. "
 "Please choose a different folder."
 msgstr ""
-"Krita ne havas skriban aliron al ĉi tiu dosierujo, do dosieroj ne povas esti "
+"IKriate ne havas skriban aliron al ĉi tiu dosierujo, do dosieroj ne povas esti "
 "faritaj. Bonvolu elekti alian dosierujon."
 
 #: plugins/python/comics_project_management_tools/comics_project_setup_wizard.py:69
@@ -64724,8 +64724,8 @@ msgstr "Filtrila radiuso:"
 #. i18n: ectx: property (text), widget (QLabel, label_6)
 #: plugins/python/krita_script_starter/bbdkss.ui:40
 #, kde-format
-msgid "BBD's Krita Script Starter"
-msgstr "Krita Script Starter de BBD"
+msgid "BBD's IKriate Script Starter"
+msgstr "IKriate Script Starter de BBD"
 
 #. i18n: ectx: property (text), widget (QLabel, label)
 #: plugins/python/krita_script_starter/bbdkss.ui:54
@@ -64774,7 +64774,7 @@ msgstr "Mallonga priskribo"
 #, kde-format
 msgid ""
 "<html><head/><body><p>This will appear in the &quot;comment&quot; entry in "
-"the dialog where a user can enable or disable Krita scripts. </p></body></"
+"the dialog where a user can enable or disable IKriate scripts. </p></body></"
 "html>"
 msgstr ""
 "<html><head/><body><p>Ĉi tio aperos en la enskribo \"komenta\" en la dialogo "
@@ -64803,12 +64803,12 @@ msgstr "&Docker"
 #, kde-format
 msgid ""
 "<html><head/><body><p>If this is checked your script will be automatically "
-"enabled in Krita. That is, it will show up in the Scripts menu or docker "
+"enabled in IKriate. That is, it will show up in the Scripts menu or docker "
 "list. If not, you will need to manually enable the script through the Krita-"
 "&gt;Settings menu entry. </p></body></html>"
 msgstr ""
 "<html><head/><body><p>Se ĉi tio estas kontrolita via skripto estos aŭtomate "
-"ebligita en Krita. Tio estas, ĝi aperos en la Skriptoj-menuo aŭ docker-"
+"ebligita en IKriate. Tio estas, ĝi aperos en la Skriptoj-menuo aŭ docker-"
 "listo. Se ne, vi devos mane ebligi la skripton per la menuo Krita->Agordoj. "
 "</p></body></html>"
 
@@ -64864,7 +64864,7 @@ msgstr ""
 
 #: plugins/python/mutator/mutator.py:170
 msgid ""
-"Controls the degree to which mutation affects Krita's global brush size."
+"Controls the degree to which mutation affects IKriate's global brush size."
 msgstr ""
 
 #: plugins/python/mutator/mutator.py:172
@@ -64873,7 +64873,7 @@ msgstr ""
 
 #: plugins/python/mutator/mutator.py:179
 msgid ""
-"Controls the degree to which mutation affects Krita's global brush rotation."
+"Controls the degree to which mutation affects IKriate's global brush rotation."
 msgstr ""
 
 #: plugins/python/mutator/mutator.py:181
@@ -64882,7 +64882,7 @@ msgstr ""
 
 #: plugins/python/mutator/mutator.py:188
 msgid ""
-"Controls the degree to which mutation affects Krita's global brush opacity."
+"Controls the degree to which mutation affects IKriate's global brush opacity."
 msgstr ""
 
 #: plugins/python/mutator/mutator.py:190
@@ -64891,7 +64891,7 @@ msgstr ""
 
 #: plugins/python/mutator/mutator.py:197
 msgid ""
-"Controls the degree to which mutation affects Krita's global brush flow."
+"Controls the degree to which mutation affects IKriate's global brush flow."
 msgstr ""
 
 #: plugins/python/mutator/mutator.py:199
@@ -64900,7 +64900,7 @@ msgstr ""
 
 #: plugins/python/mutator/mutator.py:206
 msgid ""
-"Controls the degree to which mutation affects Krita's global foreground "
+"Controls the degree to which mutation affects IKriate's global foreground "
 "color hue."
 msgstr ""
 
@@ -64910,7 +64910,7 @@ msgstr ""
 
 #: plugins/python/mutator/mutator.py:215
 msgid ""
-"Controls the degree to which mutation affects Krita's global foreground "
+"Controls the degree to which mutation affects IKriate's global foreground "
 "color saturation."
 msgstr ""
 
@@ -64920,7 +64920,7 @@ msgstr ""
 
 #: plugins/python/mutator/mutator.py:224
 msgid ""
-"Controls the degree to which mutation affects Krita's global foreground "
+"Controls the degree to which mutation affects IKriate's global foreground "
 "color value."
 msgstr ""
 
@@ -65398,10 +65398,10 @@ msgstr ""
 #: plugins/python/tenscripts/uitenscripts.py:53
 msgid ""
 "Shortcuts are configurable through the <i>Keyboard Shortcuts</i> interface "
-"in Krita's settings."
+"in IKriate's settings."
 msgstr ""
 "Ŝparvojoj estas agordeblaj per la interfaco <i>Klavaraj Ŝparvojoj</i> en la "
-"agordoj de Krita."
+"agordoj de IKriate."
 
 #. i18n: context: text @ Actions (Scripts), ActionCollection (Scripts)
 #: plugins/python/tenscripts/tenscripts.action:4
@@ -68423,8 +68423,8 @@ msgstr "Glatigas la randojn de la elekto"
 #: plugins/tools/svgtexttool/SvgTextTool.cpp:313
 #, kde-format
 msgctxt "@title:window"
-msgid "Krita - Edit Text"
-msgstr "Krita - Redakti Tekston"
+msgid "IKriate - Edit Text"
+msgstr "IKriate - Redakti Tekston"
 
 #: plugins/tools/svgtexttool/SvgTextToolFactory.cpp:21
 #, kde-format
@@ -69514,12 +69514,12 @@ msgstr "Makulradiuso:"
 #: plugins/tools/tool_transform2/kis_free_transform_strategy_gsl_helpers.cpp:438
 #, kde-format
 msgid ""
-"Krita was built without the support of GNU Scientific Library, so you cannot "
-"scale the selection with handles. Please compile Krita with GNU Scientific "
+"IKriate was built without the support of GNU Scientific Library, so you cannot "
+"scale the selection with handles. Please compile IKriate with GNU Scientific "
 "Library support, or use options widget for editing scale values manually."
 msgstr ""
-"Krita estis konstruita sen la subteno de GNU Scientific Library, do vi ne "
-"povas skali la elekton per teniloj. Bonvolu kompili Krita kun subteno de GNU "
+"IKriate estis konstruita sen la subteno de GNU Scientific Library, do vi ne "
+"povas skali la elekton per teniloj. Bonvolu kompili IKriate kun subteno de GNU "
 "Scientific Library, aŭ uzi opcian fenestraĵon por redakti skalvalorojn "
 "permane."
 

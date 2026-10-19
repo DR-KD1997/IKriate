@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+  <!-- IKriate: layer effects icon ("fx" in an oval). CC0. -->
+  <ellipse cx="12" cy="12" rx="10" ry="8"/>
+  <path d="M10.5 7.5c-1.5 0-2 .8-2.2 2l-1 6.5c-.2 1.2-.7 1.8-1.8 1.8"/>
+  <path d="M6.8 11h3.6"/>
+  <path d="M12 10l4.5 5.5M16.5 10L12 15.5"/>
+</svg>

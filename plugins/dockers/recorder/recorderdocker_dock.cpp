@@ -772,7 +772,7 @@ void RecorderDockerDock::onWriterFrameWriteFailed()
 void RecorderDockerDock::onRecorderStopWarning()
 {
     QMessageBox::warning(this, i18nc("@title:window", "Recorder"),
-                         i18n("Krita was unable to stop the recorder probably. Please try to restart Krita."));
+                         i18n("IKriate was unable to stop the recorder probably. Please try to restart IKriate."));
 }
 void RecorderDockerDock::onLowPerformanceWarning()
 {

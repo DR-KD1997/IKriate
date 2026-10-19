@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-FileCopyrightText: 2026 IKriate contributors
+     SPDX-License-Identifier: CC0-1.0
+     IKriate launch screen: the app logo centred on the app background. Shown
+     as the window background and kept up (sticky) until IKriate has drawn its
+     first screen, so start-up never shows a black window. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@color/ikriate_launch_background"/>
+    <item android:gravity="center" android:width="216dp" android:height="216dp"
+          android:drawable="@drawable/ic_launcher_foreground"/>
+</layer-list>

@@ -1,8 +1,10 @@
+# IKriate: generated from the upstream bundles in upstream/ by
+# packaging/branding/make-bundles.py.
 set (krita_BUNDLE_FILES
      README
-     Krita_4_Default_Resources.bundle
-     Krita_Artists_SeExpr_examples.bundle
-     RGBA_brushes.bundle
+     IKriate_Brushes.bundle
+     SeExpr_Examples.bundle
+     RGBA_Brushes.bundle
 )
 
 # IKriate: Krita 3's resource bundle (16 MB) ships disabled and is already left
@@ -14,7 +16,7 @@ option(IKRIATE_INSTALL_KRITA3_BUNDLE "Install Krita 3's legacy resource bundle (
 if (NOT ANDROID AND IKRIATE_INSTALL_KRITA3_BUNDLE)
     set (krita_BUNDLE_FILES
          ${krita_BUNDLE_FILES}
-         Krita_3_Default_Resources.bundle
+         upstream/Krita_3_Default_Resources.bundle
          )
 endif()
 

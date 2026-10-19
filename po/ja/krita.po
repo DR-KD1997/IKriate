@@ -1043,8 +1043,8 @@ msgstr "ペッパーとキャロット 吹き出し"
 #. i18n: Display name of resource, see context: [path-to-resources]/[resource-type]/[resource-filename]
 #, kde-format
 msgctxt "./krita/data/symbols/preset_icons.svg"
-msgid "Krita Brush Preset Icon Library"
-msgstr "Krita ブラシプリセットアイコンライブラリ"
+msgid "IKriate Brush Preset Icon Library"
+msgstr "IKriate ブラシプリセットアイコンライブラリ"
 
 #. i18n: Display name of resource, see context: [path-to-resources]/[resource-type]/[resource-filename]
 #, kde-format
@@ -7025,7 +7025,7 @@ msgstr "水彩"
 msgctxt "./krita/data/gradients/BG-Krita2.ggr"
 msgid "BG-Krita2. Gradient background for brush preset icons."
 msgstr ""
-"Krita 背景2。ブラシプリセットのアイコンの背景に使用されているグラデーションで"
+"IKriate 背景2。ブラシプリセットのアイコンの背景に使用されているグラデーションで"
 "す。"
 
 #. i18n: Display name of resource, see context: [path-to-resources]/[resource-type]/[resource-filename]
@@ -8310,10 +8310,10 @@ msgstr "リソースフォルダを開く"
 #, kde-format
 msgctxt "action"
 msgid ""
-"Opens a file browser at the location Krita saves resources such as brushes "
+"Opens a file browser at the location IKriate saves resources such as brushes "
 "to."
 msgstr ""
-"ファイルブラウザで Krita がブラシなどのリソースを保存した場所を開きます。"
+"ファイルブラウザで IKriate がブラシなどのリソースを保存した場所を開きます。"
 
 #. i18n: context: text @ Action (windows_cascade), Actions (General), ActionCollection (Krita)
 #: krita/krita.action:19
@@ -8525,8 +8525,8 @@ msgstr "タブレットデバッガーを切り替え"
 #: krita/krita.action:167 krita/krita.action:169 krita/krita.action:170
 #, kde-format
 msgctxt "action"
-msgid "Show Krita log for bug reports."
-msgstr "バグ報告用の Krita のログを表示"
+msgid "Show IKriate log for bug reports."
+msgstr "バグ報告用の IKriate のログを表示"
 
 #. i18n: context: text @ Action (sysinfo), Actions (General), ActionCollection (Krita)
 #. i18n: context: toolTip @ Action (sysinfo), Actions (General), ActionCollection (Krita)
@@ -15859,8 +15859,8 @@ msgstr "設定"
 #: krita/kritamenu.action:1775
 #, kde-format
 msgctxt "action"
-msgid "&Configure Krita..."
-msgstr "Krita の設定を変更(&C)..."
+msgid "&Configure IKriate..."
+msgstr "IKriate の設定を変更(&C)..."
 
 #. i18n: context: toolTip @ Action (options_configure), Actions (Settings), ActionCollection (Menu)
 #. i18n: context: iconText @ Action (options_configure), Actions (Settings), ActionCollection (Menu)
@@ -15869,8 +15869,8 @@ msgstr "Krita の設定を変更(&C)..."
 #: krita/kritamenu.action:1777 krita/kritamenu.action:1778
 #, kde-format
 msgctxt "action"
-msgid "Configure Krita"
-msgstr "Krita の設定を変更"
+msgid "Configure IKriate"
+msgstr "IKriate の設定を変更"
 
 #. i18n: context: text @ Action (manage_bundles), Actions (Settings), ActionCollection (Menu)
 #: krita/kritamenu.action:1787
@@ -16094,8 +16094,8 @@ msgstr "ヘルプ(&H)"
 #: krita/kritamenu.action:1933
 #, kde-format
 msgctxt "action"
-msgid "Krita &Handbook"
-msgstr "Krita ハンドブック(&H)"
+msgid "IKriate &Handbook"
+msgstr "IKriate ハンドブック(&H)"
 
 #. i18n: context: toolTip @ Action (help_contents), Actions (Help), ActionCollection (Menu)
 #. i18n: context: iconText @ Action (help_contents), Actions (Help), ActionCollection (Menu)
@@ -16104,8 +16104,8 @@ msgstr "Krita ハンドブック(&H)"
 #: krita/kritamenu.action:1935 krita/kritamenu.action:1936
 #, kde-format
 msgctxt "action"
-msgid "Krita Handbook"
-msgstr "Krita ハンドブック"
+msgid "IKriate Handbook"
+msgstr "IKriate ハンドブック"
 
 #. i18n: context: text @ Action (help_report_bug), Actions (Help), ActionCollection (Menu)
 #: krita/kritamenu.action:1943
@@ -16128,8 +16128,8 @@ msgstr "バグを報告"
 #: krita/kritamenu.action:1953
 #, kde-format
 msgctxt "action"
-msgid "&About Krita"
-msgstr "Krita について(&A)"
+msgid "&About IKriate"
+msgstr "IKriate について(&A)"
 
 #. i18n: context: toolTip @ Action (help_about_app), Actions (Help), ActionCollection (Menu)
 #. i18n: context: iconText @ Action (help_about_app), Actions (Help), ActionCollection (Menu)
@@ -16138,8 +16138,8 @@ msgstr "Krita について(&A)"
 #: krita/kritamenu.action:1955 krita/kritamenu.action:1956
 #, kde-format
 msgctxt "action"
-msgid "About Krita"
-msgstr "Krita について"
+msgid "About IKriate"
+msgstr "IKriate について"
 
 #. i18n: context: text @ Action (help_about_kde), Actions (Help), ActionCollection (Menu)
 #: krita/kritamenu.action:1963
@@ -16156,7 +16156,7 @@ msgstr "KDE について(&K)"
 #, kde-format
 msgctxt "action"
 msgid "About KDE"
-msgstr "Krita について"
+msgstr "IKriate について"
 
 #. i18n: context: text @ Actions (BrushesAndStuff), ActionCollection (Menu)
 #: krita/kritamenu.action:1974
@@ -16460,15 +16460,15 @@ msgstr "矩形を変更"
 #: krita/main.cc:723
 #, kde-format
 msgctxt "@info:credit"
-msgid "© 1999–2026 The Krita Developers"
+msgid "© 1999–2026 The IKriate Developers"
 msgstr ""
 
 #: krita/main.cc:820 libs/ui/KisApplication.cpp:523
 #: libs/ui/KisApplication.cpp:848
 #, kde-format
 msgctxt "@title:window"
-msgid "Krita: Warning"
-msgstr "Krita: 警告"
+msgid "IKriate: Warning"
+msgstr "IKriate: 警告"
 
 #: krita/main.cc:821
 #, kde-format
@@ -19388,7 +19388,7 @@ msgstr "オプション"
 msgctxt "@tooltip"
 msgid ""
 "Adjusts glyphs so they align by their optical bounds. Doesn't do anything in "
-"Krita."
+"IKriate."
 msgstr ""
 
 #: libs/flake/text/KoOpenTypeFeatureInfoFactory.cpp:77
@@ -19565,7 +19565,7 @@ msgstr "最適化"
 msgctxt "@tooltip"
 msgid ""
 "Indicates how much the font is suitable for its current size. Does nothing "
-"in Krita."
+"in IKriate."
 msgstr ""
 
 #: libs/flake/text/KoOpenTypeFeatureInfoFactory.cpp:131
@@ -21204,8 +21204,8 @@ msgstr "パスに変換"
 #: libs/global/kis_assert.cpp:82
 #, kde-format
 msgctxt "@title:window"
-msgid "Krita: Internal Error"
-msgstr "Krita: 内部エラー"
+msgid "IKriate: Internal Error"
+msgstr "IKriate: 内部エラー"
 
 #: libs/global/kis_dom_utils.cpp:128
 #, kde-format
@@ -22720,8 +22720,8 @@ msgstr "Adobe ブラシライブラリ"
 #: libs/koplugin/KisMimeDatabase.cpp:184
 #, kde-format
 msgctxt "description of a file type"
-msgid "Krita Brush Preset"
-msgstr "Krita ブラシプリセット"
+msgid "IKriate Brush Preset"
+msgstr "IKriate ブラシプリセット"
 
 #: libs/koplugin/KisMimeDatabase.cpp:189
 #, kde-format
@@ -22733,8 +22733,8 @@ msgstr "MyPaint ブラシ"
 #: libs/koplugin/KisMimeDatabase.cpp:194
 #, kde-format
 msgctxt "description of a file type"
-msgid "Krita Assistant"
-msgstr "Krita 補助線ファイル"
+msgid "IKriate Assistant"
+msgstr "IKriate 補助線ファイル"
 
 #: libs/koplugin/KisMimeDatabase.cpp:199
 #, kde-format
@@ -22787,8 +22787,8 @@ msgstr "GIMP カラーパレット"
 #: libs/koplugin/KisMimeDatabase.cpp:239
 #, kde-format
 msgctxt "description of a file type"
-msgid "Krita Color Palette"
-msgstr "Krita カラーパレット"
+msgid "IKriate Color Palette"
+msgstr "IKriate カラーパレット"
 
 #: libs/koplugin/KisMimeDatabase.cpp:244
 #, kde-format
@@ -22811,50 +22811,50 @@ msgstr "GIMP パターン"
 #: libs/koplugin/KisMimeDatabase.cpp:259
 #, kde-format
 msgctxt "description of a file type"
-msgid "Krita Resource Bundle"
-msgstr "Krita リソースバンドル"
+msgid "IKriate Resource Bundle"
+msgstr "IKriate リソースバンドル"
 
 #: libs/koplugin/KisMimeDatabase.cpp:264
 #, kde-format
 msgctxt "description of a file type"
-msgid "Krita Workspace"
-msgstr "Krita ワークスペース"
+msgid "IKriate Workspace"
+msgstr "IKriate ワークスペース"
 
 #: libs/koplugin/KisMimeDatabase.cpp:269
 #, kde-format
 msgctxt "description of a file type"
-msgid "Krita Window Layout"
-msgstr "Krita の画面レイアウト"
+msgid "IKriate Window Layout"
+msgstr "IKriate の画面レイアウト"
 
 #: libs/koplugin/KisMimeDatabase.cpp:274
 #, kde-format
 msgctxt "description of a file type"
-msgid "Krita Session"
-msgstr "Krita セッション"
+msgid "IKriate Session"
+msgstr "IKriate セッション"
 
 #: libs/koplugin/KisMimeDatabase.cpp:279
 #, kde-format
 msgctxt "description of a file type"
-msgid "Krita Taskset"
-msgstr "Krita タスクセット"
+msgid "IKriate Taskset"
+msgstr "IKriate タスクセット"
 
 #: libs/koplugin/KisMimeDatabase.cpp:284
 #, kde-format
 msgctxt "description of a file type"
-msgid "Krita Reference Image Collection"
-msgstr "Krita 資料画像コレクション"
+msgid "IKriate Reference Image Collection"
+msgstr "IKriate 資料画像コレクション"
 
 #: libs/koplugin/KisMimeDatabase.cpp:289
 #, kde-format
 msgctxt "description of a file type"
-msgid "Krita Gamut Mask"
-msgstr "Krita 色域マスク"
+msgid "IKriate Gamut Mask"
+msgstr "IKriate 色域マスク"
 
 #: libs/koplugin/KisMimeDatabase.cpp:294
 #, kde-format
 msgctxt "description of a file type"
-msgid "Krita Shortcut Scheme"
-msgstr "Krita ショートカット配置"
+msgid "IKriate Shortcut Scheme"
+msgstr "IKriate ショートカット配置"
 
 #: libs/koplugin/KisMimeDatabase.cpp:299
 #, kde-format
@@ -22895,8 +22895,8 @@ msgstr "SeExpr スクリプトパッケージ"
 #: libs/koplugin/KisMimeDatabase.cpp:334
 #, kde-format
 msgctxt "description of a file type"
-msgid "Krita Archival Image Format"
-msgstr "Krita 保存画像フォーマット"
+msgid "IKriate Archival Image Format"
+msgstr "IKriate 保存画像フォーマット"
 
 #: libs/koplugin/KisMimeDatabase.cpp:339
 #, kde-format
@@ -22955,8 +22955,8 @@ msgstr "新規作成に使ったツールの名前と内容変更を行った日
 
 #: libs/metadata/kis_meta_data_filter_p.cc:98
 #, kde-format
-msgid "Krita %1"
-msgstr "Krita %1"
+msgid "IKriate %1"
+msgstr "IKriate %1"
 
 #: libs/metadata/kis_meta_data_merge_strategy_p.cc:38
 #, kde-format
@@ -24336,13 +24336,13 @@ msgstr "ローカルリソース"
 #: plugins/tools/tool_transform2/kis_free_transform_strategy_gsl_helpers.cpp:437
 #, kde-format
 msgctxt "@title:window"
-msgid "Krita"
-msgstr "Krita"
+msgid "IKriate"
+msgstr "IKriate"
 
 #: libs/resources/KisResourceCacheDb.cpp:353
 #, kde-format
 msgid ""
-"The resource database scheme has changed. Krita will backup your database "
+"The resource database scheme has changed. IKriate will backup your database "
 "and create a new database."
 msgstr ""
 "このデータスキームは変更されています。現在のデータベースをバックアップして新"
@@ -24378,8 +24378,8 @@ msgstr "データベースと同期できませんでした。%1"
 #: libs/resources/KisResourceLocator.cpp:1044
 #, kde-format
 msgid ""
-"Krita is running for the first time. Initialization will take some time."
-msgstr "Krita の初回起動です。初期化に通常より時間がかかります。"
+"IKriate is running for the first time. Initialization will take some time."
+msgstr "IKriate の初回起動です。初期化に通常より時間がかかります。"
 
 #: libs/resources/KisResourceLocator.cpp:1051
 #, kde-format
@@ -25538,19 +25538,19 @@ msgstr ""
 #: libs/ui/animation/KisDlgImportVideoAnimation.cpp:182
 #, kde-format
 msgctxt "Title for a messagebox"
-msgid "Krita"
-msgstr "Krita"
+msgid "IKriate"
+msgstr "IKriate"
 
 #: libs/ui/animation/KisDlgImportVideoAnimation.cpp:183
 #, kde-format
 msgid ""
-"Warning: you are trying to import more than 100 frames into Krita.\n"
+"Warning: you are trying to import more than 100 frames into IKriate.\n"
 "\n"
 "This means you might be overloading your system.\n"
 "If you want to edit a clip larger than 100 frames, consider using a real "
 "video editor, like Kdenlive (https://kdenlive.org)."
 msgstr ""
-"警告: Krita に 100 フレーム以上のフレームをインポートしようとしています。\n"
+"警告: IKriate に 100 フレーム以上のフレームをインポートしようとしています。\n"
 "\n"
 "これはシステムを過負荷にする可能性があります。\n"
 "100 フレーム以上のクリップを編集したい場合は、Kdenlive (https://kdenlive."
@@ -25665,10 +25665,10 @@ msgstr "これは利用可能なメモリの半分以上を占めるため、編
 #, kde-format
 msgctxt "part of warning in video importer."
 msgid ""
-"Krita does not support the video transfer curve (%1), it will be loaded as "
+"IKriate does not support the video transfer curve (%1), it will be loaded as "
 "linear."
 msgstr ""
-"Krita はビデオ転送曲線 (%1) をサポートしていません。線形として読み込まれま"
+"IKriate はビデオ転送曲線 (%1) をサポートしていません。線形として読み込まれま"
 "す。"
 
 #: libs/ui/animation/KisDlgImportVideoAnimation.cpp:553
@@ -26650,12 +26650,12 @@ msgstr "感度"
 #, kde-format
 msgid ""
 "How sensitive should the duplicate frame filter be when determining\n"
-"which frames are added to Krita.\n"
-"The higher the sensitivity, the more frames are added to Krita."
+"which frames are added to IKriate.\n"
+"The higher the sensitivity, the more frames are added to IKriate."
 msgstr ""
-"重複フレームフィルタが Krita に追加されるフレームを決定する際の感度を設定しま"
+"重複フレームフィルタが IKriate に追加されるフレームを決定する際の感度を設定しま"
 "す。\n"
-"感度が高いほど、Krita に追加されるフレームが増えます。"
+"感度が高いほど、IKriate に追加されるフレームが増えます。"
 
 #. i18n: ectx: property (text), widget (QLabel, importDocumentLabel)
 #: libs/ui/animation/VideoImportDialog.ui:325
@@ -26991,7 +26991,7 @@ msgstr "なし"
 #, kde-format
 msgid ""
 "WARNING: HDR mode was activated on surface working in 8-bit mode!\n"
-"Please activate 10-bit mode in Krita's Preferences dialog and restart Krita "
+"Please activate 10-bit mode in IKriate's Preferences dialog and restart IKriate "
 "to avoid color banding!"
 msgstr ""
 
@@ -27163,8 +27163,8 @@ msgstr "画像の中心"
 
 #: libs/ui/dialogs/kis_about_application.cpp:35
 #, kde-format
-msgid "About Krita"
-msgstr "Krita について"
+msgid "About IKriate"
+msgstr "IKriate について"
 
 #: libs/ui/dialogs/kis_about_application.cpp:46
 #, kde-format
@@ -27235,42 +27235,42 @@ msgstr "<html><head/><body><p align=\"center\"><b>謝辞</b></p>"
 #: libs/ui/dialogs/kis_about_application.cpp:128
 #, kde-format
 msgid ""
-".</p><p><i>For supporting Krita development with advice, icons, brush sets "
+".</p><p><i>For supporting IKriate development with advice, icons, brush sets "
 "and more.</i></p></body></html>"
 msgstr ""
-"</p><p><i>Krita の開発への助言、アイコン、ブラシセットその他による支援</i></"
+"</p><p><i>IKriate の開発への助言、アイコン、ブラシセットその他による支援</i></"
 "p></body></html>"
 
 #: libs/ui/dialogs/kis_about_application.cpp:132
 #, kde-format
 msgid ""
-"<html><head/><body><h1 align=\"center\"><b>Your Rights</b></h1><p>Krita is "
+"<html><head/><body><h1 align=\"center\"><b>Your Rights</b></h1><p>IKriate is "
 "released under the GNU General Public License (version 3 or any later "
 "version).</p><p>This license grants people a number of freedoms:</"
-"p><ul><li>You are free to use Krita, for any purpose</li><li>You are free to "
-"distribute Krita</li><li>You can study how Krita works and change it</"
-"li><li>You can distribute changed versions of Krita</li></ul><p>The Krita "
+"p><ul><li>You are free to use IKriate, for any purpose</li><li>You are free to "
+"distribute IKriate</li><li>You can study how IKriate works and change it</"
+"li><li>You can distribute changed versions of IKriate</li></ul><p>The IKriate "
 "Foundation and its projects on krita.org are <b>committed</b> to preserving "
-"Krita as free software.</p><h1 align=\"center\">Your artwork</h1><p>What you "
-"create with Krita is your sole property. All your artwork is free for you to "
-"use as you like.</p><p>That means that Krita can be used commercially, for "
-"any purpose. There are no restrictions whatsoever.</p><p>Krita’s GNU GPL "
+"IKriate as free software.</p><h1 align=\"center\">Your artwork</h1><p>What you "
+"create with IKriate is your sole property. All your artwork is free for you to "
+"use as you like.</p><p>That means that IKriate can be used commercially, for "
+"any purpose. There are no restrictions whatsoever.</p><p>IKriate’s GNU GPL "
 "license guarantees you this freedom. Nobody is ever permitted to take it "
 "away, in contrast to trial or educational versions of commercial software "
 "that will forbid your work in commercial situations.</p><br/><hr/><pre>"
 msgstr ""
-"<html><head/><body><h1 align=\"center\"><b>権利関係について</h1><p>Krita は "
+"<html><head/><body><h1 align=\"center\"><b>権利関係について</h1><p>IKriate は "
 "GNU General Public License (version 3 or any later version) の元に配布されて"
 "います。</p><p>このライセンスは皆さんにいくつかの自由を与えています:</"
-"p><ul><li>皆さんは Krita をあらゆる目的で自由に使うことができます</li><li>皆"
-"さんは Krita を自由に配布することができます</li><li>皆さんは Krita がどのよう"
-"に働くかを学び、これを自由に改造することができます</li><li>皆さんは Krita の"
-"改造版を自由に配布することができます</li></ul><p>Krita 財団および Krita "
-"Project (サイト: krita.org) は Krita のフリーソフトウェアとして保護を<b>委ね"
+"p><ul><li>皆さんは IKriate をあらゆる目的で自由に使うことができます</li><li>皆"
+"さんは IKriate を自由に配布することができます</li><li>皆さんは IKriate がどのよう"
+"に働くかを学び、これを自由に改造することができます</li><li>皆さんは IKriate の"
+"改造版を自由に配布することができます</li></ul><p>IKriate 財団および IKriate "
+"Project (サイト: krita.org) は IKriate のフリーソフトウェアとして保護を<b>委ね"
 "られています<b>。</p><h1 align=\"center\">皆さんの作品について</h1><p>皆さん"
-"が Krita を使って作った物は皆さん個人の所有物です。皆さんの作品はすべて皆さん"
-"の好きなように使うことができます。</p><p>これは Krita があらゆる目的での商業"
-"利用が可能であることを意味しています。どんな制限も存在しません。</p><p>Krita "
+"が IKriate を使って作った物は皆さん個人の所有物です。皆さんの作品はすべて皆さん"
+"の好きなように使うことができます。</p><p>これは IKriate があらゆる目的での商業"
+"利用が可能であることを意味しています。どんな制限も存在しません。</p><p>IKriate "
 "の GNU GPL license は皆さんに以上の自由を保証します。何人もこれを侵すことはで"
 "きません。これは商用ソフトウェアの試用版・学生版が皆さんの作品の商用利用を禁"
 "止しているのとは対照的なものです。</p><br/><hr/><pre>"
@@ -27279,11 +27279,11 @@ msgstr ""
 #, kde-format
 msgid ""
 "<html><head/><body><h1 align=\"center\"><b>Third-party Libraries used by "
-"Krita</b></h1><p>Krita is built on the following free software libraries:</"
+"IKriate</b></h1><p>IKriate is built on the following free software libraries:</"
 "p><p><ul>"
 msgstr ""
-"<html><head/><body><h1 align=\"center\"><b>Krita が使用する サードパーティー"
-"ライブラリ</b></h1><p>Krita は、次のフリーソフトウェアライブラリから構築され"
+"<html><head/><body><h1 align=\"center\"><b>IKriate が使用する サードパーティー"
+"ライブラリ</b></h1><p>IKriate は、次のフリーソフトウェアライブラリから構築され"
 "ています。</p><p><ul>"
 
 #: libs/ui/dialogs/kis_delayed_save_dialog.cpp:57
@@ -27360,11 +27360,11 @@ msgstr "フィルタ: %1"
 #: libs/ui/dialogs/kis_dlg_hlg_import.ui:20
 #, kde-format
 msgid ""
-"<html><head/><body><p>This is an Hybrid Log Gamma image. Krita does not "
+"<html><head/><body><p>This is an Hybrid Log Gamma image. IKriate does not "
 "support sending HLG to the monitor, so for import it is recommended to "
 "convert from scene linear to display linear.</p></body></html>"
 msgstr ""
-"<html><head/><body><p>これは Hybrid Log Gamma 画像です。Krita は HLG をモニ"
+"<html><head/><body><p>これは Hybrid Log Gamma 画像です。IKriate は HLG をモニ"
 "ターに送信することをサポートしていません。そのため、インポートする際にはシー"
 "ンリニアからディスプレイリニアへの変換を推奨します。</p></body></html>"
 
@@ -27795,8 +27795,8 @@ msgstr "セッションマネージャを表示"
 
 #: libs/ui/dialogs/kis_dlg_preferences.cc:569
 #, kde-format
-msgid "You will need to Restart Krita for the changes to take an effect."
-msgstr "変更を反映するには、Krita の再起動が必要です"
+msgid "You will need to Restart IKriate for the changes to take an effect."
+msgstr "変更を反映するには、IKriate の再起動が必要です"
 
 #: libs/ui/dialogs/kis_dlg_preferences.cc:575
 #, kde-format
@@ -27824,8 +27824,8 @@ msgstr "手動で選択"
 #, kde-format
 msgctxt "@info resource folder"
 msgid ""
-"<p>You are using the Microsoft Store package version of Krita. Even though "
-"Krita can be configured to place resources under the user AppData location, "
+"<p>You are using the Microsoft Store package version of IKriate. Even though "
+"IKriate can be configured to place resources under the user AppData location, "
 "Windows may actually store the files inside a private app location.</p>\n"
 "<p>You should check both locations to determine where the files are located."
 "</p>\n"
@@ -27834,7 +27834,7 @@ msgid ""
 "<p><b>Private app location</b> (<a href=\"copyprivate\">Copy</a>):<br/>\n"
 "%2</p>"
 msgstr ""
-"<p>Krita の Microsoft Store パッケージ版を使用しています。Krita はユーザの "
+"<p>IKriate の Microsoft Store パッケージ版を使用しています。IKriate はユーザの "
 "AppData の場所にリソースを配置するように設定できますが、Windows は実際には"
 "ファイルをプライベートアプリの場所に保存することがあります。</p>\n"
 "<p>ファイルの場所を特定するためには、両方の場所を確認する必要があります。</"
@@ -27922,7 +27922,7 @@ msgstr "カラーマネジメント"
 msgid ""
 "<p>Enabling canvas color management automatically creates a separate native "
 "surface for the canvas. It might cause performance issues on some systems.</"
-"p><p>If color management is disabled, Krita will render the canvas into the "
+"p><p>If color management is disabled, IKriate will render the canvas into the "
 "surface of the main window, which is considered sRGB. It will cause two "
 "limitations:<ol>    <li>the color gamut will be limited to sRGB</li>    "
 "<li>color proofing mode will be limited to \"use global display settings"
@@ -28165,7 +28165,7 @@ msgstr ""
 #, kde-format
 msgctxt "@info:tooltip"
 msgid ""
-"<p>If you are using Krita on X11 or XWayland and experience slowness, try "
+"<p>If you are using IKriate on X11 or XWayland and experience slowness, try "
 "switching between EGL and GLX</p>"
 msgstr ""
 
@@ -28222,8 +28222,8 @@ msgstr ""
 
 #: libs/ui/dialogs/kis_dlg_preferences.cc:2510
 #, kde-format
-msgid "Configure Krita"
-msgstr "Krita の設定"
+msgid "Configure IKriate"
+msgstr "IKriate の設定"
 
 #: libs/ui/dialogs/kis_dlg_preferences.cc:2527
 #, kde-format
@@ -28429,9 +28429,9 @@ msgstr ""
 msgctxt "@info:tooltip"
 msgid ""
 "The amount of time during which the strokes will be kept unmerged. When a "
-"stroke becomes old enough, Krita will try to merge it"
+"stroke becomes old enough, IKriate will try to merge it"
 msgstr ""
-"ストロークが統合されない期間の長さ。ストロークが十分に古くなると、Krita はそ"
+"ストロークが統合されない期間の長さ。ストロークが十分に古くなると、IKriate はそ"
 "れを統合しようとします"
 
 #: libs/ui/dialogs/KisDlgConfigureCumulativeUndo.cpp:60
@@ -28443,10 +28443,10 @@ msgstr "ストロークを統合する前に待機:"
 #, kde-format
 msgctxt "@info:tooltip"
 msgid ""
-"The number of last strokes that Krita will not merge (even if they are old "
+"The number of last strokes that IKriate will not merge (even if they are old "
 "enough)"
 msgstr ""
-"Krita が別々に保存する最後のストロークの数。これらのストロークは古くなっても"
+"IKriate が別々に保存する最後のストロークの数。これらのストロークは古くなっても"
 "統合されません"
 
 #: libs/ui/dialogs/KisDlgConfigureCumulativeUndo.cpp:70
@@ -28488,19 +28488,19 @@ msgstr "グループの最大期間:"
 #: libs/ui/dialogs/KisDlgConfigureCumulativeUndo.cpp:101
 #, kde-format
 msgid ""
-"Cumulative Undo allows Krita to merge undo actions and make undo history "
-"cleaner. Krita will still keep a few latest actions unmerged according to "
+"Cumulative Undo allows IKriate to merge undo actions and make undo history "
+"cleaner. IKriate will still keep a few latest actions unmerged according to "
 "\"Wait before merging strokes\" and \"Exclude last strokes from merge\" "
 "options. Whenever an action gets outdated using the time limit and this "
-"action is not excluded using \"Exclude last strokes from merge\", Krita will "
+"action is not excluded using \"Exclude last strokes from merge\", IKriate will "
 "try  to merge this action into a group. The groups are formed using \"Max "
 "group strokes delay\" and \"Max group duration\" options."
 msgstr ""
-"累積アンドゥは Krita がアンドゥアクションを統合し、アンドゥ履歴をクリーンに保"
-"つことを可能にします。Krita はまだ統合されていない最新のアクションをいくつか"
+"累積アンドゥは IKriate がアンドゥアクションを統合し、アンドゥ履歴をクリーンに保"
+"つことを可能にします。IKriate はまだ統合されていない最新のアクションをいくつか"
 "保持しますが、それは「ストロークを統合する前に待機」および「最後のストローク"
 "を統合から除外」オプションに従います。アクションが時間制限を超え、かつ「最後"
-"のストロークを統合から除外」で除外されていない場合、Krita はこのアクションを"
+"のストロークを統合から除外」で除外されていない場合、IKriate はこのアクションを"
 "グループに統合しようとします。グループは「グループ化されたストロークの最大間"
 "隔」および「グループの最大期間」オプションを使用して形成されます。"
 
@@ -28724,8 +28724,8 @@ msgstr "ロック"
 #: libs/ui/dialogs/KisDonationManagementDialog.ui:53
 #, kde-format
 msgid ""
-"No supporter benefits available on this version of Krita.\n"
-"You can still support Krita by donating."
+"No supporter benefits available on this version of IKriate.\n"
+"You can still support IKriate by donating."
 msgstr ""
 
 #. i18n: ectx: property (text), widget (QPushButton, m_btnNoBenefitsSupport)
@@ -28820,8 +28820,8 @@ msgstr ""
 #. i18n: ectx: property (windowTitle), widget (QDialog, KisRecoverNamedAutosaveDialog)
 #: libs/ui/dialogs/KisRecoverNamedAutosaveDialog.ui:21 libs/ui/wdgsplash.ui:309
 #, kde-format
-msgid "Krita"
-msgstr "Krita"
+msgid "IKriate"
+msgstr "IKriate"
 
 #. i18n: ectx: property (text), widget (QRadioButton, rbOpenAutosave)
 #: libs/ui/dialogs/KisRecoverNamedAutosaveDialog.ui:37
@@ -28956,8 +28956,8 @@ msgstr "ユーザ マニュアル"
 #: libs/ui/forms/KisWelcomePage.ui:525 libs/ui/KisWelcomePageWidget.cpp:364
 #: plugins/extensions/resourcemanager/KisSupporterBundleWidget.ui:173
 #, kde-format
-msgid "Support Krita"
-msgstr "Krita を支援"
+msgid "Support IKriate"
+msgstr "IKriate を支援"
 
 #. i18n: ectx: property (text), widget (QLabel, poweredByKDELink)
 #: libs/ui/forms/KisWelcomePage.ui:615 libs/ui/KisWelcomePageWidget.cpp:373
@@ -28987,8 +28987,8 @@ msgstr "ユーザ コミュニティ"
 #. i18n: ectx: property (text), widget (QLabel, kritaWebsiteLink)
 #: libs/ui/forms/KisWelcomePage.ui:966 libs/ui/KisWelcomePageWidget.cpp:367
 #, kde-format
-msgid "Krita Website"
-msgstr "Krita のウェブサイト"
+msgid "IKriate Website"
+msgstr "IKriate のウェブサイト"
 
 #. i18n: ectx: property (text), widget (QLabel, recentDocumentsLabel)
 #: libs/ui/forms/KisWelcomePage.ui:1041
@@ -29026,8 +29026,8 @@ msgstr "ニュースオプション"
 #. i18n: ectx: property (text), widget (QLabel, versionNotificationLabel)
 #: libs/ui/forms/KisWelcomePage.ui:1377
 #, kde-format
-msgid "Krita Version X.X.X Available"
-msgstr "Krita バージョン X.X.X が利用可能です"
+msgid "IKriate Version X.X.X Available"
+msgstr "IKriate バージョン X.X.X が利用可能です"
 
 #. i18n: ectx: property (text), widget (QPushButton, bnVersionUpdate)
 #: libs/ui/forms/KisWelcomePage.ui:1428
@@ -29078,7 +29078,7 @@ msgid ""
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body>\n"
 "<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-"
-"right:0px; -qt-block-indent:0; text-indent:0px;\">Krita is an open source "
+"right:0px; -qt-block-indent:0; text-indent:0px;\">IKriate is an open source "
 "and community-driven tool for digital artists everywhere.<br />Progress is "
 "made possible thanks to ongoing support from our community of <a href="
 "\"https://docs.krita.org/en/contributors_manual.html\">contributors</a>, <a "
@@ -29092,7 +29092,7 @@ msgstr ""
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body>\n"
 "<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-"
-"right:0px; -qt-block-indent:0; text-indent:0px;\">Krita は、あらゆる場所にい"
+"right:0px; -qt-block-indent:0; text-indent:0px;\">IKriate は、あらゆる場所にい"
 "るデジタルアーティストのための、オープンソースでコミュニティ主導のツールで"
 "す。<br />その発展は<a href=\"https://docs.krita.org/en/contributors_manual."
 "html\">貢献者</a>コミュニティやスポンサー、そして<a href=\"https://fund."
@@ -29102,7 +29102,7 @@ msgstr ""
 #. i18n: ectx: property (text), widget (QLabel, lblAndroidSupporter)
 #: libs/ui/forms/KisWelcomePage.ui:1659
 #, kde-format
-msgid "Krita is made possible thanks to ongoing support from people like you!"
+msgid "IKriate is made possible thanks to ongoing support from people like you!"
 msgstr ""
 
 #. i18n: ectx: property (text), widget (QPushButton, bnAndroidSupporterManage)
@@ -29115,8 +29115,8 @@ msgstr ""
 #: libs/ui/forms/KisWelcomePage.ui:1717 libs/ui/KisWelcomePageWidget.cpp:844
 #, fuzzy, kde-format
 #| msgid "Support Krita"
-msgid "Support Krita!"
-msgstr "Krita を支援"
+msgid "Support IKriate!"
+msgstr "IKriate を支援"
 
 #. i18n: ectx: property (text), widget (QLabel, lblLastPrintedDesc)
 #: libs/ui/forms/koDocumentInfoAboutWidget.ui:28
@@ -29317,12 +29317,12 @@ msgstr "解像度:"
 #: libs/ui/forms/wdgaboutapplication.ui:29
 #, kde-format
 msgid "About"
-msgstr "Krita について"
+msgstr "IKriate について"
 
 #. i18n: ectx: attribute (title), widget (QWidget, authorsTab)
 #: libs/ui/forms/wdgaboutapplication.ui:35
 #, kde-format
-msgctxt "Heading for the list of Krita authors/developers"
+msgctxt "Heading for the list of IKriate authors/developers"
 msgid "Authors"
 msgstr "作者"
 
@@ -29367,11 +29367,11 @@ msgstr "プロファイルを適用"
 #, kde-format
 msgid ""
 "The image data you want to paste does not have an ICM profile associated "
-"with it. If you do not select a profile, Krita will assume that the image "
+"with it. If you do not select a profile, IKriate will assume that the image "
 "data is encoded in the import profile defined in the Settings dialog."
 msgstr ""
 "貼り付けようとしている画像データには関連付けられた ICM プロファイルがありませ"
-"ん。プロファイルを選択されない場合は、Krita はこの画像を設定ダイアログのイン"
+"ん。プロファイルを選択されない場合は、IKriate はこの画像を設定ダイアログのイン"
 "ポートプロファイルに指定されている形式でエンコードされているものと見なしま"
 "す。"
 
@@ -29525,8 +29525,8 @@ msgstr "新しい画像にデフォルトで使用する色モデル"
 #. i18n: ectx: property (title), widget (QGroupBox, grpPasteBehaviour)
 #: libs/ui/forms/wdgcolorsettings.ui:77 libs/ui/forms/wdggeneralsettings.ui:250
 #, kde-format
-msgid "When Pasting Into Krita From Other Applications"
-msgstr "他のアプリケーションから Krita に貼り付けたときの挙動"
+msgid "When Pasting Into IKriate From Other Applications"
+msgstr "他のアプリケーションから IKriate に貼り付けたときの挙動"
 
 #. i18n: ectx: property (text), widget (QRadioButton, radioPasteWeb)
 #: libs/ui/forms/wdgcolorsettings.ui:83
@@ -29549,8 +29549,8 @@ msgstr "毎回尋ねる(&K)"
 #. i18n: ectx: property (text), widget (QLabel, textLabel1_2_2)
 #: libs/ui/forms/wdgcolorsettings.ui:104
 #, kde-format
-msgid "Note: When copying/pasting inside Krita color info is always preserved."
-msgstr "注: Krita 内でのコピー/貼り付け時には常に色の情報が保持されます。"
+msgid "Note: When copying/pasting inside IKriate color info is always preserved."
+msgstr "注: IKriate 内でのコピー/貼り付け時には常に色の情報が保持されます。"
 
 #. i18n: ectx: property (text), widget (QCheckBox, chkBlackpoint)
 #: libs/ui/forms/wdgcolorsettings.ui:114
@@ -29823,11 +29823,11 @@ msgstr "黒点補正を使う"
 #: libs/ui/forms/wdgconvertcolorspace.ui:140
 #, kde-format
 msgid ""
-"Krita tries to automatically check or uncheck this based on the information "
+"IKriate tries to automatically check or uncheck this based on the information "
 "it can get from the profile you are converting from and the profile you are "
 "converting to."
 msgstr ""
-"Krita は元のプロファイルおよびこれから変換しようとしているプロファイルから得"
+"IKriate は元のプロファイルおよびこれから変換しようとしているプロファイルから得"
 "られた情報に基づいてこれに自動でチェックを入れるか入れないかを判定します。"
 
 #. i18n: ectx: property (text), widget (QLabel, textLabel1)
@@ -30265,11 +30265,11 @@ msgstr "ファイル:"
 #: libs/ui/forms/wdgdlgfilelayer.ui:87
 #, kde-format
 msgid ""
-"<html><head/><body><p>Warning: Krita uses a relative path to store the "
+"<html><head/><body><p>Warning: IKriate uses a relative path to store the "
 "location of the file in the .kra. If you move the .kra but not the file, the "
 "file layer may be broken.</p></body></html>"
 msgstr ""
-"<html><head/><body><p>警告: Krita は .kra にファイルの場所を保存するために相"
+"<html><head/><body><p>警告: IKriate は .kra にファイルの場所を保存するために相"
 "対パスを使用します。.kra を移動したがファイルを移動しなかった場合、ファイルレ"
 "イヤーが壊れる可能性があります。</p></body></html>"
 
@@ -30395,9 +30395,9 @@ msgstr "XML"
 #. i18n: ectx: property (text), widget (QLabel, label)
 #: libs/ui/forms/wdgfullscreensettings.ui:25
 #, kde-format
-msgid "Select which parts of Krita will be hidden in canvas-only mode."
+msgid "Select which parts of IKriate will be hidden in canvas-only mode."
 msgstr ""
-"キャンバスのみ表示モードで Krita のどの部分が表示されなくなるかを選択します。"
+"キャンバスのみ表示モードで IKriate のどの部分が表示されなくなるかを選択します。"
 
 #. i18n: ectx: property (text), widget (QCheckBox, chkMenu)
 #: libs/ui/forms/wdgfullscreensettings.ui:35
@@ -30426,8 +30426,8 @@ msgstr "スクロールバー"
 #. i18n: ectx: property (text), widget (QCheckBox, chkTitlebar)
 #: libs/ui/forms/wdgfullscreensettings.ui:63
 #, kde-format
-msgid "Titlebar (hiding the titlebar will make Krita go full-screen)"
-msgstr "タイトルバー (タイトルバーを隠すと Krita はフルスクリーンになります)"
+msgid "Titlebar (hiding the titlebar will make IKriate go full-screen)"
+msgstr "タイトルバー (タイトルバーを隠すと IKriate はフルスクリーンになります)"
 
 #. i18n: ectx: property (text), widget (QCheckBox, chkStatusbar)
 #: libs/ui/forms/wdgfullscreensettings.ui:70
@@ -30556,10 +30556,10 @@ msgstr ""
 #: libs/ui/forms/wdggeneralsettings.ui:190
 #, kde-format
 msgid ""
-"Use Zip64 (for very large files: cannot be opened in versions of Krita older "
+"Use Zip64 (for very large files: cannot be opened in versions of IKriate older "
 "than 4.2.0)"
 msgstr ""
-"Zip64 を使用する (大容量ファイルの場合: 4.2.0 以前のバージョンの Krita では開"
+"Zip64 を使用する (大容量ファイルの場合: 4.2.0 以前のバージョンの IKriate では開"
 "けません)"
 
 #. i18n: ectx: property (text), widget (QCheckBox, m_chkCompressKra)
@@ -31095,14 +31095,14 @@ msgstr "リソースフォルダ:"
 #. i18n: ectx: property (text), widget (QLabel, label_12)
 #: libs/ui/forms/wdggeneralsettings.ui:1316
 #, kde-format
-msgid "When Krita starts:"
-msgstr "Krita の起動時:"
+msgid "When IKriate starts:"
+msgstr "IKriate の起動時:"
 
 #. i18n: ectx: property (text), widget (QCheckBox, chkSaveSessionOnQuit)
 #: libs/ui/forms/wdggeneralsettings.ui:1333
 #, kde-format
-msgid "Save session when Krita closes"
-msgstr "Krita の終了時にセッションを保存"
+msgid "Save session when IKriate closes"
+msgstr "IKriate の終了時にセッションを保存"
 
 #. i18n: ectx: property (text), widget (QCheckBox, m_chkConvertOnImport)
 #: libs/ui/forms/wdggeneralsettings.ui:1340
@@ -31205,12 +31205,12 @@ msgstr "フォント DPI 回避策"
 #: libs/ui/forms/wdggeneralsettings.ui:1578
 #, kde-format
 msgid ""
-"In some Krita versions before 5.0 text size could be dependent on the "
+"In some IKriate versions before 5.0 text size could be dependent on the "
 "current display DPI (which was a bug).\n"
 "In Krita 5.0 this bug has been fixed, which may cause files created in "
 "previous versions look different. \n"
 "\n"
-"When loading old files Krita will try to adjust font size to the DPI of the "
+"When loading old files IKriate will try to adjust font size to the DPI of the "
 "current screen.\n"
 "If the file has been created on a different display, try adjusting this "
 "value manually.\n"
@@ -31223,7 +31223,7 @@ msgstr ""
 "Krita 5.0 でこのバグが修正されたため、以前のバージョンで作成されたファイルが"
 "異なる見え方をすることがあります。\n"
 "\n"
-"古いファイルを読み込むとき、Krita はフォントサイズを現在の画面の DPI に合わせ"
+"古いファイルを読み込むとき、IKriate はフォントサイズを現在の画面の DPI に合わせ"
 "ようとします。\n"
 "ファイルが異なるディスプレイで作成された場合、この値を手動で調整してみてくだ"
 "さい。\n"
@@ -31241,18 +31241,18 @@ msgstr "DPI:"
 #: libs/ui/forms/wdggeneralsettings.ui:1590
 #, kde-format
 msgid ""
-"In some versions of Krita before 4.4.3 text size could be dependent on the "
+"In some versions of IKriate before 4.4.3 text size could be dependent on the "
 "current display DPI (which was a bug).\n"
 "In Krita 4.4.3 this bug has been fixed, which may cause files created in "
 "previous versions look different.\n"
-"To restore the old behavior you can force Krita to use Display DPI for fonts "
+"To restore the old behavior you can force IKriate to use Display DPI for fonts "
 "by entering it in this field."
 msgstr ""
 "Krita 4.4.3 以前のバージョンでは、テキストサイズが現在のディスプレイ DPI に依"
 "存することがありました (これはバグでした)。\n"
 "Krita 4.4.3 でこのバグが修正されたため、以前のバージョンで作成されたファイル"
 "が異なる見え方をすることがあります。\n"
-"古い挙動を復元するために、このフィールドにディスプレイ DPI を入力して Krita "
+"古い挙動を復元するために、このフィールドにディスプレイ DPI を入力して IKriate "
 "にフォントの DPI を使用させることができます。"
 
 #. i18n: ectx: property (title), widget (QGroupBox, groupBox_51)
@@ -31312,7 +31312,7 @@ msgstr "慣性スクロールを有効にしたら、ドッキングパネルの
 #, kde-format
 msgid ""
 "Some applications may emulate presses of function keys with high numbers (e."
-"g. F22) to bring themselves to the foreground. This may break Krita's "
+"g. F22) to bring themselves to the foreground. This may break IKriate's "
 "shortcuts and actions system. If you have a keyboard with F13 or higher "
 "function keys, and you wish to use them, try disabling this option, but take "
 "this potential problem into account."
@@ -32219,8 +32219,8 @@ msgstr "記憶(&R)"
 #. i18n: ectx: property (text), widget (QLabel, label_10)
 #: libs/ui/forms/wdgperformancesettings.ui:38
 #, kde-format
-msgid "Note: Krita will need to be restarted for changes to take effect"
-msgstr "ノート: 変更を反映するには、Krita の再起動が必要です"
+msgid "Note: IKriate will need to be restarted for changes to take effect"
+msgstr "ノート: 変更を反映するには、IKriate の再起動が必要です"
 
 #. i18n: ectx: property (title), widget (QGroupBox, groupBox)
 #: libs/ui/forms/wdgperformancesettings.ui:55
@@ -32245,8 +32245,8 @@ msgstr "XXX MiB"
 #: libs/ui/forms/wdgperformancesettings.ui:84
 #: libs/ui/forms/wdgperformancesettings.ui:102
 #, kde-format
-msgid "Krita will not use more memory than this limit."
-msgstr "Krita はこの限界以上のメモリを使用できません"
+msgid "IKriate will not use more memory than this limit."
+msgstr "IKriate はこの限界以上のメモリを使用できません"
 
 #. i18n: ectx: property (text), widget (QLabel, label)
 #: libs/ui/forms/wdgperformancesettings.ui:87
@@ -32332,10 +32332,10 @@ msgstr "CPU の上限:"
 #: libs/ui/forms/wdgperformancesettings.ui:275
 #, kde-format
 msgid ""
-"<html><head/><body><p>Krita will not use more CPU cores than selected by "
+"<html><head/><body><p>IKriate will not use more CPU cores than selected by "
 "this limit</p></body></html>"
 msgstr ""
-"<html><head/><body><p>Krita は、ここで指定された数を超える CPU コアを使用しま"
+"<html><head/><body><p>IKriate は、ここで指定された数を超える CPU コアを使用しま"
 "せん。</p></body></html>"
 
 #. i18n: ectx: property (text), widget (QLabel, label_9)
@@ -32349,7 +32349,7 @@ msgstr "フレームレンダリングの複製制限"
 #, no-c-format, kde-format
 msgid ""
 "<html><head/><body><p>When rendering animation frames (into files or during "
-"animation cache regeneration), Krita will make the specified number of "
+"animation cache regeneration), IKriate will make the specified number of "
 "copies of your image and will work on them in parallel. Each copy will "
 "demand more RAM for its storage (about 20% of the size of you image), so "
 "raise this limit only if you have enough RAM installed.</p><p><br/></"
@@ -32358,7 +32358,7 @@ msgid ""
 "\">physical</span> (non-hyperthreaded) cores your CPU has</p></body></html>"
 msgstr ""
 "<html><head/><body><p>アニメーションフレームをレンダリングするとき (またはア"
-"ニメーションキャッシュの再生成中に)、Krita は指定された数の画像コピーを作成"
+"ニメーションキャッシュの再生成中に)、IKriate は指定された数の画像コピーを作成"
 "し、それらを並行して処理します。各コピーには格納用のメモリ (画像サイズの約"
 "20%) が必要になるため、十分な RAM がインストールされている場合にのみ、この制"
 "限値を上げてください。</p><p><br/></p><p><span style=\" font-weight:600;\">推"
@@ -32405,12 +32405,12 @@ msgstr "フレームタイミング:"
 #: libs/ui/forms/wdgperformancesettings.ui:344
 #, kde-format
 msgid ""
-"<html><head/><body><p>Krita will try to limit the number of screen updates "
+"<html><head/><body><p>IKriate will try to limit the number of screen updates "
 "per second to the given number. A lower number will decrease visual "
 "responsiveness but increase stylus precision on some systems like macOS.<p></"
 "body></html>"
 msgstr ""
-"<html><head/><body><p>Krita は1秒あたりの画面更新回数を、指定された数に制限し"
+"<html><head/><body><p>IKriate は1秒あたりの画面更新回数を、指定された数に制限し"
 "ようとします。数値を小さくすると視覚的なレスポンスは低下しますが、macOS など"
 "の一部のシステムではスタイラスの精度が向上します。<p></body></html>"
 
@@ -32466,12 +32466,12 @@ msgstr "パフォーマンスログ出力"
 #: libs/ui/forms/wdgperformancesettings.ui:415
 #, kde-format
 msgid ""
-"<html><head/><body><p>When performance logging is enabled Krita saves timing "
+"<html><head/><body><p>When performance logging is enabled IKriate saves timing "
 "information into the <tt>&lt;working_dir&gt;/log</tt> folder. If you "
 "experience performance problems and want to help us, enable this option and "
 "add the contents of the directory to a bug report.</p></body></html>"
 msgstr ""
-"<html><head/><body><p>パフォーマンスログが有効な時、Krita は時間情報を "
+"<html><head/><body><p>パフォーマンスログが有効な時、IKriate は時間情報を "
 "<tt>&lt;作業ディレクトリ&gt;/log</tt> フォルダーに保存します (作業ディレクト"
 "リとは自動保存が保存されている場所です)。もし何か問題が発生してそのトラブルを"
 "我々開発に報告してくださる場合には、このオプションを有効にしてディレクトリの"
@@ -33292,8 +33292,8 @@ msgstr "0.0"
 #. i18n: ectx: property (title), widget (QGroupBox, grpTabletApi)
 #: libs/ui/forms/wdgtabletsettings.ui:130
 #, kde-format
-msgid "Tablet Input API (changing this requires restarting Krita)"
-msgstr "Tablet Input API (変更するには、Krita を再起動する必要があります)"
+msgid "Tablet Input API (changing this requires restarting IKriate)"
+msgstr "Tablet Input API (変更するには、IKriate を再起動する必要があります)"
 
 #. i18n: ectx: property (text), widget (QRadioButton, radioWintab)
 #: libs/ui/forms/wdgtabletsettings.ui:138
@@ -33320,17 +33320,17 @@ msgstr "Windows 8+ Pointer Input (Windows Ink)"
 msgid ""
 "<html><head/><body><p>Some tablet devices don't pass barrel-button clicks "
 "via tablet API. If you have such a device, you can try activate this "
-"workaround. Krita will try to read right- and middle-button clicks from the "
+"workaround. IKriate will try to read right- and middle-button clicks from the "
 "mouse events stream. It may or may not work on your device (depends on the "
 "tablet driver implementation).</p><p><br/></p><p>After changing this option "
-"Krita should be restarted.</p></body></html>"
+"IKriate should be restarted.</p></body></html>"
 msgstr ""
 "<html><head/><body><p>一部のタブレットデバイスでは、タブレット API でバレルボ"
 "タンのクリックが機能しません。このようなデバイスがある場合は、この回避策を有"
-"効にできます。Krita はマウスイベントストリームから右ボタンと中ボタンのクリッ"
+"効にできます。IKriate はマウスイベントストリームから右ボタンと中ボタンのクリッ"
 "ク動作の読み取りを試行します。このオプションは、お使いのデバイスで動作する場"
 "合と動作しない場合があります (タブレットドライバの実装によって異なります)。</"
-"p> <p><br/></p><p>このオプションを変更した後、Krita を再起動する必要がありま"
+"p> <p><br/></p><p>このオプションを変更した後、IKriate を再起動する必要がありま"
 "す。</p></body></html>"
 
 #. i18n: ectx: property (text), widget (QCheckBox, chkUseRightMiddleClickWorkaround)
@@ -33373,10 +33373,10 @@ msgstr ""
 #: libs/ui/forms/wdgtabletsettings.ui:227
 #, kde-format
 msgid ""
-"Amount of smoothing Krita should do to speed sensor. This value is very "
+"Amount of smoothing IKriate should do to speed sensor. This value is very "
 "hardware-dependent"
 msgstr ""
-"Krita が速度センサーに対して行う平滑化の量。この値はハードウェアに強く依存し"
+"IKriate が速度センサーに対して行う平滑化の量。この値はハードウェアに強く依存し"
 "ます。"
 
 #. i18n: ectx: property (toolTip), widget (KisAngleSelector, tiltDirectionOffsetAngle)
@@ -35449,26 +35449,26 @@ msgstr ""
 
 #: libs/ui/kis_splash_screen.cpp:210
 #, kde-format
-msgid "<p><span style=\" color:%1;\"><b>Using Krita</b></span></p>"
-msgstr "<p><span style=\" color:%1;\"><b>Krita を使う</b></span></p>"
+msgid "<p><span style=\" color:%1;\"><b>Using IKriate</b></span></p>"
+msgstr "<p><span style=\" color:%1;\"><b>IKriate を使う</b></span></p>"
 
 #: libs/ui/kis_splash_screen.cpp:217
 #, kde-format
 msgid ""
 "<p><a href=\"https://krita.org/support-us/\"><span style=\" text-decoration: "
-"underline; color:%1;\">Support Krita's Development!</span></a></p>"
+"underline; color:%1;\">Support IKriate's Development!</span></a></p>"
 msgstr ""
 "<p><a href=\"https://krita.org/support-us/\"><span style=\" text-decoration: "
-"underline; color:%1;\">Krita の開発を支援する！</span></a></p>"
+"underline; color:%1;\">IKriate の開発を支援する！</span></a></p>"
 
 #: libs/ui/kis_splash_screen.cpp:218
 #, kde-format
 msgid ""
 "<p><a href=\"https://krita.org/\"><span style=\" text-decoration: underline; "
-"color:%1;\">Krita Website</span></a></p>"
+"color:%1;\">IKriate Website</span></a></p>"
 msgstr ""
 "<p><a href=\"https://krita.org/\"><span style=\" text-decoration: underline; "
-"color:%1;\">Krita ウェブサイト</span></a></p>"
+"color:%1;\">IKriate ウェブサイト</span></a></p>"
 
 #: libs/ui/kis_splash_screen.cpp:222
 #, kde-format
@@ -35492,8 +35492,8 @@ msgstr ""
 
 #: libs/ui/kis_splash_screen.cpp:225
 #, kde-format
-msgid "<p><span style=\" color:%1;\"><b>Coding Krita</b></span></p>"
-msgstr "<p><span style=\" color:%1;\"><b>Krita の開発</b></span></p>"
+msgid "<p><span style=\" color:%1;\"><b>Coding IKriate</b></span></p>"
+msgstr "<p><span style=\" color:%1;\"><b>IKriate の開発</b></span></p>"
 
 #: libs/ui/kis_splash_screen.cpp:226
 #, kde-format
@@ -35589,7 +35589,7 @@ msgid ""
 "\n"
 "\n"
 "WARNING:\tOut of memory! Swapping has been started.\n"
-"\t\tPlease configure more RAM for Krita in Settings dialog"
+"\t\tPlease configure more RAM for IKriate in Settings dialog"
 msgstr ""
 "\n"
 "\n"
@@ -35732,28 +35732,28 @@ msgstr "スタイルシート"
 msgid ""
 "%1\n"
 "\n"
-"Krita will quit now."
+"IKriate will quit now."
 msgstr ""
 "%1\n"
 "\n"
-"Krita はすぐに終了します。"
+"IKriate はすぐに終了します。"
 
 #: libs/ui/KisApplication.cpp:481 libs/ui/KisApplication.cpp:487
 #, kde-format
 msgctxt "@title:window"
-msgid "Krita: Fatal error"
-msgstr "Krita: 重大なエラー"
+msgid "IKriate: Fatal error"
+msgstr "IKriate: 重大なエラー"
 
 #: libs/ui/KisApplication.cpp:487
 #, kde-format
 msgid ""
 "\n"
 "\n"
-"Krita will quit now."
+"IKriate will quit now."
 msgstr ""
 "\n"
 "\n"
-"Krita はすぐに終了します。"
+"IKriate はすぐに終了します。"
 
 #: libs/ui/KisApplication.cpp:524
 #, kde-format
@@ -35762,7 +35762,7 @@ msgid ""
 "This is not recommended.\n"
 "Please download and install the x64 build instead."
 msgstr ""
-"あなたは 64 ビットの Windows で 32 ビット版の Krita を動かしていますが、\n"
+"あなたは 64 ビットの Windows で 32 ビット版の IKriate を動かしていますが、\n"
 "これは推奨されません。\n"
 "代わりに 64 ビット版をダウンロード・インストールしてください。"
 
@@ -35816,8 +35816,8 @@ msgstr "ファイル参照レイヤー"
 #: libs/ui/KisApplication.cpp:1121
 #, kde-format
 msgctxt "@title:window"
-msgid "Krita:Warning"
-msgstr "Krita: 警告"
+msgid "IKriate:Warning"
+msgstr "IKriate: 警告"
 
 #: libs/ui/KisApplication.cpp:838 libs/ui/KisApplication.cpp:1117
 #, kde-format
@@ -35834,7 +35834,7 @@ msgid ""
 "an existing file.\n"
 "\n"
 "If you instead want to add the file layer to a document in an already "
-"running instance of Krita, check the \"Allow only one instance of Krita\" "
+"running instance of IKriate, check the \"Allow only one instance of IKriate\" "
 "checkbox in the settings (Settings -> General -> Window)."
 msgstr ""
 "ファイル参照レイヤーを追加できません: 開いているドキュメントがありません。\n"
@@ -35842,8 +35842,8 @@ msgstr ""
 "--new-image オプションを使用して新しいドキュメントを作成するか、既存のファイ"
 "ルを開いてください。\n"
 "\n"
-"既に実行中の Krita インスタンスのドキュメントにファイル参照レイヤーを追加する"
-"場合は、設定 ([設定]->[全般]->[ウィンドウ]) の「Krita のインスタンスを一つに"
+"既に実行中の IKriate インスタンスのドキュメントにファイル参照レイヤーを追加する"
+"場合は、設定 ([設定]->[全般]->[ウィンドウ]) の「IKriate のインスタンスを一つに"
 "制限」チェックボックスをオンにしてください。"
 
 #: libs/ui/KisApplication.cpp:849
@@ -35886,17 +35886,17 @@ msgstr "テンプレート %1 は読み込みに失敗しました。"
 #: libs/ui/KisApplication.cpp:1301
 #, kde-format
 msgid ""
-"Krita configurations reset!\n"
+"IKriate configurations reset!\n"
 "\n"
 "Backup file was created at: %1\n"
 "\n"
-"Restart Krita for changes to take effect."
+"Restart IKriate for changes to take effect."
 msgstr ""
-"Krita 設定をリセットしました!\n"
+"IKriate 設定をリセットしました!\n"
 "\n"
 "バックアップファイルが作成されました:%1\n"
 "\n"
-"変更を有効にするには、Krita を再起動します。"
+"変更を有効にするには、IKriate を再起動します。"
 
 #: libs/ui/KisApplication.cpp:1315
 #, kde-format
@@ -35953,23 +35953,23 @@ msgstr ""
 
 #: libs/ui/KisApplicationArguments.cpp:84
 #, kde-format
-msgid "The name of the workspace to open Krita with"
-msgstr "Krita を開くワークスペースの名前"
+msgid "The name of the workspace to open IKriate with"
+msgstr "IKriate を開くワークスペースの名前"
 
 #: libs/ui/KisApplicationArguments.cpp:85
 #, kde-format
-msgid "The name of the window layout to open Krita with"
-msgstr "Krita を開くための画面レイアウトの名前"
+msgid "The name of the window layout to open IKriate with"
+msgstr "IKriate を開くための画面レイアウトの名前"
 
 #: libs/ui/KisApplicationArguments.cpp:86
 #, kde-format
-msgid "The name of the session to open Krita with"
-msgstr "Krita を開くセッションの名前"
+msgid "The name of the session to open IKriate with"
+msgstr "IKriate を開くセッションの名前"
 
 #: libs/ui/KisApplicationArguments.cpp:87
 #, kde-format
-msgid "Start Krita in canvas-only mode"
-msgstr "キャンバスのみ表示モードで Krita を起動します"
+msgid "Start IKriate in canvas-only mode"
+msgstr "キャンバスのみ表示モードで IKriate を起動します"
 
 #: libs/ui/KisApplicationArguments.cpp:88
 #, kde-format
@@ -35978,8 +35978,8 @@ msgstr "スプラッシュ画面を表示しない"
 
 #: libs/ui/KisApplicationArguments.cpp:89
 #, kde-format
-msgid "Start Krita in full-screen mode"
-msgstr "フルスクリーンモードで Krita を起動します"
+msgid "Start IKriate in full-screen mode"
+msgstr "フルスクリーンモードで IKriate を起動します"
 
 #: libs/ui/KisApplicationArguments.cpp:91
 #, kde-format
@@ -36009,8 +36009,8 @@ msgstr "既存または新しいファイルに追加されるファイル参照
 
 #: libs/ui/KisApplicationArguments.cpp:99
 #, kde-format
-msgid "A location that overrides the configured location for Krita's resources"
-msgstr "Krita のリソースの場所を指定した場所にオーバーライドする"
+msgid "A location that overrides the configured location for IKriate's resources"
+msgstr "IKriate のリソースの場所を指定した場所にオーバーライドする"
 
 #: libs/ui/KisApplicationArguments.cpp:100
 #, kde-format
@@ -36281,9 +36281,9 @@ msgstr "ファイルをリサイズできませんでした。"
 
 #: libs/ui/KisImportExportErrorCode.cpp:50
 #, kde-format
-msgid "Permission denied. Krita is not allowed to read or write to the file."
+msgid "Permission denied. IKriate is not allowed to read or write to the file."
 msgstr ""
-"アクセスが拒否されました。Krita はファイルの読み取りまたは書き込みが許可され"
+"アクセスが拒否されました。IKriate はファイルの読み取りまたは書き込みが許可され"
 "ていません。"
 
 #: libs/ui/KisImportExportErrorCode.cpp:52
@@ -36313,9 +36313,9 @@ msgstr "ファイルが存在しません。"
 
 #: libs/ui/KisImportExportErrorCode.cpp:157
 #, kde-format
-msgid "Permission denied: Krita is not allowed to read the file."
+msgid "Permission denied: IKriate is not allowed to read the file."
 msgstr ""
-"アクセスが拒否されました。Krita はファイルの読み取りが許可されていません。"
+"アクセスが拒否されました。IKriate はファイルの読み取りが許可されていません。"
 
 #: libs/ui/KisImportExportErrorCode.cpp:159
 #, kde-format
@@ -36344,9 +36344,9 @@ msgstr "ファイルを作成できません。"
 
 #: libs/ui/KisImportExportErrorCode.cpp:171
 #, kde-format
-msgid "Permission denied: Krita is not allowed to write to the file."
+msgid "Permission denied: IKriate is not allowed to write to the file."
 msgstr ""
-"アクセスが拒否されました。Krita はファイルの書き込みが許可されていません。"
+"アクセスが拒否されました。IKriate はファイルの書き込みが許可されていません。"
 
 #: libs/ui/KisImportExportErrorCode.cpp:173
 #, kde-format
@@ -36360,8 +36360,8 @@ msgstr "ファイルの書き込み中にエラーが発生しました。"
 
 #: libs/ui/KisImportExportErrorCode.cpp:177
 #, kde-format
-msgid "Krita does not support this file format."
-msgstr "Krita はこのファイル形式をサポートしていません。"
+msgid "IKriate does not support this file format."
+msgstr "IKriate はこのファイル形式をサポートしていません。"
 
 #: libs/ui/KisImportExportErrorCode.cpp:181
 #, kde-format
@@ -36567,8 +36567,8 @@ msgstr "理由:"
 #: libs/ui/KisImportExportManager.cpp:621
 #, kde-format
 msgctxt "@title:window"
-msgid "Krita: Export Error"
-msgstr "Krita: エクスポートエラー"
+msgid "IKriate: Export Error"
+msgstr "IKriate: エクスポートエラー"
 
 #: libs/ui/KisImportExportManager.cpp:638
 #, kde-format
@@ -36604,7 +36604,7 @@ msgstr "サイズ変更"
 
 #: libs/ui/KisImportExportManager.cpp:685
 #, kde-format
-msgid "Also save your image as a Krita file."
+msgid "Also save your image as a IKriate file."
 msgstr "この画像の.kraファイルへの保存も合わせて行ってください。"
 
 #: libs/ui/KisImportExportUtils.cpp:48
@@ -36616,10 +36616,10 @@ msgstr "インポート時に画像の色空間を変換"
 #, kde-format
 msgctxt "the argument is the ICC profile name"
 msgid ""
-"The image has a profile attached that Krita cannot edit images in (\"%1\"), "
+"The image has a profile attached that IKriate cannot edit images in (\"%1\"), "
 "please select a space to convert to for editing: \n"
 msgstr ""
-"Krita で編集できないプロファイルが画像で使用されています (\"%1\")。編集用に変"
+"IKriate で編集できないプロファイルが画像で使用されています (\"%1\")。編集用に変"
 "換する色空間を選択してください: \n"
 
 #: libs/ui/KisLayerThumbnailCache.cpp:31
@@ -36785,11 +36785,11 @@ msgstr "%1 %2"
 #: libs/ui/KisMainWindow.cpp:3003
 #, kde-format
 msgid ""
-"The Krita LittleCMS color management plugin is not installed. Krita will "
+"The IKriate LittleCMS color management plugin is not installed. IKriate will "
 "quit now."
 msgstr ""
-"Krita LittleCMS カラーマネジメントプラグインはインストールされていません。"
-"Krita は終了します。"
+"IKriate LittleCMS カラーマネジメントプラグインはインストールされていません。"
+"IKriate は終了します。"
 
 #: libs/ui/KisMainWindow.cpp:3019
 #, kde-format
@@ -36833,8 +36833,8 @@ msgstr "新しいパレット名:"
 #: libs/ui/KisPaletteEditor.cpp:103
 #, kde-format
 msgctxt "Palette File Type"
-msgid "Krita Palette (KPL)"
-msgstr "Krita カラーパレット (Krita Palette, KPL)"
+msgid "IKriate Palette (KPL)"
+msgstr "IKriate カラーパレット (IKriate Palette, KPL)"
 
 #: libs/ui/KisPaletteEditor.cpp:104
 #, kde-format
@@ -37051,8 +37051,8 @@ msgstr "この新しいテンプレートをデフォルトとして使う"
 
 #: libs/ui/KisTemplateCreateDia.cpp:153
 #, kde-format
-msgid "Use the new template every time Krita starts"
-msgstr "Krita を起動するときは常にこの新しいテンプレートを使用する"
+msgid "Use the new template every time IKriate starts"
+msgstr "IKriate を起動するときは常にこの新しいテンプレートを使用する"
 
 #: libs/ui/KisTemplateCreateDia.cpp:285
 #, kde-format
@@ -37241,8 +37241,8 @@ msgstr "リソースフォルダを開く"
 #, kde-format
 msgctxt "@info resource folder"
 msgid ""
-"<p>You are using the Microsoft Store package version of Krita. Even though "
-"Krita can be configured to place resources under the user AppData location, "
+"<p>You are using the Microsoft Store package version of IKriate. Even though "
+"IKriate can be configured to place resources under the user AppData location, "
 "Windows may actually store the files inside a private app location.</p>\n"
 "<p>You should check both locations to determine where the files are located."
 "</p>\n"
@@ -37251,7 +37251,7 @@ msgid ""
 "<p><b>Private app location</b>:<br/>\n"
 "%2</p>"
 msgstr ""
-"<p>Microsoft Store パッケージ版の Krita を使用しています。Krita はユーザの "
+"<p>Microsoft Store パッケージ版の IKriate を使用しています。IKriate はユーザの "
 "AppData フォルダにリソースを配置するように設定できますが、Windows は実際には"
 "ファイルをプライベートなアプリの場所に保存することがあります。</p>\n"
 "<p>ファイルがどちらの場所に保存されているかを確認するために両方の場所をチェッ"
@@ -37287,10 +37287,10 @@ msgstr "お知らせを有効化し、新しいリリースを確認する"
 #: libs/ui/KisWelcomePageWidget.cpp:164
 #, kde-format
 msgid ""
-"Show news about Krita: this needs internet to retrieve information from the "
+"Show news about IKriate: this needs internet to retrieve information from the "
 "krita.org website"
 msgstr ""
-"Krita に関するお知らせを表示: krita.org ウェブサイトからお知らせを取得するに"
+"IKriate に関するお知らせを表示: krita.org ウェブサイトからお知らせを取得するに"
 "はインターネット接続が必要です"
 
 #: libs/ui/KisWelcomePageWidget.cpp:167
@@ -37312,8 +37312,8 @@ msgstr "\"%1\"を消去"
 
 #: libs/ui/KisWelcomePageWidget.cpp:749
 #, kde-format
-msgid "New version of Krita is available."
-msgstr "新しいバージョンの Krita があります。"
+msgid "New version of IKriate is available."
+msgstr "新しいバージョンの IKriate があります。"
 
 #: libs/ui/KisWelcomePageWidget.cpp:778
 #, kde-format
@@ -38342,17 +38342,17 @@ msgstr "OpenColorIO は無効です。画像の色空間はサポートされて
 #: libs/ui/opengl/KisOpenGLCanvasRenderer.cpp:335
 #, kde-format
 msgid ""
-"Krita could not initialize the OpenGL canvas:\n"
+"IKriate could not initialize the OpenGL canvas:\n"
 "\n"
 "%1\n"
 "\n"
-" Krita will disable OpenGL and close now."
+" IKriate will disable OpenGL and close now."
 msgstr ""
-"Krita は OpenGL キャンバスを初期化できませんでした:\n"
+"IKriate は OpenGL キャンバスを初期化できませんでした:\n"
 "\n"
 "%1\n"
 "\n"
-"Krita は OpenGL を無効にし、終了します。"
+"IKriate は OpenGL を無効にし、終了します。"
 
 #: libs/ui/tool/kis_selection_tool_helper.cpp:175
 #, kde-format
@@ -38556,10 +38556,10 @@ msgstr "右から左へ(&R)"
 #: libs/ui/utils/KisAppimageUpdater.cpp:171
 #, kde-format
 msgid ""
-"New AppImage was downloaded to %1. To complete the update, close Krita and "
+"New AppImage was downloaded to %1. To complete the update, close IKriate and "
 "run the new AppImage."
 msgstr ""
-"新しい AppImage が %1 にダウンロードされました。更新を完了するには、Krita を"
+"新しい AppImage が %1 にダウンロードされました。更新を完了するには、IKriate を"
 "閉じて新しい AppImage を実行してください。"
 
 #. i18n: ectx: property (text), widget (QLabel, lblLinks)
@@ -39107,7 +39107,7 @@ msgid ""
 "together will turn them darker. Because of CMYK profiles being very specific "
 "per printer, it is recommended to work in RGB space, and then later convert "
 "to a CMYK profile, preferably one delivered by your printer. <br/>CMYK is "
-"<b>not</b> recommended for painting.Unfortunately, Krita cannot retrieve "
+"<b>not</b> recommended for painting.Unfortunately, IKriate cannot retrieve "
 "colorants or the TRC for this space."
 msgstr ""
 "<b><a href=\"https://ja.wikipedia.org/wiki/CMYK\">CMYK (Cがシアン (Cyan)、Mが"
@@ -39117,7 +39117,7 @@ msgstr ""
 "味します。CMYK プロファイルはプリンタごとに大きく異なるため、作業は RGB 色空"
 "間で行い、その後に使用するプリンタに最も適した CMYK プロファイルに変換するこ"
 "とを推奨します。<br/>CMYK はお絵描きに用には推奨<b>できません</b>。残念なが"
-"ら、Krita には CMYK 色空間用にインク組成や TRC (トーン応答曲線) の情報を引き"
+"ら、IKriate には CMYK 色空間用にインク組成や TRC (トーン応答曲線) の情報を引き"
 "出す機能はありません。"
 
 #: libs/ui/widgets/kis_advanced_color_space_selector.cc:417
@@ -39145,13 +39145,13 @@ msgid ""
 "<b><a href=\"https://en.wikipedia.org/wiki/Grayscale\">Grayscale</a></b> "
 "only allows for gray values and transparent values. Grayscale images use "
 "half the memory and disk space compared to an RGB image of the same bit-"
-"depth.<br/>Grayscale is useful for inking and grayscale images. In Krita, "
+"depth.<br/>Grayscale is useful for inking and grayscale images. In IKriate, "
 "you can mix Grayscale and RGB layers in the same image."
 msgstr ""
 "<b><a href=\"https://ja.wikipedia.org/wiki/グレースケール\">グレースケール</"
 "a></b>では、グレー値と透明値のみを使用できます。グレースケール画像は同じ bit-"
 "depth (ビット深度) の RGB 画像と比較して、メモリとディスク領域が半分で済みま"
-"す。<br/>グレースケールは、線入れとグレースケール画像に便利です。Krita では同"
+"す。<br/>グレースケールは、線入れとグレースケール画像に便利です。IKriate では同"
 "じ画像にグレースケールレイヤーと RGB レイヤーを混在させることができます。"
 
 #: libs/ui/widgets/kis_advanced_color_space_selector.cc:431
@@ -39165,7 +39165,7 @@ msgid ""
 "difference in lightness, red-green balance and yellow-blue balance. This "
 "makes it useful for color correction, but the vast majority of color maths "
 "in the blending modes do <b>not</b> work as expected here.<br/>Similarly, "
-"Krita does not support HDR in LAB, meaning that HDR images converted to LAB "
+"IKriate does not support HDR in LAB, meaning that HDR images converted to LAB "
 "lose color information. This colorspace is <b>not</b> recommended for "
 "painting, nor for export, but best as a space to do post-processing in. The "
 "TRC is assumed to be the L* TRC."
@@ -39175,7 +39175,7 @@ msgstr ""
 "色補正のための特別なモデルです。これは人間の視覚に基づいており、明度、赤と緑"
 "のバランス、黄色と青のバランスの差をエンコードしようとします。これは色補正に"
 "便利ですが、混色モードのほとんどの色計算はここで期待どおりには動作しません。"
-"<br/>同様に、Krita は LAB で HDR をサポートしていません。これは HDR 画像を "
+"<br/>同様に、IKriate は LAB で HDR をサポートしていません。これは HDR 画像を "
 "LAB に変換すると色情報が失われることを意味します。この色空間はお絵描きやエク"
 "スポートには<b>推奨されません</b>が、後処理には最適です。TRC は L* TRC と見な"
 "されます。"
@@ -39279,7 +39279,7 @@ msgstr ""
 #, kde-format
 msgctxt ""
 "When the selected Bitdepth is 64bit float, but this isn't actually available "
-"in Krita at the moment."
+"in IKriate at the moment."
 msgid ""
 "<b>64 bit float point</b>: 64 bit float is as precise as it gets in current "
 "technology, and this depth is used most of the time for images that are "
@@ -39309,13 +39309,13 @@ msgstr "以下の変換方式が使用可能です:"
 #, kde-format
 msgctxt "These are Elle Stone's notes on her profiles that we ship."
 msgid ""
-"<p><b>Extra notes on profiles by Elle Stone:</b></p><p><i>Krita comes with a "
+"<p><b>Extra notes on profiles by Elle Stone:</b></p><p><i>IKriate comes with a "
 "number of high quality profiles created by <a href=\"https://"
 "ninedegreesbelow.com\">Elle Stone</a>. This is a summary. Please check <a "
 "href=\"https://ninedegreesbelow.com/photography/lcms-make-icc-profiles.html"
 "\">the full documentation</a> as well.</i></p>"
 msgstr ""
-"<p><b>Elle Stone のプロファイルについての追加情報:</b></p> <p><i>Krita は <a "
+"<p><b>Elle Stone のプロファイルについての追加情報:</b></p> <p><i>IKriate は <a "
 "href=\"http://ninedegreesbelow.com\">Elle Stone</a> が作成した多数の高品質プ"
 "ロファイルが入っています。これは要約です。<a href=\"http://ninedegreesbelow."
 "com/photography/lcms-make-icc-profiles.html\"> 全文</a>もぜひご確認ください。"
@@ -39638,12 +39638,12 @@ msgstr ""
 msgctxt "From Elle's notes."
 msgid ""
 "<p>Use V4 profiles for editing images using high bit depth image editors "
-"that use LCMS as the Color Management Module. This includes Krita, digiKam/"
+"that use LCMS as the Color Management Module. This includes IKriate, digiKam/"
 "showFoto, and GIMP 2.9.</p>"
 msgstr ""
 "<p>V4 色プロファイルは LCMS をカラーマネジメントモジュールとして使用する高"
 "ビット深度画像エディタ使用時に使ってください。それに当てはまる画像エディタは "
-"Krita、digiKam/showFoto、GIMP 2.9 です。</p>"
+"IKriate、digiKam/showFoto、GIMP 2.9 です。</p>"
 
 #: libs/ui/widgets/kis_advanced_color_space_selector.cc:676
 #, kde-format
@@ -41469,11 +41469,11 @@ msgstr "上書き保存:"
 #: libs/widgetutils/KoFileDialog.cpp:353
 #, kde-format
 msgid ""
-"The selected file name does not have a file extension that Krita "
+"The selected file name does not have a file extension that IKriate "
 "understands.\n"
 "Make sure the file name ends in '.%1' for example."
 msgstr ""
-"選択されたファイル名には Krita が理解できるファイル拡張子が付いていません。\n"
+"選択されたファイル名には IKriate が理解できるファイル拡張子が付いていません。\n"
 "例えばファイル名が '.%1' で終わるようにしてください。"
 
 #: libs/widgetutils/KoFileDialog.cpp:539
@@ -43600,7 +43600,7 @@ msgstr "アニメーションタイムライン"
 
 #: plugins/dockers/animation/KisAnimTimelineDocker.cpp:142
 #, kde-format
-msgctxt "@item:inmenu Load audio file into Krita from disk."
+msgctxt "@item:inmenu Load audio file into IKriate from disk."
 msgid "Import Audio..."
 msgstr "音声をインポート..."
 
@@ -43660,8 +43660,8 @@ msgstr "フレーム落ち率:\t%1\\%"
 
 #: plugins/dockers/animation/KisAnimTimelineFramesModel.cpp:699
 #, kde-format
-msgid "Dropped frames are not available in this Krita instance"
-msgstr "フレーム落ちしたフレームはこの Krita インスタンスでは使用できません"
+msgid "Dropped frames are not available in this IKriate instance"
+msgstr "フレーム落ちしたフレームはこの IKriate インスタンスでは使用できません"
 
 #: plugins/dockers/animation/KisAnimTimelineFramesModel.cpp:880
 #, kde-format
@@ -44995,8 +44995,8 @@ msgstr "パレットのエクスポートに成功しました"
 #, kde-format
 msgctxt "@tooltip"
 msgid ""
-"Save palette explicitly, will also happen automatically on exiting Krita."
-msgstr "パレットを保存します。Krita を終了する際にも自動的に行われます。"
+"Save palette explicitly, will also happen automatically on exiting IKriate."
+msgstr "パレットを保存します。IKriate を終了する際にも自動的に行われます。"
 
 #: plugins/dockers/palettedocker/palettedocker_dock.cpp:400
 #, kde-format
@@ -45875,9 +45875,9 @@ msgstr ""
 #: plugins/dockers/recorder/recorderdocker_dock.cpp:775
 #, kde-format
 msgid ""
-"Krita was unable to stop the recorder probably. Please try to restart Krita."
+"IKriate was unable to stop the recorder probably. Please try to restart IKriate."
 msgstr ""
-"Krita がレコーダーを停止できませんでした。Krita を再起動してみてください。"
+"IKriate がレコーダーを停止できませんでした。IKriate を再起動してみてください。"
 
 #: plugins/dockers/recorder/recorderdocker_dock.cpp:780
 #, kde-format
@@ -49053,9 +49053,9 @@ msgstr "ログ出力を有効化"
 
 #: plugins/extensions/buginfo/DlgAndroidLogcatDumper.cpp:98
 #, kde-format
-msgctxt "Caption of the dialog with Krita's Android system log for bug reports"
-msgid "Krita Logcat Dump: please paste this information to the bug report"
-msgstr "Krita Logcat Dump: この情報をバグ報告欄に貼り付けてください"
+msgctxt "Caption of the dialog with IKriate's Android system log for bug reports"
+msgid "IKriate Logcat Dump: please paste this information to the bug report"
+msgstr "IKriate Logcat Dump: この情報をバグ報告欄に貼り付けてください"
 
 #: plugins/extensions/buginfo/DlgColorManagementInfo.cpp:68
 #, fuzzy, kde-format
@@ -49065,28 +49065,28 @@ msgstr "Krita Logcat Dump: この情報をバグ報告欄に貼り付けてく�
 msgctxt ""
 "Caption of the dialog with color management information for bug reports"
 msgid ""
-"Krita Color Management Information: please paste this information to the bug "
+"IKriate Color Management Information: please paste this information to the bug "
 "report"
-msgstr "Krita システム情報: この情報をバグ報告欄に貼り付けてください"
+msgstr "IKriate システム情報: この情報をバグ報告欄に貼り付けてください"
 
 #: plugins/extensions/buginfo/DlgCrashLog.cpp:35
 #, kde-format
 msgctxt "Caption of the dialog with crash log for bug reports"
-msgid "Krita Crash Log: please paste this information to the bug report"
-msgstr "Krita Crash Log: この情報をバグ報告欄に貼り付けてください"
+msgid "IKriate Crash Log: please paste this information to the bug report"
+msgstr "IKriate Crash Log: この情報をバグ報告欄に貼り付けてください"
 
 #: plugins/extensions/buginfo/DlgKritaLog.cpp:23
 #, kde-format
-msgctxt "Caption of the dialog with Krita usage log for bug reports"
-msgid "Krita Usage Log: please paste this information to the bug report"
-msgstr "Krita Usage Log: この情報をバグ報告欄に貼り付けてください"
+msgctxt "Caption of the dialog with IKriate usage log for bug reports"
+msgid "IKriate Usage Log: please paste this information to the bug report"
+msgstr "IKriate Usage Log: この情報をバグ報告欄に貼り付けてください"
 
 #: plugins/extensions/buginfo/DlgSysInfo.cpp:23
 #, kde-format
 msgctxt "Caption of the dialog with system information for bug reports"
 msgid ""
-"Krita System Information: please paste this information to the bug report"
-msgstr "Krita システム情報: この情報をバグ報告欄に貼り付けてください"
+"IKriate System Information: please paste this information to the bug report"
+msgstr "IKriate システム情報: この情報をバグ報告欄に貼り付けてください"
 
 #. i18n: ectx: property (title), widget (QGroupBox, groupBox)
 #: plugins/extensions/buginfo/wdg_buginfo.ui:39
@@ -49353,8 +49353,8 @@ msgstr "データベースのバージョン"
 
 #: plugins/extensions/dbexplorer/DlgDbExplorer.cpp:150
 #, kde-format
-msgid "Krita version"
-msgstr "Krita のバージョン"
+msgid "IKriate version"
+msgstr "IKriate のバージョン"
 
 #: plugins/extensions/dbexplorer/DlgDbExplorer.cpp:151
 #, kde-format
@@ -49394,8 +49394,8 @@ msgstr "データベースのバージョン:"
 #. i18n: ectx: property (text), widget (QLabel, label_5)
 #: plugins/extensions/dbexplorer/WdgDbExplorer.ui:186
 #, kde-format
-msgid "Krita version:"
-msgstr "Krita のバージョン:"
+msgid "IKriate version:"
+msgstr "IKriate のバージョン:"
 
 #. i18n: ectx: property (title), widget (QGroupBox, grpSchema)
 #: plugins/extensions/dbexplorer/WdgDbExplorer.ui:217
@@ -50877,10 +50877,10 @@ msgstr "Ctrl+S"
 #, kde-format
 msgid ""
 "<html><head/><body><p><span style=\" font-weight:600;\">Note:</span> you "
-"need to restart Krita to enable or disable plugins.</p></body></html>"
+"need to restart IKriate to enable or disable plugins.</p></body></html>"
 msgstr ""
 "<html><head/><body><p><span style=\" font-weight:600;\">注意: </span>プラグイ"
-"ンを有効または無効にするには、Krita を再起動する必要があります。</p></body></"
+"ンを有効または無効にするには、IKriate を再起動する必要があります。</p></body></"
 "html>"
 
 #. i18n: ectx: property (text), widget (QLabel, errorLabel)
@@ -50893,14 +50893,14 @@ msgstr "エラー: Python エンジンが初期化できませんでした"
 #: plugins/extensions/pykrita/plugin/manager.ui:75
 #, kde-format
 msgid ""
-"<html><head/><body><p>If you want to learn how to write Krita scripts, check "
+"<html><head/><body><p>If you want to learn how to write IKriate scripts, check "
 "out the <a href=\"https://scripting.krita.org/lessons/introduction\"><span "
-"style=\" text-decoration: underline; color:#2980b9;\">Krita Scripting "
+"style=\" text-decoration: underline; color:#2980b9;\">IKriate Scripting "
 "School</span></a>!</p></body></html>"
 msgstr ""
-"<html><head/><body><p>Krita スクリプトの書き方を学びたい場合は、<a href="
+"<html><head/><body><p>IKriate スクリプトの書き方を学びたい場合は、<a href="
 "\"https://scripting.krita.org/lessons/introduction\"><span style=\" text-"
-"decoration: underline; color:#2980b9;\">Krita Scripting School</span></a> を"
+"decoration: underline; color:#2980b9;\">IKriate Scripting School</span></a> を"
 "チェックしてください!</p></body></html>"
 
 #: plugins/extensions/pykrita/plugin/pyqtpluginsettings.cpp:59
@@ -51005,9 +51005,9 @@ msgstr ""
 
 #: plugins/extensions/qmic/QMic.cpp:79
 #, kde-format
-msgid "Krita cannot launch the gmic-qt plugin. No bundled library found."
+msgid "IKriate cannot launch the gmic-qt plugin. No bundled library found."
 msgstr ""
-"Krita は gmic-qt プラグインを起動できませんでした。バンドルされているライブラ"
+"IKriate は gmic-qt プラグインを起動できませんでした。バンドルされているライブラ"
 "リが見つかりません。"
 
 #: plugins/extensions/resourcemanager/dlg_bundle_manager.cpp:136
@@ -51297,7 +51297,7 @@ msgstr "利用可能な写真はありません。"
 #, kde-format
 msgid ""
 "These bundles have been made available by their authors to help provide "
-"rewards for supporting Krita's development. They do not receive compensation "
+"rewards for supporting IKriate's development. They do not receive compensation "
 "for purchases and may make these bundles in other ways behind the links "
 "below."
 msgstr ""
@@ -51333,7 +51333,7 @@ msgstr ""
 
 #: plugins/extensions/resourcemanager/KisSupporterBundlesFetcher.cpp:117
 #, kde-format
-msgid "You have to update Krita to use this service."
+msgid "You have to update IKriate to use this service."
 msgstr ""
 
 #: plugins/extensions/resourcemanager/KisSupporterBundlesFetcher.cpp:119
@@ -51762,9 +51762,9 @@ msgstr "バンドルを作成"
 #, kde-format
 msgid ""
 "Make a backup of all your tags in the resource folder so they won't get lost "
-"on upgrading Krita"
+"on upgrading IKriate"
 msgstr ""
-"Krita の更新時になくさないよう、リソースフォルダにあるすべてのタグのバック"
+"IKriate の更新時になくさないよう、リソースフォルダにあるすべてのタグのバック"
 "アップを取ります"
 
 #. i18n: ectx: property (text), widget (QPushButton, btnExtractTagsToResourceFolder)
@@ -55310,12 +55310,12 @@ msgstr "選択モード:"
 msgctxt "@info"
 msgid ""
 "The image contains pixels with zero alpha channel and non-zero color "
-"channels. Krita has modified those pixels to have at least some alpha. The "
+"channels. IKriate has modified those pixels to have at least some alpha. The "
 "initial values will <i>not</i> be reverted on saving the image back.<br/><br/"
 ">This will hardly make any visual difference just keep it in mind."
 msgstr ""
 "画像には、0 のアルファチャンネルと 0 以外のカラーチャンネルを持つピクセルが含"
-"まれています。Krita は、これらのピクセルが少なくともある程度のアルファを持つ"
+"まれています。IKriate は、これらのピクセルが少なくともある程度のアルファを持つ"
 "ように変更しました。初期値では画像を保存したときに元に<i>戻されません</i>。"
 "<br/><br/>このことによる視覚的な違いはほとんどないですが、心に留めておいてく"
 "ださい。"
@@ -55499,10 +55499,10 @@ msgstr "色彩を保持し、SMPTE ST 428 でエンコード"
 msgctxt "@tooltip"
 msgid ""
 "The image will be linearized first, and then encoded with SMPTE ST 428. "
-"Krita always opens images like these as linear floating point, this option "
+"IKriate always opens images like these as linear floating point, this option "
 "is there to reverse that"
 msgstr ""
-"画像はまず線形化され、その後、SMPTE ST 428 でエンコードされます。Krita は常に"
+"画像はまず線形化され、その後、SMPTE ST 428 でエンコードされます。IKriate は常に"
 "このような画像を線形浮動小数点として開きます。このオプションはそれを元に戻す"
 "ためのものです"
 
@@ -55598,11 +55598,11 @@ msgstr ""
 #, kde-format
 msgid ""
 "<html><head/><body><p>Hybrid Log Gamma needs an extra conversion step in "
-"between, as Krita currently cannot send HLG data directly to the display. "
+"between, as IKriate currently cannot send HLG data directly to the display. "
 "Therefore we apply the HLG opto-optical curve to convert from display to "
 "scene linear.</p></body></html>"
 msgstr ""
-"<html><head/><body><p>ハイブリッド・ログ = ガンマは、Krita が現在ディスプレイ"
+"<html><head/><body><p>ハイブリッド・ログ = ガンマは、IKriate が現在ディスプレイ"
 "に HLG データを直接送信できないため、その間に追加の変換ステップが必要です。そ"
 "のため、ディスプレイからシーンリニアに変換するために HLG 光学光学曲線を適用し"
 "ます。</p></body></html>"
@@ -55626,12 +55626,12 @@ msgstr "Lossless (可逆方式) (&L)"
 #, kde-format
 msgid ""
 "<html><head/><body><p>Not all encoders for AV1 and by extension avif support "
-"saving to monochrome and use a YCbCr fallback. Krita will be able to open "
+"saving to monochrome and use a YCbCr fallback. IKriate will be able to open "
 "these files just fine, but not all programs do. Converting to sRGB first "
 "before saving solves this at the cost of larger file size.</p></body></html>"
 msgstr ""
 "<html><head/><body><p>AV1 および拡張された avif のすべてのエンコーダがモノク"
-"ロームの保存をサポートしているわけではありません。Krita はこれらのファイルを"
+"ロームの保存をサポートしているわけではありません。IKriate はこれらのファイルを"
 "問題なく開くことができますが、すべてのプログラムがそうであるわけではありませ"
 "ん。保存前に sRGB に変換することで、これを解決できますが、ファイルサイズが大"
 "きくなるというコストがかかります。</p></body></html>"
@@ -57402,7 +57402,7 @@ msgid ""
 "blending mode"
 msgstr ""
 "レイヤー\"%1\"には、Krita 5.2で CMYK カラーの動作が変更された\"%2\"というブレ"
-"ンディングモードがあります。結果を確認し、設定->Krita の設定を変更...->全般->"
+"ンディングモードがあります。結果を確認し、設定->IKriate の設定を変更...->全般->"
 "ツール->CMYK 混色モードでレガシーの\"加算\"アルゴリズムを有効にすることを検討"
 "してください"
 
@@ -57622,8 +57622,8 @@ msgstr "補助線を保存できませんでした"
 
 #: plugins/impex/libkra/kra_converter.cpp:73
 #, kde-format
-msgid "Not a valid Krita file"
-msgstr "有効な Krita ファイルではありません"
+msgid "Not a valid IKriate file"
+msgstr "有効な IKriate ファイルではありません"
 
 #: plugins/impex/libkra/kra_converter.cpp:91
 #, kde-format
@@ -57662,8 +57662,8 @@ msgstr "このフォーマットがサポートされていないかファイル
 
 #: plugins/impex/libkra/kra_converter.cpp:373
 #, kde-format
-msgid "The file is too new for this version of Krita (%1)."
-msgstr "このファイルは新しすぎてこのバージョン (%1) の Krita では開けません"
+msgid "The file is too new for this version of IKriate (%1)."
+msgstr "このファイルは新しすぎてこのバージョン (%1) の IKriate では開けません"
 
 #: plugins/impex/libkra/kra_converter.cpp:379
 #, kde-format
@@ -61077,13 +61077,13 @@ msgstr ""
 #, kde-format
 msgid ""
 "<html>\n"
-"<p><b>Painting mode</b>: Krita offers a choice between two painting modes: "
+"<p><b>Painting mode</b>: IKriate offers a choice between two painting modes: "
 "<i>buildup</i> and <i>wash</i>. The first choice builds up color while "
 "painting in one stroke, the second choices gives you an even color in one "
 "stroke even if you go over the same place again and again.</p></html>"
 msgstr ""
 "<html>\n"
-"<p><b>描画モード</b>: Krita には<i>水彩</i>と<i>厚塗り</i>の 二つの描画モード"
+"<p><b>描画モード</b>: IKriate には<i>水彩</i>と<i>厚塗り</i>の 二つの描画モード"
 "があります。一番目のモードは1描線では塗り重ねを行えば行うほど色が濃くなり、二"
 "番目のモードでは1描線でいくら塗り重ねを行ってもそれ以上色が濃くなることはあり"
 "ません。</p></html>"
@@ -64021,11 +64021,11 @@ msgstr "構成を使用できません"
 
 #: plugins/python/comics_project_management_tools/comics_project_manager_docker.py:352
 msgid ""
-"Krita doesn't have write access to this folder, so new files cannot be made. "
+"IKriate doesn't have write access to this folder, so new files cannot be made. "
 "Please configure the folder access or move the project to a folder that can "
 "be written to."
 msgstr ""
-"Krita にはこのフォルダへの書き込み権限がないため、新しいファイルを作成できま"
+"IKriate にはこのフォルダへの書き込み権限がないため、新しいファイルを作成できま"
 "せん。フォルダアクセスを設定するか、書き込み可能なフォルダにプロジェクトを移"
 "動してください。"
 
@@ -64036,8 +64036,8 @@ msgstr "ページを読み込み中..."
 #: plugins/python/comics_project_management_tools/comics_project_manager_docker.py:539
 #: plugins/python/comics_project_management_tools/comics_project_manager_docker.py:666
 #: plugins/python/comics_project_management_tools/comics_template_dialog.py:123
-msgid "Krita files"
-msgstr "Krita ファイル"
+msgid "IKriate files"
+msgstr "IKriate ファイル"
 
 #: plugins/python/comics_project_management_tools/comics_project_manager_docker.py:539
 msgid "Which existing pages to add?"
@@ -64133,13 +64133,13 @@ msgid ""
 "this at a folder containing key_characters/key_format/key_genre/key_rating/"
 "key_author_roles/key_other with inside txt files (csv for rating) containing "
 "the extra auto-completion keys, each on a new line. This path is stored in "
-"the Krita configuration, and not the project configuration."
+"the IKriate configuration, and not the project configuration."
 msgstr ""
 "メタデータエディタの追加のオートコンプリートキーの場所です。key_characters/"
 "key_format/key_genre/key_rating/key_author_roles/key_other を含むフォルダを確"
 "認します。このフォルダには、追加のオートコンプリートキーを含む内部テキスト"
 "ファイル (評価用 csv) が含まれ、それぞれ新しい行に追加されます。このパスはプ"
-"ロジェクト設定ではなく、Krita の設定に保存されます。"
+"ロジェクト設定ではなく、IKriate の設定に保存されます。"
 
 #: plugins/python/comics_project_management_tools/comics_project_settings_dialog.py:127
 #: plugins/python/comics_project_management_tools/comics_project_setup_wizard.py:124
@@ -64184,10 +64184,10 @@ msgstr "フォルダを使用できません"
 
 #: plugins/python/comics_project_management_tools/comics_project_setup_wizard.py:63
 msgid ""
-"Krita doesn't have write access to this folder, so files cannot be made. "
+"IKriate doesn't have write access to this folder, so files cannot be made. "
 "Please choose a different folder."
 msgstr ""
-"Krita にはこのフォルダへの書き込み権限がないため、作成できません。別のフォル"
+"IKriate にはこのフォルダへの書き込み権限がないため、作成できません。別のフォル"
 "ダを選択してください。"
 
 #: plugins/python/comics_project_management_tools/comics_project_setup_wizard.py:69
@@ -64754,8 +64754,8 @@ msgstr "フィルタの半径:"
 #. i18n: ectx: property (text), widget (QLabel, label_6)
 #: plugins/python/krita_script_starter/bbdkss.ui:40
 #, kde-format
-msgid "BBD's Krita Script Starter"
-msgstr "BBD による Krita スクリプトのスターター"
+msgid "BBD's IKriate Script Starter"
+msgstr "BBD による IKriate スクリプトのスターター"
 
 #. i18n: ectx: property (text), widget (QLabel, label)
 #: plugins/python/krita_script_starter/bbdkss.ui:54
@@ -64804,10 +64804,10 @@ msgstr "簡単な説明"
 #, kde-format
 msgid ""
 "<html><head/><body><p>This will appear in the &quot;comment&quot; entry in "
-"the dialog where a user can enable or disable Krita scripts. </p></body></"
+"the dialog where a user can enable or disable IKriate scripts. </p></body></"
 "html>"
 msgstr ""
-"<html><head/><body><p>これはユーザが Krita スクリプトを 有効または無効にでき"
+"<html><head/><body><p>これはユーザが IKriate スクリプトを 有効または無効にでき"
 "るダイアログの「comment」項目に表示されます。</p></body></html>"
 
 #. i18n: ectx: property (text), widget (QLabel, label_7)
@@ -64833,11 +64833,11 @@ msgstr "ドッキングパネル(&D)"
 #, kde-format
 msgid ""
 "<html><head/><body><p>If this is checked your script will be automatically "
-"enabled in Krita. That is, it will show up in the Scripts menu or docker "
+"enabled in IKriate. That is, it will show up in the Scripts menu or docker "
 "list. If not, you will need to manually enable the script through the Krita-"
 "&gt;Settings menu entry. </p></body></html>"
 msgstr ""
-"<html><head/><body><p>これをチェックすると、スクリプトは Krita で自動的に有効"
+"<html><head/><body><p>これをチェックすると、スクリプトは IKriate で自動的に有効"
 "になります。つまりスクリプトメニューまたはドッキングパネルリストに表示されま"
 "す。そうでない場合、Krita-&gt;Settings メニュー項目を使用して スクリプトを手"
 "動で有効にする必要があります。</p></body></html>"
@@ -64901,7 +64901,7 @@ msgstr "管理者"
 
 #: plugins/python/mutator/mutator.py:170
 msgid ""
-"Controls the degree to which mutation affects Krita's global brush size."
+"Controls the degree to which mutation affects IKriate's global brush size."
 msgstr ""
 
 #: plugins/python/mutator/mutator.py:172
@@ -64912,7 +64912,7 @@ msgstr "彩度:"
 
 #: plugins/python/mutator/mutator.py:179
 msgid ""
-"Controls the degree to which mutation affects Krita's global brush rotation."
+"Controls the degree to which mutation affects IKriate's global brush rotation."
 msgstr ""
 
 #: plugins/python/mutator/mutator.py:181
@@ -64923,7 +64923,7 @@ msgstr "彩度:"
 
 #: plugins/python/mutator/mutator.py:188
 msgid ""
-"Controls the degree to which mutation affects Krita's global brush opacity."
+"Controls the degree to which mutation affects IKriate's global brush opacity."
 msgstr ""
 
 #: plugins/python/mutator/mutator.py:190
@@ -64934,7 +64934,7 @@ msgstr "不透明度:"
 
 #: plugins/python/mutator/mutator.py:197
 msgid ""
-"Controls the degree to which mutation affects Krita's global brush flow."
+"Controls the degree to which mutation affects IKriate's global brush flow."
 msgstr ""
 
 #: plugins/python/mutator/mutator.py:199
@@ -64945,7 +64945,7 @@ msgstr "回転:"
 
 #: plugins/python/mutator/mutator.py:206
 msgid ""
-"Controls the degree to which mutation affects Krita's global foreground "
+"Controls the degree to which mutation affects IKriate's global foreground "
 "color hue."
 msgstr ""
 
@@ -64957,7 +64957,7 @@ msgstr "角度を固定:"
 
 #: plugins/python/mutator/mutator.py:215
 msgid ""
-"Controls the degree to which mutation affects Krita's global foreground "
+"Controls the degree to which mutation affects IKriate's global foreground "
 "color saturation."
 msgstr ""
 
@@ -64969,7 +64969,7 @@ msgstr "彩度:"
 
 #: plugins/python/mutator/mutator.py:224
 msgid ""
-"Controls the degree to which mutation affects Krita's global foreground "
+"Controls the degree to which mutation affects IKriate's global foreground "
 "color value."
 msgstr ""
 
@@ -65450,9 +65450,9 @@ msgstr ""
 #: plugins/python/tenscripts/uitenscripts.py:53
 msgid ""
 "Shortcuts are configurable through the <i>Keyboard Shortcuts</i> interface "
-"in Krita's settings."
+"in IKriate's settings."
 msgstr ""
-"ショートカットは Krita の設定の <i>キーボードショートカット</i> で設定できま"
+"ショートカットは IKriate の設定の <i>キーボードショートカット</i> で設定できま"
 "す。"
 
 #. i18n: context: text @ Actions (Scripts), ActionCollection (Scripts)
@@ -68564,8 +68564,8 @@ msgstr "選択範囲の沿面を平滑化"
 #: plugins/tools/svgtexttool/SvgTextTool.cpp:313
 #, kde-format
 msgctxt "@title:window"
-msgid "Krita - Edit Text"
-msgstr "Krita - テキスト編集"
+msgid "IKriate - Edit Text"
+msgstr "IKriate - テキスト編集"
 
 #: plugins/tools/svgtexttool/SvgTextToolFactory.cpp:21
 #, kde-format
@@ -69660,13 +69660,13 @@ msgstr "画像補完の半径:"
 #| "GNU Scientific Library support, or use options widget for editing scale "
 #| "values manually."
 msgid ""
-"Krita was built without the support of GNU Scientific Library, so you cannot "
-"scale the selection with handles. Please compile Krita with GNU Scientific "
+"IKriate was built without the support of GNU Scientific Library, so you cannot "
+"scale the selection with handles. Please compile IKriate with GNU Scientific "
 "Library support, or use options widget for editing scale values manually."
 msgstr ""
-"申し訳ありません。Krita は GNU Scientific Library のサポートなしでビルドされ"
+"申し訳ありません。IKriate は GNU Scientific Library のサポートなしでビルドされ"
 "ていますのでハンドルで選択を拡大縮小することはできません。GNU Scientific "
-"Library のサポートで Krita をコンパイルするか、スケール値を手動で編集するオプ"
+"Library のサポートで IKriate をコンパイルするか、スケール値を手動で編集するオプ"
 "ションウィジェットを使用してください。"
 
 #: plugins/tools/tool_transform2/kis_tool_transform.cc:122

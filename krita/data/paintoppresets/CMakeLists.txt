@@ -1,30 +1,8 @@
-install( FILES
-a\)_Eraser_Circle.kpp
-b\)_Basic-5_Size_default.kpp
-j\)_WaterC_Basic_Lines-Dry.kpp
-j\)_WaterC_Basic_Lines-Wet.kpp
-j\)_WaterC_Basic_Lines-Wet-Pattern.kpp
-j\)_WaterC_Basic_Round-Fringe_02.kpp
-j\)_WaterC_Basic_Round-Grain.kpp
-j\)_WaterC_Basic_Round-Grunge.kpp
-j\)_WaterC_Flat_Big-Grain_Tilt.kpp
-j\)_WaterC_Flat_Decay_Tilt.kpp
-j\)_WaterC_Special_Blobs.kpp
-j\)_WaterC_Special_Splats.kpp
-j\)_WaterC_Spread.kpp
-j\)_WaterC_Spread-Pattern.kpp
-j\)_WaterC_Spread_WideArea.kpp
-j\)_WaterC_Water-Pattern.kpp
-DESTINATION  ${KDE_INSTALL_DATADIR}/krita/paintoppresets)
-
+# IKriate: the default presets now live in IKriate_Brushes.bundle (see
+# packaging/branding/make-bundles.py). Only the tags are installed here: the
+# brush categories shown by the brush panel, and the favourites tag.
+file(GLOB IKRIATE_CATEGORY_TAGS ${CMAKE_CURRENT_SOURCE_DIR}/ikriate-*.tag)
 install( FILES
     "Favorites.tag"
-    "Pixel_Art.tag"
-    Digital.tag        
-    Erasers.tag
-    FX.tag   
-    Ink.tag  
-    Paint.tag        
-    Sketch.tag
-    Textures.tag
+    ${IKRIATE_CATEGORY_TAGS}
 DESTINATION  ${KDE_INSTALL_DATADIR}/krita/paintoppresets)

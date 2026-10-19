@@ -49,8 +49,8 @@
        <item>
         <widget class="QLabel" name="m_lblNoBenefits">
          <property name="text">
-          <string>No supporter benefits available on this version of Krita.
-You can still support Krita by donating.</string>
+          <string>No supporter benefits available on this version of IKriate.
+You can still support IKriate by donating.</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>

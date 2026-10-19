@@ -140,10 +140,13 @@ void KisConfig::logImportantSettings() const
 
 KisConfig::TouchPainting KisConfig::touchPainting(bool defaultValue) const
 {
+    // IKriate: only the pen paints by default; a finger pans, pinches and
+    // rotates. Krita's "auto" mode let fingers paint until the first pen event
+    // of the session, so the first touch after start-up left marks.
     if (defaultValue) {
-        return TOUCH_PAINTING_AUTO;
+        return TOUCH_PAINTING_DISABLED;
     } else {
-        int value = m_cfg.readEntry("touchPainting", int(TOUCH_PAINTING_AUTO));
+        int value = m_cfg.readEntry("touchPainting", int(TOUCH_PAINTING_DISABLED));
         return TouchPainting(value);
     }
 }
@@ -1307,7 +1310,8 @@ void KisConfig::setCanvasBorderColor(const QColor& color) const
 
 bool KisConfig::hideScrollbars(bool defaultValue) const
 {
-    return (defaultValue ? false : m_cfg.readEntry("hideScrollbars", false));
+    // IKriate: the canvas is panned with gestures; scroll bars are opt-in.
+    return (defaultValue ? true : m_cfg.readEntry("hideScrollbars", true));
 }
 
 void KisConfig::setHideScrollbars(bool value) const

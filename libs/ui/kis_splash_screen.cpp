@@ -135,6 +135,8 @@ void KisSplashScreen::updateSplashImage()
     // Place logo to the left of banner.
     m_brandingSvg->setFixedSize(bannerHeight, bannerHeight);
     m_brandingSvg->move(m_bannerSvg->x() - m_brandingSvg->width(), marginTop);
+    // IKriate's banner already includes the logo.
+    m_brandingSvg->hide();
 
     // Place loading text immediately below.
     m_loadingTextLabel->move(marginRight, m_brandingSvg->geometry().bottom());
@@ -207,24 +209,16 @@ void KisSplashScreen::displayLinks(bool show) {
         lblLinksText    << "<html>"
                         << "<head/>"
                         << "<body><table style=\"width:100%\" cellpadding=\"30\"><tr><td>"
-                        << i18n("<p><span style=\" color:%1;\"><b>Using Krita</b></span></p>",color);
+                        << i18n("<p><span style=\" color:%1;\"><b>Using IKriate</b></span></p>",color);
 
-#ifdef Q_OS_MACOS
-        // macOS store version should not contain external links containing donation buttons or forms
-        if (!KisMacosEntitlements().sandbox()) {
-#endif
-
-            lblLinksText    << i18n("<p><a href=\"https://krita.org/support-us/\"><span style=\" text-decoration: underline; color:%1;\">Support Krita's Development!</span></a></p>",color)
-                            << i18n("<p><a href=\"https://krita.org/\"><span style=\" text-decoration: underline; color:%1;\">Krita Website</span></a></p>",color);
-#ifdef Q_OS_MACOS
-        }
-#endif
-        lblLinksText    << i18n("<p><a href=\"https://docs.krita.org/en/user_manual/getting_started.html\"><span style=\" text-decoration: underline; color:%1;\">Getting Started</span></a></p>",color)
-                        << i18n("<p><a href=\"https://docs.krita.org/\"><span style=\" text-decoration: underline; color:%1;\">Manual</span></a></p>",color)
+        // IKriate: no donation or Krita website links; IKriate is not part of
+        // the Krita Foundation's projects. The painting manual still applies.
+        lblLinksText    << i18n("<p><a href=\"https://github.com/DR-KD1997/IKriate#readme\"><span style=\" text-decoration: underline; color:%1;\">IKriate Guide</span></a></p>",color)
+                        << i18n("<p><a href=\"https://docs.krita.org/\"><span style=\" text-decoration: underline; color:%1;\">Painting Manual (upstream)</span></a></p>",color)
                         << "</td><td>"
-                        << i18n("<p><span style=\" color:%1;\"><b>Coding Krita</b></span></p>",color)
-                        << i18n("<p><a href=\"https://krita-artists.org\"><span style=\" text-decoration: underline; color:%1;\">User Community</span></a></p>",color)
-                        << i18n("<p><a href=\"https://invent.kde.org/graphics/krita\"><span style=\" text-decoration: underline; color:%1;\">Source Code</span></a></p>",color)
+                        << i18n("<p><span style=\" color:%1;\"><b>Development</b></span></p>",color)
+                        << i18n("<p><a href=\"https://github.com/DR-KD1997/IKriate/issues\"><span style=\" text-decoration: underline; color:%1;\">Report a Problem</span></a></p>",color)
+                        << i18n("<p><a href=\"https://github.com/DR-KD1997/IKriate\"><span style=\" text-decoration: underline; color:%1;\">Source Code</span></a></p>",color)
                         << i18n("<p><a href=\"https://api.kde.org/krita/html/classKrita.html\"><span style=\" text-decoration: underline; color:%1;\">Scripting API</span></a></p>",color)
                         << i18n("<p><a href=\"https://scripting.krita.org/lessons/introduction\"><span style=\" text-decoration: underline; color:%1;\">Scripting School</span></a></p>",color)
                         << "</td></tr></table></body>"
@@ -270,7 +264,9 @@ void KisSplashScreen::setLoadingText(QString text)
 
 KisSplashScreen::Source KisSplashScreen::getImageSource()
 {
-    QString artistCredit = i18nc("Normal splash artist name", "Tyson Tan");
+    // IKriate: the splash artwork is IKriate's own (krita/data/splash), so it
+    // carries no artist credit; the upstream artwork is not shipped.
+    QString artistCredit;
     // Loading the ginormous 4K PNG splash image increases the startup time on
     // Android by several seconds and at the same time looks really bad when
     // scaled down to a dinky size. Instead of overengineering this into an

@@ -161,7 +161,7 @@ KisWelcomePageWidget::KisWelcomePageWidget(QWidget *parent)
     newsOptionsMenu->setToolTipsVisible(true);
     ShowNewsAction *showNewsAction = new ShowNewsAction(i18n("Enable news and check for new releases"), newsOptionsMenu);
     newsOptionsMenu->addAction(showNewsAction);
-    showNewsAction->setToolTip(i18n("Show news about Krita: this needs internet to retrieve information from the krita.org website"));
+    showNewsAction->setToolTip(i18n("Show news about IKriate: this needs internet to retrieve information from the krita.org website"));
     showNewsAction->setCheckable(true);
 
     newsOptionsMenu->addSection(i18n("Language"));
@@ -361,10 +361,10 @@ void KisWelcomePageWidget::slotUpdateThemeColors()
                         .append(i18n("User Manual")).append("</a>"));
 
     supportKritaLink->setText(QString("<a style=\"color: " + blendedColor.name() + " \" href=\"https://krita.org/support-us/donations?" + analyticsString + "donations" + "\">")
-                              .append(i18n("Support Krita")).append("</a>"));
+                              .append(i18n("Support IKriate")).append("</a>"));
 
     kritaWebsiteLink->setText(QString("<a style=\"color: " + blendedColor.name() + " \" href=\"https://www.krita.org?" + analyticsString + "marketing-site" + "\">")
-                              .append(i18n("Krita Website")).append("</a>"));
+                              .append(i18n("IKriate Website")).append("</a>"));
 
     sourceCodeLink->setText(QString("<a style=\"color: " + blendedColor.name() + " \" href=\"https://invent.kde.org/graphics/krita\">")
                             .append(i18n("Source Code")).append("</a>"));
@@ -746,7 +746,7 @@ void KisWelcomePageWidget::updateVersionUpdaterFrame()
     if (m_updaterStatus.status() == UpdaterStatus::StatusID::UPDATE_AVAILABLE) {
         updaterFrame->setVisible(true);
         updaterFrame->setEnabled(true);
-        versionLabelText = i18n("New version of Krita is available.");
+        versionLabelText = i18n("New version of IKriate is available.");
         versionNotificationLabel->setVisible(true);
         updateIcon->setIcon(KisIconUtils::loadIcon("update-medium"));
 
@@ -841,7 +841,7 @@ void KisWelcomePageWidget::initDonations()
     } else {
         QVector<QString> headlines = {
             i18n("Become a Supporter!"),
-            i18n("Support Krita!"),
+            i18n("Support IKriate!"),
         };
         QVector<QString> subtitles = {
             i18n("Supporters get brush packs and more."),

@@ -179,8 +179,8 @@ RenderedFrames KisDlgImportVideoAnimation::renderFrames(const QDir& directory)
     const float nDuplicateSensitivity = m_ui.sensitivitySpinbox->value() / m_ui.sensitivitySpinbox->maximum();
 
     if (exportDuration / fps > 100.0) {
-        if (QMessageBox::warning(this, i18nc("Title for a messagebox", "Krita"),
-                             i18n("Warning: you are trying to import more than 100 frames into Krita.\n\n"
+        if (QMessageBox::warning(this, i18nc("Title for a messagebox", "IKriate"),
+                             i18n("Warning: you are trying to import more than 100 frames into IKriate.\n\n"
                                   "This means you might be overloading your system.\n"
                                   "If you want to edit a clip larger than 100 frames, consider using a real video editor, like Kdenlive (https://kdenlive.org)."),
                                  QMessageBox::Ok | QMessageBox::Cancel,
@@ -517,7 +517,7 @@ void KisDlgImportVideoAnimation::slotImportDurationChanged(qreal time)
                || m_videoInfo.colorTransfer == TRC_SMPTE_ST_428_1) {
         warnings.append(text_frames);
         QString text_trc =  i18nc("part of warning in video importer."
-                                  , "Krita does not support the video transfer curve (%1), it will be loaded as linear."
+                                  , "IKriate does not support the video transfer curve (%1), it will be loaded as linear."
                                   , KoColorProfile::getTransferCharacteristicName(m_videoInfo.colorTransfer));
         warnings.append(text_trc);
     }
