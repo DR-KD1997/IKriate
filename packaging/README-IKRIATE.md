@@ -120,6 +120,11 @@ marked `IKRIATE-REBRAND: skip` (the About dialog, which credits Krita by name).
 |---|---|
 | `libs/ui/ikriate/IkInterfaceManager.*` | Layout switching, platform defaults, draw/erase/smudge mode, menus, hiding the desktop chrome |
 | `libs/ui/ikriate/IkLayouts.*`, `IkDesktopLayout.cpp`, `IkKriateLayout.cpp`, `IkMinimalLayout.cpp` | The three canvas layouts |
+| `libs/ui/ikriate/IkLayoutEditing.cpp` | Edit Interface: button docks, drag and drop, saved arrangements (`[IKriateArrangement]`) |
+| `libs/ui/ikriate/IkTouchGestures.*` | Multi-finger taps and double taps on the canvas (`[IKriateGestures]`) |
+| `libs/ui/ikriate/IkPractice.*` | Practice activities (timed, memory, value study, warm-up) |
+| `libs/ui/ikriate/IkLayerAdjust.*` | Layer hue/saturation/brightness and colour balance |
+| `libs/ui/ikriate/IkWindowFrames.*` | Rounded accent outline on dialogs, menus and pop-up windows |
 | `libs/ui/ikriate/IkHomeScreen.*`, `IkNewCanvasDialog.*`, `IkRecycleBin.*` | Gallery, create menu, New Canvas and Template sheets, recycle bin |
 | `libs/ui/ikriate/IkSettingsPage.*` | Settings (theme, layout, language, advanced, clean-up) |
 | `libs/ui/ikriate/IkBrushLibrary.*`, `IkStrokePreview.*` | Brush library and stroke previews |

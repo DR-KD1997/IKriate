@@ -33,6 +33,9 @@ public:
     static bool brushGhostingRemoved();
     static void setBrushGhostingRemoved(bool removed);
 
+    int currentSection() const;
+    void openSection(int section);
+
 public Q_SLOTS:
     void reload();
 

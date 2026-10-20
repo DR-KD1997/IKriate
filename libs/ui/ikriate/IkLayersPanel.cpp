@@ -339,10 +339,10 @@ void IkLayersPanel::showLayerMenu(KisNodeSP node, const QPoint &globalPos)
     QLabel *ol1 = new QLabel(i18n("Opacity"), ow);
     ol->addWidget(ol1);
     IkSlider *opacity = new IkSlider(ow);
-    opacity->setMinimumWidth(160);
+    opacity->setMinimumWidth(IkStyle::scaled(160));
     opacity->setValue(node->opacity() / 255.0);
     QLabel *ov = new QLabel(QStringLiteral("%1%").arg(qRound(node->opacity() / 2.55)), ow);
-    ov->setMinimumWidth(40);
+    ov->setMinimumWidth(IkStyle::scaled(40));
     ol->addWidget(opacity, 1);
     ol->addWidget(ov);
     const quint8 originalOpacity = node->opacity();

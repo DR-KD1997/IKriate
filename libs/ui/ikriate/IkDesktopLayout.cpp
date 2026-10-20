@@ -97,11 +97,20 @@ IkDesktopLayout::IkDesktopLayout(IkInterfaceManager *mgr)
     titles->addWidget(m_subtitle);
     top->addLayout(titles);
     top->addStretch(1);
-    top->addWidget(actionButton(m_top, QStringLiteral("undo"), i18n("Undo"), QStringLiteral("edit_undo")));
-    top->addWidget(actionButton(m_top, QStringLiteral("redo"), i18n("Redo"), QStringLiteral("edit_redo")));
+    QHBoxLayout *topBox = new QHBoxLayout();
+    topBox->setSpacing(6);
+    top->addLayout(topBox);
+    topBox->addWidget(actionButton(m_top, QStringLiteral("undo"), i18n("Undo"), QStringLiteral("edit_undo")));
+    topBox->addWidget(actionButton(m_top, QStringLiteral("redo"), i18n("Redo"), QStringLiteral("edit_redo")));
+    topBox->addWidget(symmetryButton(m_top));
+    topBox->addWidget(toolButton(m_top, QStringLiteral("reference"), i18n("Reference images"), QStringLiteral("ToolReferenceImages")));
     top->addWidget(new IkSeparatorLine(m_top));
-    top->addWidget(actionButton(m_top, QStringLiteral("mirror"), i18n("Mirror view"), QStringLiteral("mirror_canvas")));
-    top->addWidget(toolButton(m_top, QStringLiteral("reference"), i18n("Reference images"), QStringLiteral("ToolReferenceImages")));
+    auto barStyle = [](IkIconButton *b) {
+        b->setVariant(IkIconButton::Ghost);
+        b->setEdge(-1);
+        b->setIconPixelSize(-1);
+    };
+    addDock(QStringLiteral("top"), m_top, topBox, barStyle);
     IkTextButton *zoom = new IkTextButton(QStringLiteral("100%"), IkTextButton::Filled, m_top);
     zoom->setRadius(10);
     zoom->setFontScale(1.0, QFont::DemiBold);
@@ -147,9 +156,17 @@ IkDesktopLayout::IkDesktopLayout(IkInterfaceManager *mgr)
     QVBoxLayout *rail = new QVBoxLayout(m_rail);
     rail->setContentsMargins(8, 12, 8, 12);
     rail->setSpacing(4);
-    auto railButton = [&](IkIconButton *b) {
+    QVBoxLayout *railBox = new QVBoxLayout();
+    railBox->setSpacing(4);
+    rail->addLayout(railBox);
+    auto railStyle = [ts](IkIconButton *b) {
+        b->setVariant(IkIconButton::Ghost);
         b->setEdge(ts + 8);
-        rail->addWidget(b, 0, Qt::AlignHCenter);
+        b->setIconPixelSize(-1);
+    };
+    auto railButton = [&](IkIconButton *b) {
+        railStyle(b);
+        railBox->addWidget(b, 0, Qt::AlignHCenter);
         return b;
     };
     railButton(toolButton(m_rail, QStringLiteral("move"), i18n("Move"), QStringLiteral("KritaTransform/KisToolMove")));
@@ -180,6 +197,7 @@ IkDesktopLayout::IkDesktopLayout(IkInterfaceManager *mgr)
     railButton(toolButton(m_rail, QStringLiteral("text"), i18n("Text"), QStringLiteral("SvgTextTool")));
     railButton(toolButton(m_rail, QStringLiteral("zoom"), i18n("Zoom"), QStringLiteral("ZoomTool")));
     railButton(toolButton(m_rail, QStringLiteral("pan"), i18n("Pan"), QStringLiteral("PanTool")));
+    addDock(QStringLiteral("rail"), m_rail, railBox, railStyle, Qt::AlignHCenter);
     rail->addStretch(1);
     QWidget *chips = new QWidget(m_rail);
     chips->setFixedSize(ts + 8, ts + 8);
@@ -239,7 +257,7 @@ IkDesktopLayout::IkDesktopLayout(IkInterfaceManager *mgr)
     cl->setContentsMargins(12, 2, 16, 2);
     cl->setSpacing(10);
     IkClickLabel *stroke = new IkClickLabel(chip);
-    stroke->setFixedSize(64, ts - 12);
+    stroke->setFixedSize(IkStyle::scaled(64), ts - 12);
     stroke->onClick = [this]() { setBrushLibraryOpen(!m_libraryOpen); };
     m_brushStroke = stroke;
     IkClickLabel *name = new IkClickLabel(chip);
@@ -255,10 +273,10 @@ IkDesktopLayout::IkDesktopLayout(IkInterfaceManager *mgr)
         l->setForegroundRole(QPalette::PlaceholderText);
         bottom->addWidget(l);
         IkSlider *s = new IkSlider(m_bottom);
-        s->setMinimumWidth(120);
+        s->setMinimumWidth(IkStyle::scaled(120));
         bottom->addWidget(s, 1);
         QLabel *v = new QLabel(m_bottom);
-        v->setMinimumWidth(56);
+        v->setMinimumWidth(IkStyle::scaled(56));
         v->setFont(IkStyle::font(1.0, QFont::DemiBold));
         bottom->addWidget(v);
         if (isSize) bindSize(s, v);
@@ -270,7 +288,7 @@ IkDesktopLayout::IkDesktopLayout(IkInterfaceManager *mgr)
     bottom->addSpacing(10);
     IkChoiceRow *blend = new IkChoiceRow(i18n("Normal"), m_bottom);
     blend->setCentered(true);
-    blend->setFixedWidth(130);
+    blend->setFixedWidth(IkStyle::scaled(130));
     const QStringList ops = {COMPOSITE_OVER, COMPOSITE_MULT, COMPOSITE_SCREEN, COMPOSITE_OVERLAY, COMPOSITE_SOFT_LIGHT_PHOTOSHOP,
                              COMPOSITE_DARKEN, COMPOSITE_LIGHTEN, COMPOSITE_DODGE, COMPOSITE_BURN, COMPOSITE_ADD, COMPOSITE_COLOR,
                              COMPOSITE_BEHIND};
@@ -283,6 +301,10 @@ IkDesktopLayout::IkDesktopLayout(IkInterfaceManager *mgr)
     m_bottom->setProperty("ikBlend", QVariant::fromValue<QObject *>(blend));
     m_bottom->setProperty("ikBlendOps", ops);
     bottom->addWidget(blend);
+    QHBoxLayout *bottomBox = new QHBoxLayout();
+    bottomBox->setSpacing(6);
+    bottom->addLayout(bottomBox);
+    addDock(QStringLiteral("bottom"), m_bottom, bottomBox, barStyle);
 
     // ---- brush library (slides out next to the rail) ----------------------------
     m_library = panel();
@@ -296,8 +318,7 @@ IkDesktopLayout::IkDesktopLayout(IkInterfaceManager *mgr)
     ll->addWidget(m_libraryWidget);
     connect(m_libraryWidget, &IkBrushLibrary::presetActivated, this, [this]() { refresh(); });
 
-    // Size handled by layoutPanels
-    Q_UNUSED(ts);
+    finishDocks();
 }
 
 void IkDesktopLayout::setVisible(bool visible)
@@ -334,6 +355,12 @@ void IkDesktopLayout::layoutPanels(const QRect &areaIn)
                        static_cast<QWidget *>(m_bottom), static_cast<QWidget *>(m_library)}) {
         w->raise();
     }    raisePopovers();
+}
+
+void IkDesktopLayout::closeTransient()
+{
+    IkLayout::closeTransient();
+    if (m_libraryOpen) setBrushLibraryOpen(false);
 }
 
 void IkDesktopLayout::setBrushLibraryOpen(bool open)

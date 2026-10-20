@@ -5,6 +5,8 @@
  */
 
 #include "IkLayouts.h"
+#include "IkPractice.h"
+#include "IkLayerAdjust.h"
 
 #include <QAction>
 #include <QGridLayout>
@@ -65,6 +67,7 @@ IkLayout::IkLayout(IkInterfaceManager *manager)
 IkLayout::~IkLayout()
 {
     closePopovers();
+    delete m_editOverlay.data();
     for (const QPointer<QWidget> &w : m_panels) delete w.data();
     delete m_colorPop.data();
     delete m_layersPop.data();
@@ -84,7 +87,10 @@ void IkLayout::setVisible(bool visible)
     for (const QPointer<QWidget> &w : m_panels) {
         if (w) w->setVisible(visible && !w->property("ikHidden").toBool());
     }
-    if (!visible) closePopovers();
+    if (!visible) {
+        closePopovers();
+        setEditing(false);
+    }
     if (visible) {
         refresh();
         for (const QPointer<QWidget> &w : m_panels) if (w) w->raise();
@@ -181,16 +187,26 @@ IkPopover *IkLayout::popover(QPointer<IkPopover> &slot)
     return slot;
 }
 
+void IkLayout::closeTransient()
+{
+    closePopovers();
+    setEditing(false);
+}
+
 void IkLayout::raisePopovers()
 {
-    for (IkPopover *p : {m_colorPop.data(), m_layersPop.data(), m_brushPop.data(), m_toolsPop.data(), m_optionsPop.data()}) {
+    IkPractice::raiseActive();
+    for (IkPopover *p : {m_colorPop.data(), m_layersPop.data(), m_brushPop.data(), m_toolsPop.data(), m_optionsPop.data(),
+                         m_adjustPop.data(), m_symmetryPop.data()}) {
         if (p) p->raiseToTop();
     }
+    syncEditOverlay();
 }
 
 void IkLayout::closePopovers()
 {
-    for (IkPopover *p : {m_colorPop.data(), m_layersPop.data(), m_brushPop.data(), m_toolsPop.data(), m_optionsPop.data()}) {
+    for (IkPopover *p : {m_colorPop.data(), m_layersPop.data(), m_brushPop.data(), m_toolsPop.data(), m_optionsPop.data(),
+                         m_adjustPop.data(), m_symmetryPop.data()}) {
         if (p) p->dismiss();
     }
 }
@@ -207,7 +223,87 @@ void IkLayout::toggleColorPopover(QWidget *anchor, int placement)
         p->setContent(m_colorPanel);
     }
     m_colorPanel->refresh();
-    p->popup(anchor, IkPopover::Placement(placement), QSize(380, 520));
+    p->popup(anchor, IkPopover::Placement(placementFor(anchor, placement)), QSize(380, 520));
+}
+
+void IkLayout::toggleAdjustPopover(QWidget *anchor, int placement)
+{
+    IkPopover *p = popover(m_adjustPop);
+    if (p->isOpen()) {
+        p->dismiss();
+        return;
+    }
+    // A fresh panel each time: closing it commits (or nothing was changed).
+    IkLayerAdjustPanel *panel = new IkLayerAdjustPanel(m_manager, p);
+    connect(p, &IkPopover::dismissed, panel, [panel]() {
+        panel->commit();
+        panel->deleteLater();
+    });
+    p->setContent(panel);
+    p->popup(anchor, IkPopover::Placement(placementFor(anchor, placement)), QSize(IkStyle::scaled(400), p->sizeHint().height()));
+}
+
+IkIconButton *IkLayout::symmetryButton(QWidget *parent)
+{
+    IkIconButton *b = button(parent, QStringLiteral("symmetry"), i18n("Symmetry"));
+    connect(b, &QAbstractButton::clicked, this, [this, b]() { toggleSymmetryPopover(b, IkPopover::Below); });
+    m_symmetryButtons << b;
+    return b;
+}
+
+void IkLayout::toggleSymmetryPopover(QWidget *anchor, int placement)
+{
+    IkPopover *p = popover(m_symmetryPop);
+    if (p->isOpen()) {
+        p->dismiss();
+        return;
+    }
+    QWidget *content = new QWidget(p);
+    QVBoxLayout *l = new QVBoxLayout(content);
+    l->setContentsMargins(4, 4, 4, 4);
+    l->setSpacing(2);
+    QLabel *title = new QLabel(i18n("Symmetry"), content);
+    title->setFont(IkStyle::font(1.15, QFont::Bold));
+    title->setContentsMargins(10, 4, 10, 6);
+    l->addWidget(title);
+    const IkInterfaceManager::Symmetry current = m_manager->symmetry();
+    struct Opt { IkInterfaceManager::Symmetry s; QString icon; QString text; };
+    const QList<Opt> opts = {{IkInterfaceManager::SymmetryOff, QStringLiteral("close"), i18n("Off")},
+                             {IkInterfaceManager::SymmetryX, QStringLiteral("symmetry-x"), i18n("Left and right (X)")},
+                             {IkInterfaceManager::SymmetryY, QStringLiteral("symmetry-y"), i18n("Top and bottom (Y)")},
+                             {IkInterfaceManager::SymmetryXY, QStringLiteral("symmetry"), i18n("Both (X and Y)")},
+                             {IkInterfaceManager::SymmetryRadial, QStringLiteral("symmetry-radial"), i18n("Radial")}};
+    for (const Opt &o : opts) {
+        IkNavRow *row = new IkNavRow(o.icon, o.text, content);
+        row->setSelected(o.s == current);
+        const IkInterfaceManager::Symmetry s = o.s;
+        connect(row, &QAbstractButton::clicked, this, [this, p, s]() {
+            m_manager->setSymmetry(s);
+            p->dismiss();
+        });
+        l->addWidget(row);
+    }
+    // Radial options.
+    const QList<int> sections = {2, 3, 4, 5, 6, 8, 10, 12, 16};
+    IkChoiceRow *count = new IkChoiceRow(i18n("Radial sections"), content);
+    QStringList names;
+    for (int n : sections) names << QString::number(n);
+    count->setChoices(names, qMax(0, sections.indexOf(m_manager->radialSections())));
+    connect(count, &IkChoiceRow::chosen, this, [this, sections](int i) {
+        m_manager->setSymmetry(IkInterfaceManager::SymmetryRadial, sections.value(i, 6));
+    });
+    l->addWidget(count);
+    IkNavRow *mirrored = new IkNavRow(QStringLiteral("symmetry-x"), i18n("Mirror each section"), content);
+    IkSwitch *sw = new IkSwitch(mirrored);
+    sw->setChecked(m_manager->radialMirrored());
+    mirrored->setTrailing(sw);
+    connect(mirrored, &QAbstractButton::clicked, sw, [sw]() { sw->toggle(); });
+    connect(sw, &QAbstractButton::toggled, this, [this](bool on) {
+        m_manager->setSymmetry(IkInterfaceManager::SymmetryRadial, -1, on ? 1 : 0);
+    });
+    l->addWidget(mirrored);
+    p->setContent(content);
+    p->popup(anchor, IkPopover::Placement(placementFor(anchor, placement)), QSize(IkStyle::scaled(300), p->sizeHint().height()));
 }
 
 void IkLayout::toggleLayersPopover(QWidget *anchor, int placement)
@@ -223,7 +319,7 @@ void IkLayout::toggleLayersPopover(QWidget *anchor, int placement)
     }
     m_layersPanel->refresh();
     const int h = qMin(620, host()->height() - 120);
-    p->popup(anchor, IkPopover::Placement(placement), QSize(420, h));
+    p->popup(anchor, IkPopover::Placement(placementFor(anchor, placement)), QSize(420, h));
 }
 
 void IkLayout::toggleBrushPopover(QWidget *anchor, int placement)
@@ -239,7 +335,7 @@ void IkLayout::toggleBrushPopover(QWidget *anchor, int placement)
     }
     m_brushLibrary->reload();
     const int h = qMin(720, host()->height() - 120);
-    p->popup(anchor, IkPopover::Placement(placement), QSize(560, h));
+    p->popup(anchor, IkPopover::Placement(placementFor(anchor, placement)), QSize(560, h));
 }
 
 void IkLayout::showToolsPopover(QWidget *anchor, int placement)
@@ -268,8 +364,6 @@ void IkLayout::showToolsPopover(QWidget *anchor, int placement)
         {QStringLiteral("select-shape"), i18n("Select shapes"), QStringLiteral("InteractionTool")},
         {QStringLiteral("assistant"), i18n("Drawing assistants"), QStringLiteral("KisAssistantTool")},
         {QStringLiteral("reference"), i18n("Reference images"), QStringLiteral("ToolReferenceImages")},
-        {QStringLiteral("zoom"), i18n("Zoom"), QStringLiteral("ZoomTool")},
-        {QStringLiteral("pan"), i18n("Pan"), QStringLiteral("PanTool")},
     };
     int i = 0;
     for (const T &t : tools) {
@@ -289,7 +383,7 @@ void IkLayout::showToolsPopover(QWidget *anchor, int placement)
     QWidget *old = p->content();
     p->setContent(grid);
     delete old;
-    p->popup(anchor, IkPopover::Placement(placement));
+    p->popup(anchor, IkPopover::Placement(placementFor(anchor, placement)));
 }
 
 void IkLayout::showSelectionPopover(QWidget *anchor, int placement)
@@ -343,7 +437,7 @@ void IkLayout::showSelectionPopover(QWidget *anchor, int placement)
     QWidget *old = p->content();
     p->setContent(w);
     delete old;
-    p->popup(anchor, IkPopover::Placement(placement));
+    p->popup(anchor, IkPopover::Placement(placementFor(anchor, placement)));
 }
 
 void IkLayout::showToolOptionsPopover(QWidget *anchor, int placement)
@@ -362,7 +456,7 @@ void IkLayout::showToolOptionsPopover(QWidget *anchor, int placement)
         connect(p, &IkPopover::dismissed, this, [this]() { m_manager->releaseToolOptions(); });
     }
     m_manager->takeToolOptions(host);
-    p->popup(anchor, IkPopover::Placement(placement), QSize(400, qMin(600, this->host()->height() - 140)));
+    p->popup(anchor, IkPopover::Placement(placementFor(anchor, placement)), QSize(400, qMin(600, this->host()->height() - 140)));
 }
 
 void IkLayout::showMoreMenu(QWidget *anchor)
@@ -400,6 +494,12 @@ void IkLayout::ensureConnections()
     connect(KoToolManager::instance(), &KoToolManager::changedTool, this, [this]() { if (m_visible) refreshTools(); });
     connect(vm, &KisViewManager::viewChanged, this, [this]() { if (m_visible) refresh(); });
     connect(m_manager, &IkInterfaceManager::paintModeChanged, this, [this]() { if (m_visible) refreshTools(); });
+    connect(m_manager, &IkInterfaceManager::symmetryChanged, this, [this]() { if (m_visible) refreshTools(); });
+    for (const char *name : {"hmirror_action", "vmirror_action"}) {
+        if (QAction *a = m_manager->action(QString::fromLatin1(name))) {
+            connect(a, &QAction::toggled, this, [this]() { if (m_visible) refreshTools(); });
+        }
+    }
     connect(IkSkinManager::instance(), &IkSkinManager::sigSkinChanged, this, &IkLayout::restyle);
 }
 
@@ -426,7 +526,9 @@ void IkLayout::refreshTools()
 {
     const QString active = KoToolManager::instance()->activeToolId();
     const IkInterfaceManager::PaintMode mode = m_manager->paintMode();
-    const bool brushTool = active == QLatin1String("KritaShape/KisToolBrush");
+    const bool brushTool = active == QLatin1String("KritaShape/KisToolBrush") || active == QLatin1String("KritaShape/KisToolMultiBrush");
+    const bool symmetric = m_manager->symmetry() != IkInterfaceManager::SymmetryOff;
+    for (const auto &b : m_symmetryButtons) if (b) b->setActive(symmetric);
     for (const auto &entry : m_toolButtons) {
         if (!entry.first) continue;
         bool on = entry.second == active;

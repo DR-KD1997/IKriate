@@ -21,6 +21,10 @@
 #include <kis_icon_utils.h>
 
 #include "IkSkinManager.h"
+#include "KisUiFont.h"
+
+#include <KConfigGroup>
+#include <KSharedConfig>
 
 namespace
 {
@@ -159,9 +163,59 @@ bool touchFirst()
 #endif
 }
 
+namespace
+{
+qreal &scaleStore()
+{
+    static qreal value = [] {
+#ifdef Q_OS_ANDROID
+        // Android scales the whole interface through the screen density.
+        return 1.0;
+#else
+        const int pct = KConfigGroup(KSharedConfig::openConfig(), "IKriate").readEntry("InterfaceScale", 100);
+        return qBound(0.5, pct / 100.0, 3.0);
+#endif
+    }();
+    return value;
+}
+}
+
+qreal uiScale()
+{
+    return scaleStore();
+}
+
+void setUiScale(qreal scale)
+{
+#ifdef Q_OS_ANDROID
+    Q_UNUSED(scale);
+#else
+    scaleStore() = qBound(0.5, scale, 3.0);
+#endif
+}
+
+int scaled(int px)
+{
+    return qRound(px * uiScale());
+}
+
+void applyInterfaceFont()
+{
+    if (!qApp) return;
+    QFont f = KisUiFont::normalFont();
+    const qreal s = uiScale();
+    if (f.pointSizeF() > 0) {
+        f.setPointSizeF(f.pointSizeF() * s);
+    } else if (f.pixelSize() > 0) {
+        f.setPixelSize(qRound(f.pixelSize() * s));
+    }
+    qApp->setFont(f);
+    clearCache();
+}
+
 int touchSize()
 {
-    return touchFirst() ? 48 : 40;
+    return scaled(touchFirst() ? 48 : 40);
 }
 
 int radius()
@@ -171,7 +225,7 @@ int radius()
 
 int spacing()
 {
-    return touchFirst() ? 12 : 10;
+    return scaled(touchFirst() ? 12 : 10);
 }
 
 QFont font(qreal pointScale, int weight)

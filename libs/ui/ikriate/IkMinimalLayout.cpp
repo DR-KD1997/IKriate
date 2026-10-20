@@ -40,15 +40,19 @@ IkMinimalLayout::IkMinimalLayout(IkInterfaceManager *mgr)
     QHBoxLayout *tl = new QHBoxLayout(m_tools);
     tl->setContentsMargins(14, 4, 14, 6);
     tl->setSpacing(14);
-    auto toolsAdd = [&](IkIconButton *b) {
+    auto toolsStyle = [ts](IkIconButton *b) {
+        b->setVariant(IkIconButton::Ghost);
         b->setEdge(ts + 6);
         b->setIconPixelSize(qRound(ts * 0.6));
+    };
+    auto toolsAdd = [&](IkIconButton *b) {
+        toolsStyle(b);
         tl->addWidget(b);
         return b;
     };
-    IkIconButton *colors = toolsAdd(button(m_tools, QStringLiteral("colors"), i18n("Colour")));
+    IkIconButton *colors = toolsAdd(button(m_tools, QStringLiteral("colors"), i18n("Adjust layer colours")));
     colors->setKeepIconColors(true);
-    connect(colors, &QAbstractButton::clicked, this, [this, colors]() { toggleColorPopover(colors, IkPopover::Below); });
+    connect(colors, &QAbstractButton::clicked, this, [this, colors]() { toggleAdjustPopover(colors, IkPopover::Below); });
     IkIconButton *select = toolsAdd(button(m_tools, QStringLiteral("select-rect"), i18n("Selection")));
     connect(select, &QAbstractButton::clicked, this, [this, select]() { showSelectionPopover(select, IkPopover::Below); });
     m_toolButtons << qMakePair(QPointer<IkIconButton>(select), QStringLiteral("KisToolSelectRectangular"));
@@ -57,9 +61,10 @@ IkMinimalLayout::IkMinimalLayout(IkInterfaceManager *mgr)
     IkIconButton *smudge = toolsAdd(button(m_tools, QStringLiteral("smudge"), i18n("Smudge")));
     connect(smudge, &QAbstractButton::clicked, this, [this]() { this->manager()->setPaintMode(IkInterfaceManager::Smudge); });
     m_smudgeButtons << smudge;
-    toolsAdd(toolButton(m_tools, QStringLiteral("zoom"), i18n("Zoom"), QStringLiteral("ZoomTool")));
+    toolsAdd(symmetryButton(m_tools));
     IkIconButton *all = toolsAdd(button(m_tools, QStringLiteral("tools"), i18n("All tools")));
     connect(all, &QAbstractButton::clicked, this, [this, all]() { showToolsPopover(all, IkPopover::Below); });
+    addDock(QStringLiteral("tools"), m_tools, tl, toolsStyle, Qt::Alignment(), true);
 
     // ---- top-right: assistants + brush settings, layers, more ----------------
     m_right = panel(true);
@@ -79,6 +84,12 @@ IkMinimalLayout::IkMinimalLayout(IkInterfaceManager *mgr)
         else showToolOptionsPopover(settings, IkPopover::Below);
     });
     rl->addWidget(settings);
+    auto rightStyle = [ts](IkIconButton *b) {
+        b->setVariant(IkIconButton::Ghost);
+        b->setEdge(ts + 6);
+        b->setIconPixelSize(-1);
+    };
+    addDock(QStringLiteral("right"), m_right, rl, rightStyle, Qt::Alignment(), true);
 
     m_layers = panel(true);
     m_layers->setRole(IkStyle::Surface);
@@ -149,6 +160,11 @@ IkMinimalLayout::IkMinimalLayout(IkInterfaceManager *mgr)
     });
     m_eraseButtons << eraser;
     mo->addWidget(eraser);
+    addDock(QStringLiteral("modes"), m_modes, mo, [round](IkIconButton *b) {
+        b->setVariant(IkIconButton::Round);
+        b->setEdge(round);
+        b->setIconPixelSize(-1);
+    }, Qt::Alignment(), true);
 
     // ---- undo / redo (bottom-left) -----------------------------------------------------
     m_history = panel(true);
@@ -162,6 +178,9 @@ IkMinimalLayout::IkMinimalLayout(IkInterfaceManager *mgr)
         b->setEdge(ts + 6);
         hy->addWidget(b);
     }
+    addDock(QStringLiteral("history"), m_history, hy, rightStyle, Qt::Alignment(), true);
+
+    finishDocks();
 }
 
 void IkMinimalLayout::layoutPanels(const QRect &a)
@@ -175,6 +194,7 @@ void IkMinimalLayout::layoutPanels(const QRect &a)
     m_tools->setGeometry(a.left() + (a.width() - tsz.width()) / 2, a.top(), tsz.width(), tsz.height());
     m_more->setGeometry(a.right() - m - round + 1, a.top() + m, round, round);
     m_layers->setGeometry(m_more->x() - 14 - round, a.top() + m, round, round);
+    m_right->adjustSize();
     const QSize rsz = m_right->sizeHint();
     m_right->setGeometry(m_layers->x() - 14 - rsz.width(), a.top() + m, rsz.width(), round);
 
@@ -182,8 +202,9 @@ void IkMinimalLayout::layoutPanels(const QRect &a)
     const int sideTop = a.top() + int(a.height() * 0.26);
     const int sideH = qMin(int(a.height() * 0.55), a.bottom() - sideTop - round - 3 * m);
     m_side->setGeometry(a.left() + m + 4, sideTop, sideW, sideH);
-    const int modesH = 3 * round;
-    m_modes->setGeometry(m_side->geometry().right() + 14, sideTop + (sideH - modesH) / 2, round, modesH);
+    const int modesH = qMin(m_modes->sizeHint().height(), a.height() - 2 * m);
+    const int modesTop = qBound(a.top() + m, sideTop + (sideH - modesH) / 2, a.bottom() - m - modesH);
+    m_modes->setGeometry(m_side->geometry().right() + 14, modesTop, round, modesH);
     m_history->adjustSize();
     const QSize hsz = m_history->sizeHint();
     m_history->setGeometry(a.left() + m + 4, a.bottom() - m - hsz.height(), hsz.width(), hsz.height());

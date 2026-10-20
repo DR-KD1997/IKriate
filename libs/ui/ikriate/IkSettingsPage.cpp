@@ -5,6 +5,11 @@
  */
 
 #include "IkSettingsPage.h"
+#include "IkTouchGestures.h"
+
+#ifdef Q_OS_ANDROID
+#include "KisAndroidScaling.h"
+#endif
 
 #include <QApplication>
 #include <QColorDialog>
@@ -96,7 +101,7 @@ class IkLayoutPreview : public QWidget
 public:
     IkLayoutPreview(IkInterfaceManager::Mode mode, QWidget *parent) : QWidget(parent), m_mode(mode)
     {
-        setMinimumSize(420, 280);
+        setMinimumSize(IkStyle::scaled(420),IkStyle::scaled(280));
     }
 
 protected:
@@ -216,6 +221,7 @@ struct IkSettingsPage::Private
     // toggles
     IkSwitch *hwAccel {nullptr};
     IkSwitch *ghosting {nullptr};
+    IkSwitch *autoSave {nullptr};
 
     // clean up / recycle
     QVBoxLayout *cleanRows {nullptr};
@@ -256,6 +262,10 @@ IkSettingsPage::IkSettingsPage(KisMainWindow *mainWindow, QWidget *parent)
             } else if (items[i].first == QLatin1String("ghost")) {
                 d->ghosting = new IkSwitch(row);
                 row->setTrailing(d->ghosting);
+            } else if (items[i].first == QLatin1String("save")) {
+                d->autoSave = new IkSwitch(row);
+                row->setTrailing(d->autoSave);
+                row->setToolTip(i18n("Save your changes automatically, without asking, when you return to the gallery."));
             }
         }
         left->addWidget(c);
@@ -265,13 +275,13 @@ IkSettingsPage::IkSettingsPage(KisMainWindow *mainWindow, QWidget *parent)
              {QStringLiteral("advanced"), i18n("Advanced")}},
             {ThemeSection, LanguageSection, AdvancedSection});
     navCard({{QStringLiteral("cleanup"), i18n("Clean Up")}, {QStringLiteral("rocket"), i18n("Hardware Acceleration")},
-             {QStringLiteral("ghost"), i18n("Remove Brush Ghosting")}},
+             {QStringLiteral("ghost"), i18n("Remove Brush Ghosting")}, {QStringLiteral("save"), i18n("Auto-Save")}},
             {CleanUpSection});
     navCard({{QStringLiteral("recycle"), i18n("Recycle Bin")}}, {RecycleSection});
     left->addStretch(1);
     QWidget *leftHost = new QWidget(this);
     leftHost->setLayout(left);
-    leftHost->setFixedWidth(IkStyle::touchFirst() ? 360 : 340);
+    leftHost->setFixedWidth(IkStyle::scaled(IkStyle::touchFirst() ? 360 : 340));
     outer->addWidget(leftHost);
 
     connect(d->hwAccel, &QAbstractButton::toggled, this, [this](bool on) {
@@ -279,6 +289,9 @@ IkSettingsPage::IkSettingsPage(KisMainWindow *mainWindow, QWidget *parent)
         notifyRestart();
     });
     connect(d->ghosting, &QAbstractButton::toggled, this, [](bool on) { setBrushGhostingRemoved(on); });
+    connect(d->autoSave, &QAbstractButton::toggled, this, [](bool on) {
+        KConfigGroup(KSharedConfig::openConfig(), "IKriate").writeEntry("AutoSave", on);
+    });
 
     // ---- right: pages -------------------------------------------------------
     d->pages = new QStackedWidget(this);
@@ -340,6 +353,16 @@ void IkSettingsPage::notifyRestart()
     QMessageBox::information(this, i18n("Restart Needed"), i18n("This change takes effect the next time IKriate starts."));
 }
 
+int IkSettingsPage::currentSection() const
+{
+    return d->pages->currentIndex();
+}
+
+void IkSettingsPage::openSection(int section)
+{
+    showSection(section);
+}
+
 void IkSettingsPage::showSection(int section)
 {
     for (IkNavRow *row : d->nav) row->setSelected(row->property("ikSection").toInt() == section);
@@ -364,7 +387,8 @@ void IkSettingsPage::reload()
     d->scale->setCurrentIndex(d->scales.indexOf(scale) >= 0 ? d->scales.indexOf(scale) : d->scales.indexOf(100));
     d->font->setValueText(qApp->font().family());
     {
-        QSignalBlocker b1(d->hwAccel), b2(d->ghosting);
+        QSignalBlocker b1(d->hwAccel), b2(d->ghosting), b3(d->autoSave);
+        d->autoSave->setChecked(KConfigGroup(KSharedConfig::openConfig(), "IKriate").readEntry("AutoSave", true));
         d->hwAccel->setChecked(KisOpenGL::getUserPreferredOpenGLRendererConfig() != KisOpenGL::RendererNone);
         d->ghosting->setChecked(brushGhostingRemoved());
     }
@@ -503,12 +527,20 @@ QWidget *IkSettingsPage::buildThemePage()
     connect(d->scale, &IkChoiceRow::chosen, this, [this](int i) {
         const int pct = d->scales.value(i, 100);
         KConfigGroup(KSharedConfig::openConfig(), "IKriate").writeEntry("InterfaceScale", pct);
-#ifdef Q_OS_ANDROID
-        KisConfig cfg(false);
-        cfg.setAndroidScalingTargetScale(cfg.androidScalingLastInitialScale() * pct / 100.0);
-#endif
         KSharedConfig::openConfig()->sync();
-        notifyRestart();
+#ifdef Q_OS_ANDROID
+        // Android scales everything through the screen density, live.
+        KisConfig cfg(false);
+        const qreal target = cfg.androidScalingLastInitialScale() * pct / 100.0;
+        cfg.setAndroidScalingTargetScale(target);
+        if (KisAndroidScaling *scaling = KisAndroidScaling::instance()) {
+            Q_EMIT scaling->sigJniSetPrimaryScreenScale(target);
+        }
+#else
+        IkStyle::setUiScale(pct / 100.0);
+        IkStyle::applyInterfaceFont();
+#endif
+        if (d->manager) d->manager->rebuildInterface();
     });
     il->addWidget(d->scale);
     d->font = new IkChoiceRow(i18n("Font"), iface);
@@ -539,16 +571,13 @@ QWidget *IkSettingsPage::buildThemePage()
         KisConfig cfg(false);
         if (picked == system) {
             cfg.writeEntry<bool>("use_custom_system_font", false);
-            notifyRestart();
-            return;
+        } else {
+            cfg.writeEntry<bool>("use_custom_system_font", true);
+            cfg.writeEntry<QString>("custom_system_font", picked->data().toString());
         }
-        const QString family = picked->data().toString();
-        cfg.writeEntry<bool>("use_custom_system_font", true);
-        cfg.writeEntry<QString>("custom_system_font", family);
-        QFont f = qApp->font();
-        f.setFamily(family);
-        qApp->setFont(f);
-        reload();
+        // Applied live: the interface is rebuilt with the new font.
+        IkStyle::applyInterfaceFont();
+        if (d->manager) d->manager->rebuildInterface();
     });
     il->addWidget(d->font);
     il->addStretch(1);
@@ -659,6 +688,32 @@ QWidget *IkSettingsPage::buildAdvancedPage()
     });
     cl->addWidget(classic);
     l->addWidget(c);
+
+    // ---- touch gestures ----
+    IkPanel *g = card(page);
+    QVBoxLayout *gl = new QVBoxLayout(g);
+    gl->setContentsMargins(40, 20, 40, 26);
+    gl->setSpacing(8);
+    gl->addWidget(new IkSectionHeader(i18n("Touch Gestures"), g));
+    QLabel *gIntro = new QLabel(i18n("One finger pans, two fingers zoom and rotate. Choose what multi-finger taps do on the canvas."), g);
+    gIntro->setWordWrap(true);
+    gIntro->setForegroundRole(QPalette::PlaceholderText);
+    gl->addWidget(gIntro);
+    const QStringList functions = IkTouchGestures::functionIds();
+    QStringList functionNames;
+    for (const QString &f : functions) functionNames << IkTouchGestures::functionName(f);
+    for (int i = 0; i < IkTouchGestures::GestureCount; ++i) {
+        const auto gesture = IkTouchGestures::Gesture(i);
+        IkChoiceRow *row = new IkChoiceRow(IkTouchGestures::gestureName(gesture), g);
+        row->setBordered(true);
+        row->setMinimumHeight(IkStyle::touchSize() + 6);
+        row->setChoices(functionNames, qMax(0, functions.indexOf(IkTouchGestures::assignedFunction(gesture))));
+        connect(row, &IkChoiceRow::chosen, this, [gesture, functions](int index) {
+            IkTouchGestures::assignFunction(gesture, functions.value(index, QStringLiteral("none")));
+        });
+        gl->addWidget(row);
+    }
+    l->addWidget(g);
 
     // ---- skins ----
     IkPanel *skins = card(page);

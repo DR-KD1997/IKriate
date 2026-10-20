@@ -10,7 +10,9 @@
 #include <QActionGroup>
 #include <QApplication>
 #include <QCursor>
+#include <QComboBox>
 #include <QDockWidget>
+#include <QSpinBox>
 #include <QEvent>
 #include <QLayout>
 #include <QMdiArea>
@@ -22,6 +24,9 @@
 #include <QStatusBar>
 #include <QTabBar>
 #include <QTimer>
+#include <QFileInfo>
+#include <QDir>
+#include <QStandardPaths>
 #include <QToolBar>
 
 #include <KConfigGroup>
@@ -39,6 +44,10 @@
 #include <brushengine/kis_paintop_preset.h>
 
 #include "KisMainWindow.h"
+#include "KisImportExportErrorCode.h"
+#include "KisView.h"
+#include "KisDocument.h"
+#include <KisRecentFilesManager.h>
 #include "KisViewManager.h"
 #include "canvas/kis_canvas2.h"
 #include "input/kis_input_manager.h"
@@ -53,6 +62,9 @@
 #include "IkBrushLibrary.h"
 #include "IkHomeScreen.h"
 #include "IkLayouts.h"
+#include "IkPractice.h"
+#include "IkTouchGestures.h"
+#include "IkWindowFrames.h"
 #include "IkSettingsPage.h"
 #include "IkSkinManager.h"
 #include "IkStyle.h"
@@ -67,6 +79,7 @@ const char *const kPrevProfileKey = "PreviousInputProfile";
 const char *const kTabletProfile = "IKriate Tablet";
 const char *const kAutoId = "auto";
 const char *const kBrushTool = "KritaShape/KisToolBrush";
+const char *const kMultiBrushTool = "KritaShape/KisToolMultiBrush";
 
 KConfigGroup ikConfig()
 {
@@ -103,6 +116,9 @@ struct IkInterfaceManager::Private
     bool canvasOnly {false};
 
     PaintMode paintMode {Draw};
+    Symmetry symmetry {SymmetryOff};
+    int radialSections {6};
+    bool radialMirrored {false};
     bool settingMode {false};
     QString drawPreset;
     QPointer<QWidget> toolOptions;
@@ -138,9 +154,57 @@ IkInterfaceManager::IkInterfaceManager(KisMainWindow *mainWindow)
     d->mode = d->followDefault ? platformDefaultMode() : modeFromId(stored, platformDefaultMode());
     if (d->mode == Classic && !classicOffered()) d->mode = platformDefaultMode();
     d->classicState = QByteArray::fromBase64(cfg.readEntry(kClassicStateKey, QByteArray()));
+    d->radialSections = qBound(2, cfg.readEntry("RadialSections", 6), 32);
+    d->radialMirrored = cfg.readEntry("RadialMirrored", false);
+
+    // Interface scale and font (desktop; Android scales through the density).
+    if (!qFuzzyCompare(IkStyle::uiScale(), 1.0)) {
+        IkStyle::applyInterfaceFont();
+    }
 
     createActions();
+    new IkTouchGestures(this);
+    new IkWindowFrames(this);
     QTimer::singleShot(0, this, &IkInterfaceManager::slotDeferredInit);
+}
+
+void IkInterfaceManager::rebuildInterface()
+{
+    QTimer::singleShot(0, this, [this]() {
+        if (!d->stack) return;
+        const bool onCanvas = d->onCanvasPage();
+        const IkHomeScreen::Page page = d->home ? d->home->currentPage() : IkHomeScreen::GalleryPage;
+        const int section = d->home ? d->home->settingsSection() : 0;
+        const bool settingsOpen = d->settings && d->settings->isOpen();
+        for (QPointer<IkPopover> *p : {&d->settings, &d->brushes}) {
+            if (*p) {
+                (*p)->dismiss();
+                (*p)->deleteLater();
+                *p = nullptr;
+            }
+        }
+        releaseToolOptions();
+        d->desktop.reset();
+        d->kriate.reset();
+        d->minimal.reset();
+        IkStyle::clearCache();
+
+        if (d->home) {
+            IkHomeScreen *old = d->home;
+            IkHomeScreen *fresh = new IkHomeScreen(d->mw);
+            d->stack->insertWidget(0, fresh);
+            d->stack->removeWidget(old);
+            old->hide();
+            old->deleteLater();
+            d->home = fresh;
+            fresh->setManager(this);
+            fresh->showPage(page);
+            fresh->showSettingsSection(section);
+            if (!onCanvas) d->stack->setCurrentIndex(0);
+        }
+        applyMode();
+        if (settingsOpen && onCanvas) showSettings();
+    });
 }
 
 IkInterfaceManager::~IkInterfaceManager()
@@ -233,7 +297,68 @@ QAction *IkInterfaceManager::action(const QString &name) const
 
 bool IkInterfaceManager::isBrushToolActive() const
 {
-    return KoToolManager::instance()->activeToolId() == QLatin1String(kBrushTool);
+    const QString id = KoToolManager::instance()->activeToolId();
+    return id == QLatin1String(kBrushTool) || id == QLatin1String(kMultiBrushTool);
+}
+
+IkInterfaceManager::Symmetry IkInterfaceManager::symmetry() const
+{
+    // Mirror painting belongs to each view, so read it from the actions.
+    if (d->symmetry == SymmetryRadial && KoToolManager::instance()->activeToolId() == QLatin1String(kMultiBrushTool)) {
+        return SymmetryRadial;
+    }
+    QAction *h = action(QStringLiteral("hmirror_action"));
+    QAction *v = action(QStringLiteral("vmirror_action"));
+    const bool x = h && h->isChecked();
+    const bool y = v && v->isChecked();
+    return x && y ? SymmetryXY : x ? SymmetryX : y ? SymmetryY : SymmetryOff;
+}
+int IkInterfaceManager::radialSections() const { return d->radialSections; }
+bool IkInterfaceManager::radialMirrored() const { return d->radialMirrored; }
+
+void IkInterfaceManager::setSymmetry(Symmetry symmetry, int radialSections, int radialMirrored)
+{
+    if (radialSections > 0) d->radialSections = qBound(2, radialSections, 32);
+    if (radialMirrored >= 0) d->radialMirrored = radialMirrored;
+    const bool wasRadial = d->symmetry == SymmetryRadial;
+    d->symmetry = symmetry;
+
+    // X / Y: Krita's canvas mirror painting.
+    auto setChecked = [this](const char *name, bool on) {
+        if (QAction *a = action(QString::fromLatin1(name))) {
+            if (a->isCheckable() && a->isChecked() != on) a->trigger();
+        }
+    };
+    setChecked("hmirror_action", symmetry == SymmetryX || symmetry == SymmetryXY);
+    setChecked("vmirror_action", symmetry == SymmetryY || symmetry == SymmetryXY);
+
+    // Radial: the multi-brush tool in symmetry (or snowflake) mode.
+    KConfigGroup multi(KSharedConfig::openConfig(), QString::fromLatin1(kMultiBrushTool));
+    multi.writeEntry("transformMode", d->radialMirrored ? 3 : 0);  // SNOWFLAKE : SYMMETRY
+    multi.writeEntry("handsCount", d->radialSections);
+    if (symmetry == SymmetryRadial) {
+        activateTool(QString::fromLatin1(kMultiBrushTool));
+        // The tool reads its settings when its options are first built;
+        // update the live controls too if they exist already.
+        QTimer::singleShot(0, this, [this]() {
+            for (QComboBox *c : d->mw->findChildren<QComboBox *>(QStringLiteral("multihandTypeCombobox"))) {
+                c->setCurrentIndex(d->radialMirrored ? 3 : 0);
+            }
+            for (QSpinBox *b : d->mw->findChildren<QSpinBox *>(QStringLiteral("brushCountSpinBox"))) {
+                b->setValue(d->radialSections);
+            }
+            for (QAbstractSpinBox *b : d->mw->findChildren<QAbstractSpinBox *>(QStringLiteral("brushCountSpinBox"))) {
+                b->setProperty("value", d->radialSections);
+            }
+        });
+    } else if (wasRadial && KoToolManager::instance()->activeToolId() == QLatin1String(kMultiBrushTool)) {
+        activateTool(QString::fromLatin1(kBrushTool));
+    }
+    KConfigGroup ik = ikConfig();
+    ik.writeEntry("Symmetry", int(symmetry));
+    ik.writeEntry("RadialSections", d->radialSections);
+    ik.writeEntry("RadialMirrored", d->radialMirrored);
+    Q_EMIT symmetryChanged(symmetry);
 }
 
 // ------------------------------------------------------------------ actions
@@ -459,7 +584,9 @@ void IkInterfaceManager::applyInputProfile()
     KisInputProfileManager *pm = KisInputProfileManager::instance();
     KisInputProfile *current = pm->currentProfile();
     KConfigGroup cfg = ikConfig();
-    const bool touchLayout = d->mode == Kriate || d->mode == Minimal;
+    // All IKriate layouts use the IKriate profile (its taps are handled by
+    // IkTouchGestures); the classic docker interface keeps Krita's profiles.
+    const bool touchLayout = d->mode != Classic;
     if (touchLayout) {
         KisInputProfile *tablet = pm->profile(QString::fromLatin1(kTabletProfile));
         if (tablet && current != tablet) {
@@ -527,7 +654,37 @@ void IkInterfaceManager::updateLayoutVisibility()
 
 void IkInterfaceManager::slotStackPageChanged()
 {
+    if (!d->onCanvasPage()) closeTransientWindows();
     applyMode();
+}
+
+void IkInterfaceManager::closeTransientWindows()
+{
+    IkPractice::stopActive();
+    // IKriate pop-overs (layout pop-overs, brush library, settings, practice, ...)
+    const QList<IkPopover *> popovers = d->mw->findChildren<IkPopover *>();
+    for (IkPopover *p : popovers) {
+        if (p->isOpen()) p->dismiss();
+    }
+    for (Mode m : {Desktop, Kriate, Minimal}) {
+        if (IkLayout *l = d->layout(m)) l->closeTransient();
+    }
+    // Krita's brush editor and any open menus or pop-up windows.
+    if (QAction *editor = action(QStringLiteral("show_brush_editor"))) {
+        if (editor->isCheckable() && editor->isChecked()) editor->trigger();
+    }
+    const QList<QWidget *> tops = QApplication::topLevelWidgets();
+    for (QWidget *w : tops) {
+        if (w == d->mw || !w->isVisible() || w->isModal()) continue;
+        if (w->inherits("KisPaintOpPresetsEditor") || qobject_cast<QMenu *>(w) || (w->windowFlags() & Qt::Popup) == Qt::Popup
+            || (w->windowFlags() & Qt::Tool) == Qt::Tool) {
+            w->hide();
+        }
+    }
+    const QList<QWidget *> kids = d->mw->findChildren<QWidget *>();
+    for (QWidget *w : kids) {
+        if (w->isWindow() && w->isVisible() && w->inherits("KisPaintOpPresetsEditor")) w->hide();
+    }
 }
 
 void IkInterfaceManager::slotCanvasOnlyToggled(bool on)
@@ -650,7 +807,9 @@ void IkInterfaceManager::activateTool(const QString &toolId)
 
 void IkInterfaceManager::ensureBrushTool()
 {
-    if (!isBrushToolActive()) activateTool(QString::fromLatin1(kBrushTool));
+    if (!isBrushToolActive()) {
+        activateTool(QString::fromLatin1(d->symmetry == SymmetryRadial ? kMultiBrushTool : kBrushTool));
+    }
 }
 
 // -------------------------------------------------------------- tool options
@@ -690,13 +849,96 @@ void IkInterfaceManager::triggerAction(const QString &name)
     }
 }
 
+namespace
+{
+/// Where auto-save puts artworks that have never been saved.
+QString autoSaveFolder()
+{
+#ifdef Q_OS_ANDROID
+    QString base = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
+#else
+    QString base = QStandardPaths::writableLocation(QStandardPaths::PicturesLocation);
+#endif
+    if (base.isEmpty()) base = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    const QString dir = base + QStringLiteral("/IKriate");
+    QDir().mkpath(dir);
+    return dir;
+}
+}
+
+bool IkInterfaceManager::autoSaveThenGoHome()
+{
+    if (!ikConfig().readEntry("AutoSave", true)) return false;
+    KisView *view = d->mw->activeView();
+    KisDocument *doc = view ? view->document() : nullptr;
+    if (!doc || !doc->isModified()) return false;
+
+    // Save as .kra: into the same file when it is one, otherwise next to it
+    // (or into the IKriate folder), so layers are never flattened.
+    QString path = doc->path();
+    const bool isKra = path.endsWith(QLatin1String(".kra"), Qt::CaseInsensitive);
+    if (!isKra) {
+        const QFileInfo info(path);
+        QString name = info.completeBaseName();
+        if (name.isEmpty()) name = i18nc("file name of an auto-saved artwork", "Artwork");
+        const QString dir = (!path.isEmpty() && !path.startsWith(QLatin1String("content:")) && QFileInfo(info.absolutePath()).isWritable())
+            ? info.absolutePath()
+            : autoSaveFolder();
+        path = QStringLiteral("%1/%2.kra").arg(dir, name);
+        for (int i = 2; QFileInfo::exists(path); ++i) path = QStringLiteral("%1/%2 %3.kra").arg(dir, name).arg(i);
+    }
+
+    QPointer<KisDocument> guard = doc;
+    auto connection = std::make_shared<QMetaObject::Connection>();
+    *connection = connect(doc, &KisDocument::sigCompleteBackgroundSaving, this,
+                          [this, guard, connection](const KritaUtils::ExportFileJob &job, KisImportExportErrorCode status,
+                                                    const QString &, const QString &) {
+                              disconnect(*connection);
+                              const QString saved = job.filePath;
+                              QTimer::singleShot(0, this, [this, guard, saved, ok = status.isOk()]() {
+                                  if (ok && guard) guard->setModified(false);
+                                  // The gallery lists recent files.
+                                  if (ok && !saved.isEmpty()) KisRecentFilesManager::instance()->add(QUrl::fromLocalFile(saved));
+                                  // Not saved: fall back to the normal close (it asks).
+                                  triggerAction(QStringLiteral("file_close"));
+                              });
+                          });
+    const bool started = isKra ? doc->save(false, nullptr) : doc->saveAs(path, QByteArrayLiteral("application/x-krita"), false);
+    if (!started) {
+        disconnect(*connection);
+        return false;
+    }
+    return true;
+}
+
 void IkInterfaceManager::goHome()
 {
+    closeTransientWindows();
+    if (autoSaveThenGoHome()) return;
     if (d->mw->activeView()) {
         triggerAction(QStringLiteral("file_close"));
     } else if (d->home) {
         d->home->showPage(IkHomeScreen::GalleryPage);
     }
+}
+
+bool IkInterfaceManager::isEditingInterface() const
+{
+    IkLayout *l = d->layout(d->mode);
+    return l && l->isEditing();
+}
+
+void IkInterfaceManager::setEditingInterface(bool editing)
+{
+    IkLayout *l = d->layout(d->mode);
+    if (!l) return;
+    if (editing) closeTransientWindows();
+    l->setEditing(editing && d->onCanvasPage());
+}
+
+void IkInterfaceManager::requestLayout()
+{
+    slotLayoutPanels();
 }
 
 void IkInterfaceManager::showMainMenu(QWidget *anchor)
@@ -722,6 +964,15 @@ void IkInterfaceManager::showMainMenu(QWidget *anchor)
     layouts->addAction(d->followDefaultAction);
     menu.addAction(action(QStringLiteral("ikriate_brush_studio")));
     menu.addAction(action(QStringLiteral("ikriate_appearance")));
+    if (d->layout(d->mode) && d->onCanvasPage()) {
+        QAction *edit = menu.addAction(IkStyle::icon(QStringLiteral("edit-interface")), i18n("Edit Interface"));
+        edit->setCheckable(true);
+        edit->setChecked(isEditingInterface());
+        connect(edit, &QAction::toggled, this, [this](bool on) {
+            // After the menu has closed.
+            QTimer::singleShot(0, this, [this, on]() { setEditingInterface(on); });
+        });
+    }
     const QPoint pos = anchor ? anchor->mapToGlobal(QPoint(0, anchor->height() + 4)) : QCursor::pos();
     menu.exec(pos);
 }

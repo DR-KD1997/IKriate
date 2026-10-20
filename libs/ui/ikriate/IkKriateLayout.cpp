@@ -30,23 +30,37 @@ IkKriateLayout::IkKriateLayout(IkInterfaceManager *mgr)
     QHBoxLayout *top = new QHBoxLayout(m_top);
     top->setContentsMargins(10, 6, 10, 6);
     top->setSpacing(10);
-    auto add = [&](IkIconButton *b) {
+    // Two docks: tools on the left, painting and panels on the right.
+    QHBoxLayout *startBox = new QHBoxLayout();
+    startBox->setSpacing(10);
+    QHBoxLayout *endBox = new QHBoxLayout();
+    endBox->setSpacing(10);
+    top->addLayout(startBox);
+    top->addStretch(1);
+    top->addLayout(endBox);
+    auto topStyle = [ts](IkIconButton *b) {
+        b->setVariant(IkIconButton::Ghost);
         b->setEdge(ts + 10);
         b->setIconPixelSize(qRound(ts * 0.62));
-        top->addWidget(b);
+    };
+    QHBoxLayout *box = startBox;
+    auto add = [&](IkIconButton *b) {
+        topStyle(b);
+        box->addWidget(b);
         return b;
     };
     IkIconButton *home = add(button(m_top, QStringLiteral("home"), i18n("Gallery")));
     connect(home, &QAbstractButton::clicked, mgr, &IkInterfaceManager::goHome);
-    IkIconButton *colors = add(button(m_top, QStringLiteral("colors"), i18n("Colour")));
+    IkIconButton *colors = add(button(m_top, QStringLiteral("colors"), i18n("Adjust layer colours")));
     colors->setKeepIconColors(true);
-    connect(colors, &QAbstractButton::clicked, this, [this, colors]() { toggleColorPopover(colors, IkPopover::Below); });
+    connect(colors, &QAbstractButton::clicked, this, [this, colors]() { toggleAdjustPopover(colors, IkPopover::Below); });
     IkIconButton *select = add(button(m_top, QStringLiteral("select-rect"), i18n("Selection")));
     connect(select, &QAbstractButton::clicked, this, [this, select]() { showSelectionPopover(select, IkPopover::Below); });
     m_toolButtons << qMakePair(QPointer<IkIconButton>(select), QStringLiteral("KisToolSelectRectangular"));
     add(toolButton(m_top, QStringLiteral("transform"), i18n("Transform"), QStringLiteral("KisToolTransform")));
-    top->addStretch(1);
+    add(symmetryButton(m_top));
 
+    box = endBox;
     IkIconButton *brush = add(button(m_top, QStringLiteral("brush"), i18n("Paint (tap again for brushes)")));
     connect(brush, &QAbstractButton::clicked, this, [this]() {
         const bool already = manager()->paintMode() == IkInterfaceManager::Draw && manager()->isBrushToolActive();
@@ -76,6 +90,8 @@ IkKriateLayout::IkKriateLayout(IkInterfaceManager *mgr)
     connect(layers, &QAbstractButton::clicked, this, [this, layers]() { toggleLayersPopover(layers, IkPopover::Below); });
     IkIconButton *more = add(button(m_top, QStringLiteral("more-vertical"), i18n("More")));
     connect(more, &QAbstractButton::clicked, this, [this, more]() { showMoreMenu(more); });
+    addDock(QStringLiteral("top-start"), m_top, startBox, topStyle);
+    addDock(QStringLiteral("top-end"), m_top, endBox, topStyle);
 
     // ---- left strip: size, colour, opacity, undo, redo ----------------------
     m_side = panel();
@@ -100,12 +116,21 @@ IkKriateLayout::IkKriateLayout(IkInterfaceManager *mgr)
     bindOpacity(opacity);
     side->addWidget(opacity, 3, Qt::AlignHCenter);
     side->addSpacing(6);
+    QVBoxLayout *sideBox = new QVBoxLayout();
+    sideBox->setSpacing(6);
+    side->addLayout(sideBox);
+    auto sideStyle = [ts](IkIconButton *b) {
+        b->setVariant(IkIconButton::Ghost);
+        b->setEdge(ts);
+        b->setIconPixelSize(-1);
+    };
     for (const auto &a : QList<QPair<QString, QString>>{{QStringLiteral("undo"), QStringLiteral("edit_undo")},
                                                          {QStringLiteral("redo"), QStringLiteral("edit_redo")}}) {
         IkIconButton *b = actionButton(m_side, a.first, a.first == QLatin1String("undo") ? i18n("Undo") : i18n("Redo"), a.second);
-        b->setEdge(ts);
-        side->addWidget(b, 0, Qt::AlignHCenter);
+        sideStyle(b);
+        sideBox->addWidget(b, 0, Qt::AlignHCenter);
     }
+    addDock(QStringLiteral("side"), m_side, sideBox, sideStyle, Qt::AlignHCenter);
 
     // ---- docked brush library ----------------------------------------------
     m_library = panel();
@@ -117,6 +142,8 @@ IkKriateLayout::IkKriateLayout(IkInterfaceManager *mgr)
     ll->addWidget(m_libraryWidget);
     m_libraryOpen = KConfigGroup(KSharedConfig::openConfig(), "IKriate").readEntry("KriateBrushLibraryOpen", true);
     m_library->setProperty("ikHidden", !m_libraryOpen);
+
+    finishDocks();
 }
 
 void IkKriateLayout::setVisible(bool visible)

@@ -44,6 +44,7 @@
 #include "IkNewCanvasDialog.h"
 #include "IkRecycleBin.h"
 #include "IkSettingsPage.h"
+#include "IkPractice.h"
 #include "IkStyle.h"
 #include "IkWidgets.h"
 
@@ -429,7 +430,7 @@ IkHomeScreen::IkHomeScreen(KisMainWindow *mainWindow)
     d->header = new IkHomeHeader(this);
     d->header->onTab = [this](int i) { showPage(Page(i)); };
     d->header->onHelp = [this]() {
-        QDesktopServices::openUrl(QUrl(QStringLiteral("https://github.com/DR-KD1997/IKriate#readme")));
+        if (d->manager) d->manager->triggerAction(QStringLiteral("help_about_app"));
     };
     l->addWidget(d->header);
 
@@ -459,13 +460,13 @@ IkHomeScreen::IkHomeScreen(KisMainWindow *mainWindow)
     d->pill = new IkDockPill(this);
     d->palette = new IkIconButton(QStringLiteral("palette"), i18n("Brushes and resources"), d->pill);
     d->palette->setIconPixelSize(28);
-    d->profile = new IkIconButton(QStringLiteral("user"), i18n("About IKriate"), d->pill);
+    d->profile = new IkIconButton(QStringLiteral("lightbulb"), i18n("Practice"), d->pill);
     d->profile->setIconPixelSize(28);
     connect(d->palette, &QAbstractButton::clicked, this, [this]() {
         if (d->manager) d->manager->triggerAction(QStringLiteral("manage_resources"));
     });
     connect(d->profile, &QAbstractButton::clicked, this, [this]() {
-        if (d->manager) d->manager->triggerAction(QStringLiteral("help_about_app"));
+        if (d->manager) IkPractice::showMenu(d->manager, d->profile);
     });
     d->fab = new IkIconButton(QStringLiteral("plus"), i18n("Create"), this);
     d->fab->setVariant(IkIconButton::Fab);
@@ -503,6 +504,21 @@ void IkHomeScreen::setManager(IkInterfaceManager *manager)
 {
     d->manager = manager;
     d->settings->setManager(manager);
+}
+
+IkHomeScreen::Page IkHomeScreen::currentPage() const
+{
+    return Page(d->pages->currentIndex());
+}
+
+int IkHomeScreen::settingsSection() const
+{
+    return d->settings->currentSection();
+}
+
+void IkHomeScreen::showSettingsSection(int section)
+{
+    d->settings->openSection(section);
 }
 
 void IkHomeScreen::showPage(Page page)

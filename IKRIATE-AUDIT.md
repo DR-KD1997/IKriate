@@ -27,6 +27,20 @@ by expected value.
 | Branding | `rebrand-strings.py` renames the product in all translatable text and the 75 translation catalogues; About/splash credit Krita accurately and drop Krita's sponsors and donation links; Krita's colour themes renamed "Classic …"; Android billing code (the Krita Foundation's Play Store products) removed; AppStream metadata rewritten. File-format names (".kra, Krita document") and the Python API module name are kept, since they name Krita's format and API. |
 | Size | Identical code folding (`IKRIATE_ICF=safe`) in Windows and Linux CI; brushes merged into one optimised bundle without duplicate tips and patterns. |
 
+## Done in 1.1 (interface refinements)
+
+| Area | Change |
+|---|---|
+| Scale and font | The interface scale (desktop) and font apply immediately: the font is re-applied and the home screen and layouts are rebuilt in place. On Android the scale changes the screen density live. |
+| Window frames | Dialogs, menus and pop-up windows are masked to rounded corners with a 2 px accent-gradient outline (`IkWindowFrames`), replacing the style's rectangular frame. |
+| Home | "?" opens About; the profile button is now a lightbulb that opens the Practice activities. |
+| Tools | Zoom and Pan removed from the Kriate and Minimal tool sets (gestures, scroll wheel and middle mouse already do this). The Desktop "Mirror View" button is now a symmetry button (X, Y, both, radial) in all three layouts; flipping the canvas moves to a three-finger double tap. |
+| Layer colours | The colours button in Kriate and Minimal adjusts the selected layer (HSV, colour balance) through Krita's filter preview, applied as one undo step. |
+| Edit Interface | Layout buttons live in named docks; an editing overlay disables the tools and lets buttons be dragged between docks. Arrangements are saved per layout. |
+| Auto-Save | Returning to the gallery saves modified documents without a prompt (on by default). |
+| Touch gestures | IKriate's own tap and double-tap recogniser replaces the tap entries of the touch profile, configurable in Settings › Advanced. |
+| Fixes | Windows, menus and the brush editor opened in a project are closed when going back to the gallery. The New Canvas background chip previews the canvas aspect ratio. |
+
 ## Recommended next
 
 1. **Qt 6 on Android.** Switch `build-android.yml` to Qt 6 once KDE publishes Qt 6 Android

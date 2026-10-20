@@ -1,8 +1,8 @@
-# IKriate Tablet: the default touch profile for the Radial layout.
+# IKriate Tablet: the input profile of the IKriate layouts.
 # Same as Krita Default, except that holding one finger on the canvas opens
 # the radial palette (instead of a one-finger tap), so a stray palm tap
-# does not pop it up. Two-finger tap undoes, three-finger tap redoes and
-# four-finger tap hides all interface chrome.
+# does not pop it up, and that multi-finger taps are left to IKriate's own
+# gesture handler (IkTouchGestures), configured under Settings > Advanced.
 [Alternate Invocation]
 0={1;2;[1000023,1000020];1;0;0}
 1={0;2;[1000021,1000020];1;0;0}
@@ -79,7 +79,4 @@ version=6
 0={0;4;[];0;0;7}
 
 [Touch Gestures]
-0={0;4;[];0;0;2}
-1={1;4;[];0;0;3}
-2={2;4;[];0;0;4}
 3={3;2;[];20;0;0}

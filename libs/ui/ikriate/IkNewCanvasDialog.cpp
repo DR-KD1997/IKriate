@@ -143,31 +143,55 @@ protected:
 };
 
 /// Background colour chip (white rectangle in the mockup); checkerboard when transparent.
+/// Background colour button that also previews the canvas shape: a page
+/// with the width/height ratio of the canvas, filled with the background.
 class IkBackgroundChip : public QAbstractButton
 {
 public:
     explicit IkBackgroundChip(QWidget *parent) : QAbstractButton(parent)
     {
         setCursor(Qt::PointingHandCursor);
-        setFixedSize(96, IkStyle::touchSize() + 8);
+        setFixedSize(IkStyle::scaled(96), IkStyle::touchSize() + IkStyle::scaled(8));
         setToolTip(i18n("Background"));
     }
     QColor color {Qt::white};
+
+    void setAspect(qreal widthOverHeight)
+    {
+        if (widthOverHeight > 0 && !qFuzzyCompare(m_aspect, widthOverHeight)) {
+            m_aspect = widthOverHeight;
+            update();
+        }
+    }
 
 protected:
     void paintEvent(QPaintEvent *) override
     {
         QPainter p(this);
-        const QRect r = rect().adjusted(1, 1, -1, -1);
+        p.setRenderHint(QPainter::Antialiasing);
+        const QRectF box = QRectF(rect()).adjusted(3, 3, -3, -3);
+        QSizeF s(box.height() * m_aspect, box.height());
+        if (s.width() > box.width()) s = QSizeF(box.width(), box.width() / m_aspect);
+        s = s.expandedTo(QSizeF(3, 3));
+        QRectF r(QPointF(), s);
+        r.moveCenter(box.center());
+        r = QRectF(qRound(r.x()), qRound(r.y()), qRound(r.width()), qRound(r.height()));
+        IkStyle::drawShadow(p, r, 2, 6, 60);
         if (color.alpha() < 255) {
-            const int c = 8;
-            for (int y = r.top(); y < r.bottom(); y += c)
-                for (int x = r.left(); x < r.right(); x += c)
-                    p.fillRect(QRect(x, y, c, c).intersected(r), ((x / c + y / c) % 2) ? QColor(200, 200, 200) : QColor(245, 245, 245));
+            const int c = 6;
+            p.save();
+            p.setClipRect(r);
+            for (qreal y = r.top(); y < r.bottom(); y += c)
+                for (qreal x = r.left(); x < r.right(); x += c)
+                    p.fillRect(QRectF(x, y, c, c), (int((x - r.left()) / c + (y - r.top()) / c) % 2) ? QColor(200, 200, 200) : QColor(245, 245, 245));
+            p.restore();
         }
         p.fillRect(r, color);
-        if (isDown()) p.fillRect(r, QColor(0, 0, 0, 40));
+        if (isDown() || underMouse()) p.fillRect(r, QColor(0, 0, 0, isDown() ? 40 : 15));
     }
+
+private:
+    qreal m_aspect {1.0};
 };
 
 class IkNewCanvasSheet : public QWidget
@@ -327,6 +351,7 @@ public:
 
     void updateBudget()
     {
+        if (m_bg && heightPx() > 0) m_bg->setAspect(qreal(widthPx()) / heightPx());
         m_lastW = widthPx();
         m_lastH = heightPx();
         m_budget->layers = IkNewCanvasDialog::estimatedMaxLayers(m_lastW, m_lastH);
@@ -416,7 +441,7 @@ public:
             w->setUniformItemSizes(true);
             QScroller::grabGesture(w->viewport(), IkStyle::touchFirst() ? QScroller::LeftMouseButtonGesture : QScroller::TouchGesture);
         }
-        m_groups->setFixedWidth(200);
+        m_groups->setFixedWidth(IkStyle::scaled(200));
         body->addWidget(m_groups);
         IkDivider *vline = new IkDivider(this);
         vline->setFixedHeight(QWIDGETSIZE_MAX);

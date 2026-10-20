@@ -48,7 +48,16 @@ enum Role {
 KRITAUI_EXPORT QColor color(Role role, const QPalette &palette);
 KRITAUI_EXPORT QColor color(Role role);
 
-/// Edge of a comfortable touch target (48 on tablets, 40 with a mouse).
+/// Interface scale chosen in Settings (1.0 = 100%). On Android the system
+/// density does the scaling, so this stays 1.0 there.
+KRITAUI_EXPORT qreal uiScale();
+KRITAUI_EXPORT void setUiScale(qreal scale);
+/// @p px multiplied by uiScale().
+KRITAUI_EXPORT int scaled(int px);
+/// Applies the interface font (custom family, if any) at the current scale.
+KRITAUI_EXPORT void applyInterfaceFont();
+
+/// Edge of a comfortable touch target (48 on tablets, 40 with a mouse), scaled.
 KRITAUI_EXPORT int touchSize();
 /// Base corner radius for panels; controls use smaller fractions of it.
 KRITAUI_EXPORT int radius();

@@ -153,7 +153,14 @@ void IkIconButton::setActive(bool active)
 void IkIconButton::setEdge(int px)
 {
     m_edge = px;
-    setFixedSize(px, px);
+    if (px > 0) {
+        setFixedSize(px, px);
+    } else {
+        // Back to the natural size (sizeHint).
+        setMinimumSize(0, 0);
+        setMaximumSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
+        updateGeometry();
+    }
 }
 
 void IkIconButton::bindAction(QAction *action)

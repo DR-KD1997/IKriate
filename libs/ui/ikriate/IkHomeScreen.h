@@ -33,6 +33,10 @@ public:
 
     void setManager(IkInterfaceManager *manager);
     void showPage(Page page);
+    Page currentPage() const;
+    /// Section shown on the settings page (Theme, Language, ...).
+    int settingsSection() const;
+    void showSettingsSection(int section);
 
     /// Documents the user starred (shown under the star tab).
     static QList<QUrl> favoriteDocuments();

@@ -125,7 +125,7 @@ private:
 class IkFgBgChip : public QWidget
 {
 public:
-    explicit IkFgBgChip(QWidget *parent) : QWidget(parent) { setCursor(Qt::PointingHandCursor); setFixedSize(44, 44); }
+    explicit IkFgBgChip(QWidget *parent) : QWidget(parent) { setCursor(Qt::PointingHandCursor); setFixedSize(IkStyle::scaled(44),IkStyle::scaled(44)); }
     QColor fg {Qt::black}, bg {Qt::white};
     std::function<void()> onClick;
 
@@ -192,7 +192,7 @@ IkColorPanel::IkColorPanel(IkInterfaceManager *manager, QWidget *parent)
         d->sliders[i] = new IkChannelSlider(IkChannelSlider::Channel(i), d->sliderBlock);
         g->addWidget(d->sliders[i], i, 2);
         d->fields[i] = new QLineEdit(d->sliderBlock);
-        d->fields[i]->setFixedWidth(46);
+        d->fields[i]->setFixedWidth(IkStyle::scaled(46));
         d->fields[i]->setAlignment(Qt::AlignRight);
         d->fields[i]->setFont(IkStyle::font(0.85));
         d->fields[i]->setFrame(false);
@@ -225,7 +225,7 @@ IkColorPanel::IkColorPanel(IkInterfaceManager *manager, QWidget *parent)
                                       KisColorSelectorConfiguration::SV, KisColorSelectorConfiguration::H);
     d->selector->setConfiguration(&cfg);
     d->selector->setAcceptTabletEvents(true);
-    d->selector->setMinimumSize(180, 180);
+    d->selector->setMinimumSize(IkStyle::scaled(180),IkStyle::scaled(180));
     d->selector->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     d->selector->slotSetColorSpace(KoColorSpaceRegistry::instance()->rgb8());
     l->addWidget(d->selector, 1);
@@ -356,7 +356,7 @@ void IkColorPanel::rebuildSwatches()
         IkSwatch *s = new IkSwatch(this);
         s->setShape(true);
         s->setDiameter(30);
-        s->setMinimumSize(40, 40);
+        s->setMinimumSize(IkStyle::scaled(40),IkStyle::scaled(40));
         s->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
         connect(s, &QAbstractButton::clicked, this, [this, s]() {
             setForeground(KoColor(s->color(), KoColorSpaceRegistry::instance()->rgb8()));
