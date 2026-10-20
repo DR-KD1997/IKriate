@@ -207,11 +207,12 @@ def main():
         else:
             print(f"keep {len(fonts)} bundled font files ({human(size)}): fontconfig does not read /system/fonts")
 
-    # Documentation, headers and build metadata the dependency packages install;
+    # Documentation the dependency packages install;
     # share/ ends up in the APK's assets.
+    # (Not include/ or the CMake/pkg-config files: the packaging step re-runs
+    # CMake against this prefix.)
     for sub in ("share/doc", "share/info", "share/man", "share/gtk-doc", "share/gettext",
-                "share/aclocal", "share/bash-completion", "share/cmake", "share/pkgconfig",
-                "include", "lib/pkgconfig", "lib/cmake"):
+                "share/bash-completion"):
         d = os.path.join(prefix, sub)
         if os.path.isdir(d):
             size = sum(os.path.getsize(os.path.join(r, f)) for r, _, fs in os.walk(d) for f in fs
