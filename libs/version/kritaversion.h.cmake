@@ -30,6 +30,9 @@
 */
 #define KRITA_VERSION_STRING "@KRITA_VERSION_STRING@"
 
+/// IKriate release number shown to users (About, splash, packages).
+#define IKRIATE_VERSION_STRING "@IKRIATE_VERSION_STRING@"
+
 /**
  * @def KRITA_STABLE_VERSION_MAJOR
  * @ingroup KritaMacros

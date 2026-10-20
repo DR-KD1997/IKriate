@@ -36,6 +36,13 @@ Stylesheet=my-skin.qss   ; optional Qt stylesheet next to the skin
 Description=One line shown in the skin picker
 ```
 
+## Download
+
+Windows, Linux and Android packages are on the
+[Releases](https://github.com/DR-KD1997/IKriate/releases) page. The Android APK is
+debug-signed: allow installing from unknown sources, and uninstall it before installing a
+future release-signed version.
+
 ## Building
 
 See [packaging/README-IKRIATE.md](packaging/README-IKRIATE.md) for Linux, Windows and Android

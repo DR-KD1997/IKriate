@@ -47,6 +47,7 @@
 #include <kis_image_config.h>
 #include <opengl/kis_opengl.h>
 #include "KritaVersionWrapper.h"
+#include <kritaversion.h>
 
 #include "KisApplicationArguments.h"
 #include "KisDocument.h"
@@ -725,12 +726,16 @@ if (!qEnvironmentVariableIsEmpty("KRITA_OPENGL_DEBUG")) {
     /// DrKonqi of the host system
     // The component name stays "krita" so that installed data (share/krita),
     // translations and plugins are found unchanged; only the visible name differs.
+    // Shown in About and on the splash: IKriate's release, then the Krita base.
+    const QString krita = QStringLiteral("Krita");
+    const QString shownVersion = QStringLiteral(IKRIATE_VERSION_STRING " (%1 %2)")
+                                     .arg(krita, KritaVersionWrapper::versionString(true));
     KAboutData aboutData("krita",
                             "IKriate",
-                            KritaVersionWrapper::versionString(true),
+                            shownVersion,
                             "", // TODO: "short description" needs new string exception
                             KAboutLicense::GPL,
-                            i18nc("@info:credit", "IKriate is based on Krita. © 1999–2026 The IKriate Developers"));
+                            i18nc("@info:credit", "IKriate is based on %1. © 1999–2026 the %1 developers; IKriate changes © 2026 the IKriate contributors.", krita));
     aboutData.setHomepage(QStringLiteral("https://github.com/DR-KD1997/IKriate"));
     aboutData.setBugAddress("https://github.com/DR-KD1997/IKriate/issues");
     aboutData.setOrganizationDomain("krita.org");

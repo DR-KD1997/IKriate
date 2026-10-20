@@ -8,9 +8,10 @@ builds come from the same source.
 
 ## GitHub Actions (all three platforms)
 
-The Qt 5 versions of all three produced working packages on 17 Oct 2026 (Linux AppImage
-156 MB, Windows zip 219 MB, Android APK 180 MB). Download them from the run's **Artifacts**
-section. Each run's
+IKriate 1.0.0 (20 Oct 2026): Windows zip 215 MB (Qt 6), Linux AppImage (Qt 6), Android APK
+123 MB (Qt 5, tablet package; 180 MB before the tablet cuts). Pushing a `v*` tag builds all
+three and attaches them to the GitHub release of that tag; other runs keep them under
+**Artifacts**. Each run's
 summary page lists the package size and its largest parts; `IKRIATE-OPTIMISATION.md` has the
 size and memory study.
 
