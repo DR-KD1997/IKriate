@@ -41,6 +41,8 @@ public:
     void setTranslucent(bool translucent);
     void setShadow(bool shadow);
     void setBorder(bool border);
+    /// Outline in the accent gradient (pop-ups opened from settings).
+    void setAccentOutline(bool outline);
     /// Only round some corners (e.g. a panel docked to a window edge).
     enum Corner { TopLeft = 1, TopRight = 2, BottomLeft = 4, BottomRight = 8, AllCorners = 15 };
     void setRoundedCorners(int corners);
@@ -58,6 +60,7 @@ private:
     bool m_translucent {false};
     bool m_shadow {false};
     bool m_border {false};
+    bool m_accentOutline {false};
     int m_corners {AllCorners};
 };
 
@@ -480,6 +483,32 @@ private:
     QSize m_requested;
     bool m_modal {false};
     bool m_dim {false};
+};
+
+
+/// One hue / saturation / brightness slider: gradient track with a triangle
+/// marker below it. Values are 0..1 (hue below 1).
+class KRITAUI_EXPORT IkChannelSlider : public QWidget
+{
+public:
+    enum Channel { Hue, Saturation, Brightness };
+    IkChannelSlider(Channel channel, QWidget *parent);
+    std::function<void(qreal)> onEdited;
+    qreal h {0}, s {0}, v {0};
+    qreal value() const;
+    QSize sizeHint() const override;
+
+protected:
+    QRectF track() const;
+    void paintEvent(QPaintEvent *) override;
+    void mousePressEvent(QMouseEvent *e) override;
+    void mouseMoveEvent(QMouseEvent *e) override;
+    void mouseReleaseEvent(QMouseEvent *) override;
+
+private:
+    void setFrom(qreal px);
+    Channel m_channel;
+    bool m_drag {false};
 };
 
 #endif // IKWIDGETS_H

@@ -403,6 +403,38 @@ void KoCreatePathTool::endPath()
     endShape();
 }
 
+void KoCreatePathTool::closeAndEndPath()
+{
+    Q_D(KoCreatePathTool);
+
+    if (!d->shape) {
+        return;
+    }
+    if (d->shape->pointCount() > 1) {
+        delete d->shape->removePoint(d->shape->pathPointIndex(d->activePoint));
+    }
+    if (d->shape->pointCount() > 2) {
+        d->shape->close();
+    }
+    d->existingStartPoint = 0;
+    d->addPathShape();
+
+    repaintDecorations();
+    endShape();
+}
+
+KoPathShape *KoCreatePathTool::pathInProgress() const
+{
+    Q_D(const KoCreatePathTool);
+    return d->shape;
+}
+
+KoPathPoint *KoCreatePathTool::activePathPoint() const
+{
+    Q_D(const KoCreatePathTool);
+    return d->activePoint;
+}
+
 void KoCreatePathTool::endPathWithoutLastPoint()
 {
     Q_D(KoCreatePathTool);

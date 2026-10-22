@@ -57,7 +57,7 @@ IkKriateLayout::IkKriateLayout(IkInterfaceManager *mgr)
     IkIconButton *select = add(button(m_top, QStringLiteral("select-rect"), i18n("Selection")));
     connect(select, &QAbstractButton::clicked, this, [this, select]() { showSelectionPopover(select, IkPopover::Below); });
     m_toolButtons << qMakePair(QPointer<IkIconButton>(select), QStringLiteral("KisToolSelectRectangular"));
-    add(toolButton(m_top, QStringLiteral("transform"), i18n("Transform"), QStringLiteral("KisToolTransform")));
+    add(transformButton(m_top));
     add(symmetryButton(m_top));
 
     box = endBox;
@@ -77,11 +77,10 @@ IkKriateLayout::IkKriateLayout(IkInterfaceManager *mgr)
         if (already) setLibraryOpen(!m_libraryOpen);
     });
     m_eraseButtons << eraser;
-    IkIconButton *smudge = add(button(m_top, QStringLiteral("smudge"), i18n("Smudge (tap again for brushes)")));
-    connect(smudge, &QAbstractButton::clicked, this, [this]() {
-        const bool already = manager()->paintMode() == IkInterfaceManager::Smudge;
-        manager()->setPaintMode(IkInterfaceManager::Smudge);
-        if (already) setLibraryOpen(!m_libraryOpen);
+    IkIconButton *smudge = add(button(m_top, QStringLiteral("smudge"), i18n("Smudge, blur or liquify")));
+    connect(smudge, &QAbstractButton::clicked, this, [this, smudge]() {
+        manager()->setSmudgeVariant(manager()->smudgeVariant());
+        showSmudgeOptions(smudge);
     });
     m_smudgeButtons << smudge;
     IkIconButton *tools = add(button(m_top, QStringLiteral("tools"), i18n("All tools")));

@@ -8,11 +8,11 @@
 # The AppImage bundles Qt and needs a distribution with glibc 2.42 or newer.
 name: Linux (AppImage)
 
+# For now only release tags and manual runs build this platform; pushes to
+# main build Android only (Android-first testing).
 on:
   push:
-    branches: [main]
     tags: ['v*']
-  pull_request:
   workflow_dispatch:
 
 permissions:

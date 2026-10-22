@@ -124,6 +124,9 @@ marked `IKRIATE-REBRAND: skip` (the About dialog, which credits Krita by name).
 | `libs/ui/ikriate/IkTouchGestures.*` | Multi-finger taps and double taps on the canvas (`[IKriateGestures]`) |
 | `libs/ui/ikriate/IkPractice.*` | Practice activities (timed, memory, value study, warm-up) |
 | `libs/ui/ikriate/IkLayerAdjust.*` | Layer hue/saturation/brightness and colour balance |
+| `libs/ui/ikriate/IkMenus.*` | Options and layer action grids, HSB picker, popover helper |
+| `libs/ui/ikriate/IkBrushSettings.*` | IKriate brush settings panel inside Krita's brush editor |
+| `libs/ui/ikriate/IkReferences.*` | Reference images on the canvas or floating |
 | `libs/ui/ikriate/IkWindowFrames.*` | Rounded accent outline on dialogs, menus and pop-up windows |
 | `libs/ui/ikriate/IkHomeScreen.*`, `IkNewCanvasDialog.*`, `IkRecycleBin.*` | Gallery, create menu, New Canvas and Template sheets, recycle bin |
 | `libs/ui/ikriate/IkSettingsPage.*` | Settings (theme, layout, language, advanced, clean-up) |

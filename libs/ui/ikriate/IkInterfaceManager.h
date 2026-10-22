@@ -53,6 +53,11 @@ public:
 
     /// Symmetrical painting: mirror across the vertical axis (X), the
     /// horizontal axis (Y), both, or radial (rotational) with N sections.
+    enum TransformMode { TransformBasic, TransformAnchor, TransformDistort, TransformWarp, TransformLiquify };
+    enum SmudgeVariant { SmudgeSmear, SmudgeBlur, SmudgeLiquify };
+    int transformMode() const;
+    int smudgeVariant() const;
+
     enum Symmetry { SymmetryOff, SymmetryX, SymmetryY, SymmetryXY, SymmetryRadial };
     Q_ENUM(Symmetry)
 
@@ -98,6 +103,16 @@ public Q_SLOTS:
     void setPaintMode(IkInterfaceManager::PaintMode mode);
     void setSymmetry(IkInterfaceManager::Symmetry symmetry, int radialSections = -1, int radialMirrored = -1);
     void activateTool(const QString &toolId);
+    /// Transform tool in one of its modes (TransformBasic ... TransformLiquify).
+    void activateTransform(int mode);
+    /// Mirrors the current layer (or selection) horizontally or vertically.
+    void flipLayer(bool horizontal);
+    /// Smudge (smear), Blur or Liquify (see SmudgeVariant).
+    void setSmudgeVariant(int variant);
+    /// "Selection Fill": a lasso whose shape is filled with the foreground
+    /// colour as soon as it is closed.
+    void activateSelectionFill();
+    bool isSelectionFillActive() const;
     void ensureBrushTool();
     void showBrushEditor();
     void createBrushFromCurrent();
@@ -108,6 +123,10 @@ public Q_SLOTS:
 
     /// Pops up a menu with the full main menu, the layouts and settings.
     void showMainMenu(QWidget *anchor);
+    /// Layout choice (Desktop, Kriate, Minimal, Classic) and Edit Interface.
+    void showLayoutMenu(QWidget *anchor);
+    /// All of Krita's menus, as one menu.
+    void showKritaMenus(QWidget *anchor);
     /// Pops up one top-level menu, e.g. "file" or "Filter".
     void showNamedMenu(const QString &menuName, QWidget *anchor);
     /// Shows the radial pop-up palette, centred on @p globalPos or the canvas.

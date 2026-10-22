@@ -28,6 +28,7 @@ void KisToolEllipseBase::paintRectangle(QPainter &gc, const QRectF &imageRect)
     QPainterPath path;
     path.addEllipse(viewRect);
     getRotatedPath(path, viewRect.center(), getRotationAngle());
+    paintBrushPreview(&gc, path);
     path.addPath(drawX(pixelToView(m_dragStart)));
     path.addPath(drawX(pixelToView(m_dragCenter)));
     paintToolOutline(&gc, path);

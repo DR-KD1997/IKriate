@@ -12,6 +12,9 @@
 #include <QHBoxLayout>
 #include <QLineEdit>
 #include <QMenu>
+#include <QScroller>
+#include <QScrollArea>
+#include <QLinearGradient>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QPainterPath>
@@ -115,6 +118,17 @@ void IkPanel::paintEvent(QPaintEvent *)
     p.setPen(m_border ? QPen(IkStyle::color(IkStyle::Divider, palette()), 1.0) : Qt::NoPen);
     p.setBrush(bg);
     p.drawPath(roundedPath(r.adjusted(0.5, 0.5, -0.5, -0.5), radius, m_corners));
+    if (m_accentOutline) {
+        p.setBrush(Qt::NoBrush);
+        p.setPen(QPen(IkStyle::accentGradient(r, palette()), 2.0));
+        p.drawPath(roundedPath(r.adjusted(1, 1, -1, -1), qMax<qreal>(0, radius - 1), m_corners));
+    }
+}
+
+void IkPanel::setAccentOutline(bool outline)
+{
+    m_accentOutline = outline;
+    update();
 }
 
 // ============================================================== IkIconButton
@@ -998,26 +1012,88 @@ void IkChoiceRow::paintEvent(QPaintEvent *)
     p.drawText(r.adjusted(0, 0, -(arrow + 32), 0), Qt::AlignVCenter | Qt::AlignRight, m_value);
 }
 
+namespace
+{
+/// One choice in an IkChoiceRow's list: text, check mark when current.
+class IkChoiceItem : public QAbstractButton
+{
+public:
+    IkChoiceItem(const QString &text, bool current, QWidget *parent) : QAbstractButton(parent), m_current(current)
+    {
+        setText(text);
+        setCursor(Qt::PointingHandCursor);
+        setAttribute(Qt::WA_Hover);
+        setFocusPolicy(Qt::NoFocus);
+        setMinimumHeight(IkStyle::touchFirst() ? IkStyle::touchSize() : IkStyle::scaled(38));
+    }
+    QSize sizeHint() const override
+    {
+        return QSize(QFontMetrics(IkStyle::font(1.05)).horizontalAdvance(text()) + IkStyle::scaled(64), minimumHeight());
+    }
+
+protected:
+    void paintEvent(QPaintEvent *) override
+    {
+        QPainter p(this);
+        p.setRenderHint(QPainter::Antialiasing);
+        const QPalette pal = palette();
+        if (m_current || underMouse() || isDown()) {
+            p.setPen(Qt::NoPen);
+            p.setBrush(m_current ? IkStyle::color(IkStyle::AccentSoft, pal) : IkStyle::color(IkStyle::RaisedHover, pal));
+            p.drawRoundedRect(QRectF(rect()).adjusted(2, 1, -2, -1), 10, 10);
+        }
+        p.setFont(IkStyle::font(1.05, m_current ? QFont::DemiBold : -1));
+        p.setPen(m_current ? IkStyle::color(IkStyle::Accent, pal) : IkStyle::color(IkStyle::Text, pal));
+        p.drawText(rect().adjusted(IkStyle::scaled(16), 0, -IkStyle::scaled(40), 0), Qt::AlignVCenter | Qt::AlignLeft, text());
+        if (m_current) {
+            const int s = IkStyle::scaled(18);
+            p.drawPixmap(QRect(width() - s - IkStyle::scaled(14), (height() - s) / 2, s, s),
+                         IkStyle::pixmap(QStringLiteral("check"), s, IkStyle::color(IkStyle::Accent, pal), devicePixelRatioF()));
+        }
+    }
+
+private:
+    bool m_current;
+};
+}
+
 void IkChoiceRow::openMenu()
 {
     if (m_choices.isEmpty()) {
         Q_EMIT chosen(-1);
         return;
     }
-    QMenu menu(this);
-    menu.setMinimumWidth(width());
+    // A styled list in a popover (instead of a plain QMenu).
+    IkPopover *pop = new IkPopover(window());
+    pop->setRadius(16);
+    pop->setAccentOutline(true);
+    connect(pop, &IkPopover::dismissed, pop, &QObject::deleteLater);
+    QScrollArea *scroll = new QScrollArea(pop);
+    scroll->setFrameShape(QFrame::NoFrame);
+    scroll->setWidgetResizable(true);
+    scroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    IkStyle::makeTransparent(scroll);
+    QWidget *list = new QWidget(scroll);
+    QVBoxLayout *l = new QVBoxLayout(list);
+    l->setContentsMargins(4, 4, 4, 4);
+    l->setSpacing(2);
+    int widest = width();
+    QPointer<IkPopover> guard = pop;
     for (int i = 0; i < m_choices.size(); ++i) {
-        QAction *a = menu.addAction(m_choices[i]);
-        a->setCheckable(true);
-        a->setChecked(i == m_current);
-        a->setData(i);
+        IkChoiceItem *item = new IkChoiceItem(m_choices[i], i == m_current, list);
+        widest = qMax(widest, item->sizeHint().width() + 40);
+        connect(item, &QAbstractButton::clicked, this, [this, i, guard]() {
+            if (guard) guard->dismiss();
+            setCurrentIndex(i);
+            Q_EMIT chosen(i);
+        });
+        l->addWidget(item);
     }
-    QAction *picked = menu.exec(mapToGlobal(QPoint(0, height() + 2)));
-    if (picked) {
-        const int i = picked->data().toInt();
-        setCurrentIndex(i);
-        Q_EMIT chosen(i);
-    }
+    scroll->setWidget(list);
+    QScroller::grabGesture(scroll->viewport(), IkStyle::touchFirst() ? QScroller::LeftMouseButtonGesture : QScroller::TouchGesture);
+    pop->setContent(scroll);
+    const int rows = list->sizeHint().height() + 2 * 20 + 10;
+    pop->popup(this, IkPopover::Below, QSize(qMin(widest, window()->width() - 40), qMin(rows, window()->height() * 2 / 3)));
 }
 
 // =============================================================== IkNumberRow
@@ -1427,3 +1503,65 @@ bool IkPopover::eventFilter(QObject *watched, QEvent *event)
     }
     return IkPanel::eventFilter(watched, event);
 }
+
+// ---- IkChannelSlider ----------------------------------------------------------
+
+IkChannelSlider::IkChannelSlider(Channel channel, QWidget *parent)
+    : QWidget(parent), m_channel(channel)
+{
+    setAttribute(Qt::WA_AcceptTouchEvents);
+    setCursor(Qt::PointingHandCursor);
+    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+}
+
+qreal IkChannelSlider::value() const { return m_channel == Hue ? h : m_channel == Saturation ? s : v; }
+QSize IkChannelSlider::sizeHint() const { return QSize(200, 24); }
+QRectF IkChannelSlider::track() const { return QRectF(6, 3, width() - 12, 9); }
+
+void IkChannelSlider::paintEvent(QPaintEvent *)
+{
+    QPainter p(this);
+    p.setRenderHint(QPainter::Antialiasing);
+    const QRectF t = track();
+    QLinearGradient g(t.topLeft(), t.topRight());
+    if (m_channel == Hue) {
+        for (int i = 0; i <= 6; ++i) g.setColorAt(i / 6.0, QColor::fromHsvF(qMin(0.9999, i / 6.0), 1, 1));
+    } else if (m_channel == Saturation) {
+        g.setColorAt(0, QColor::fromHsvF(h, 0, v));
+        g.setColorAt(1, QColor::fromHsvF(h, 1, v));
+    } else {
+        g.setColorAt(0, Qt::black);
+        g.setColorAt(1, QColor::fromHsvF(h, s, 1));
+    }
+    p.setPen(Qt::NoPen);
+    p.setBrush(g);
+    p.drawRoundedRect(t, 4.5, 4.5);
+    const qreal x = t.left() + t.width() * value();
+    QPainterPath tri;
+    tri.moveTo(x, t.bottom() + 1);
+    tri.lineTo(x - 5.5, t.bottom() + 10);
+    tri.lineTo(x + 5.5, t.bottom() + 10);
+    tri.closeSubpath();
+    p.setBrush(IkStyle::color(IkStyle::Text, palette()));
+    p.drawPath(tri);
+}
+
+void IkChannelSlider::setFrom(qreal px)
+{
+    const QRectF t = track();
+    const qreal val = qBound<qreal>(0.0, (px - t.left()) / t.width(), m_channel == Hue ? 0.9999 : 1.0);
+    if (onEdited) onEdited(val);
+}
+
+static qreal ikPosX(QMouseEvent *e)
+{
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    return e->position().x();
+#else
+    return e->localPos().x();
+#endif
+}
+
+void IkChannelSlider::mousePressEvent(QMouseEvent *e) { m_drag = true; setFrom(ikPosX(e)); }
+void IkChannelSlider::mouseMoveEvent(QMouseEvent *e) { if (m_drag) setFrom(ikPosX(e)); }
+void IkChannelSlider::mouseReleaseEvent(QMouseEvent *) { m_drag = false; }

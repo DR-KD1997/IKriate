@@ -41,12 +41,17 @@
 #include <KoCanvasResourcesIds.h>
 #include <KoResource.h>
 #include <KoToolManager.h>
+#include <KoCanvasController.h>
+#include <KoToolBase.h>
+#include <kis_selection.h>
+#include <kis_image.h>
 #include <brushengine/kis_paintop_preset.h>
 
 #include "KisMainWindow.h"
 #include "KisImportExportErrorCode.h"
 #include "KisView.h"
 #include "KisDocument.h"
+#include "kis_selection_manager.h"
 #include <KisRecentFilesManager.h>
 #include "KisViewManager.h"
 #include "canvas/kis_canvas2.h"
@@ -65,6 +70,10 @@
 #include "IkPractice.h"
 #include "IkTouchGestures.h"
 #include "IkWindowFrames.h"
+#include "IkNewCanvasDialog.h"
+#include "IkMenus.h"
+#include "IkBrushSettings.h"
+#include "IkReferences.h"
 #include "IkSettingsPage.h"
 #include "IkSkinManager.h"
 #include "IkStyle.h"
@@ -119,6 +128,9 @@ struct IkInterfaceManager::Private
     Symmetry symmetry {SymmetryOff};
     int radialSections {6};
     bool radialMirrored {false};
+    bool selectionFill {false};
+    bool fillingSelection {false};
+    QPointer<QObject> selectionFillWatched;
     bool settingMode {false};
     QString drawPreset;
     QPointer<QWidget> toolOptions;
@@ -538,6 +550,19 @@ void IkInterfaceManager::applyMode()
     }
     applyInputProfile();
     updateLayoutVisibility();
+    if (d->mode == Classic) {
+        // The docker interface gets Krita's own brush editor back.
+        for (QWidget *top : QApplication::topLevelWidgets()) {
+            QList<QWidget *> candidates = top->findChildren<QWidget *>();
+            candidates.prepend(top);
+            for (QWidget *w : candidates) {
+                if (w->inherits("KisPaintOpPresetsEditor")) IkBrushSettings::adoptEditor(w, this, false);
+            }
+        }
+        for (QWidget *w : d->mw->findChildren<QWidget *>()) {
+            if (w->inherits("KisPaintOpPresetsEditor")) IkBrushSettings::adoptEditor(w, this, false);
+        }
+    }
 }
 
 void IkInterfaceManager::hideDesktopChrome()
@@ -656,6 +681,7 @@ void IkInterfaceManager::slotStackPageChanged()
 {
     if (!d->onCanvasPage()) closeTransientWindows();
     applyMode();
+    IkReferences::setFloatingVisible(this, d->onCanvasPage() && d->mode != Classic);
 }
 
 void IkInterfaceManager::closeTransientWindows()
@@ -794,7 +820,8 @@ void IkInterfaceManager::slotPresetChanged()
     IkBrushLibrary::noteRecent(name);
     if (d->settingMode) return;
     if (d->paintMode == Smudge) {
-        ikConfig().writeEntry("SmudgePreset", name);
+        // Remember the smear brush; the blur brushes have their own entry.
+        if (!name.contains(QLatin1String("Blur"), Qt::CaseInsensitive)) ikConfig().writeEntry("SmudgePreset", name);
     } else {
         d->drawPreset = name;
     }
@@ -802,7 +829,120 @@ void IkInterfaceManager::slotPresetChanged()
 
 void IkInterfaceManager::activateTool(const QString &toolId)
 {
+    // Any explicit tool choice ends Selection Fill (it re-enables itself
+    // after this call when it is the one being chosen).
+    d->selectionFill = false;
     KoToolManager::instance()->switchToolRequested(toolId);
+}
+
+int IkInterfaceManager::transformMode() const
+{
+    return ikConfig().readEntry("TransformMode", int(TransformBasic));
+}
+
+int IkInterfaceManager::smudgeVariant() const
+{
+    return ikConfig().readEntry("SmudgeVariant", int(SmudgeSmear));
+}
+
+void IkInterfaceManager::activateTransform(int mode)
+{
+    // Krita's transform tool modes (KisToolTransform::TransformToolMode).
+    enum { Free = 0, Warp = 1, Cage = 2, Liquify = 3, Perspective = 4 };
+    int kritaMode = Free;
+    switch (mode) {
+    case TransformAnchor: kritaMode = Cage; break;       // pin anchor points, drag the shape around them
+    case TransformDistort: kritaMode = Perspective; break;
+    case TransformWarp: kritaMode = Warp; break;
+    case TransformLiquify: kritaMode = Liquify; break;
+    default: break;
+    }
+    if (mode != TransformLiquify) ikConfig().writeEntry("TransformMode", mode);
+    setPaintMode(Draw);
+    activateTool(QStringLiteral("KisToolTransform"));
+    // The tool object exists once it has been activated on this canvas.
+    QTimer::singleShot(0, this, [this, kritaMode]() {
+        KisViewManager *vm = viewManager();
+        if (!vm || !vm->canvasBase()) return;
+        if (KoToolBase *tool = KoToolManager::instance()->toolById(vm->canvasBase(), QStringLiteral("KisToolTransform"))) {
+            tool->setProperty("transformMode", kritaMode);
+        }
+    });
+}
+
+void IkInterfaceManager::flipLayer(bool horizontal)
+{
+    KisViewManager *vm = viewManager();
+    const bool hasSelection = vm && vm->selection();
+    if (hasSelection) {
+        triggerAction(horizontal ? QStringLiteral("mirrorSelectionX") : QStringLiteral("mirrorSelectionY"));
+    } else {
+        triggerAction(horizontal ? QStringLiteral("mirrorNodeX") : QStringLiteral("mirrorNodeY"));
+    }
+}
+
+void IkInterfaceManager::setSmudgeVariant(int variant)
+{
+    ikConfig().writeEntry("SmudgeVariant", variant);
+    if (variant == SmudgeLiquify) {
+        activateTransform(TransformLiquify);
+        return;
+    }
+    setPaintMode(Smudge);
+    ensureBrushTool();
+    d->settingMode = true;
+    if (variant == SmudgeBlur) {
+        activatePresetMatching({QStringLiteral("Blender_Blur"), QStringLiteral("Blender Blur"), QStringLiteral("Filter_Blur")});
+    } else {
+        const QString smear = ikConfig().readEntry("SmudgePreset", QString());
+        if (smear.isEmpty() || smear.contains(QLatin1String("Blur"), Qt::CaseInsensitive) || !activatePresetMatching({smear})) {
+            activatePresetMatching({QStringLiteral("Blender_Basic"), QStringLiteral("Blender Basic"), QStringLiteral("Blender_Smear")});
+        }
+    }
+    d->settingMode = false;
+    Q_EMIT paintModeChanged(d->paintMode);
+}
+
+bool IkInterfaceManager::isSelectionFillActive() const
+{
+    return d->selectionFill && KoToolManager::instance()->activeToolId() == QLatin1String("KisToolSelectOutline");
+}
+
+void IkInterfaceManager::activateSelectionFill()
+{
+    KisViewManager *vm = viewManager();
+    if (!vm || !vm->selectionManager()) return;
+    setPaintMode(Draw);
+    // A fresh lasso each time: start without a selection.
+    if (vm->selection()) triggerAction(QStringLiteral("deselect"));
+    activateTool(QStringLiteral("KisToolSelectOutline"));
+    d->selectionFill = true;
+    if (d->selectionFillWatched != vm->selectionManager()) {
+        d->selectionFillWatched = vm->selectionManager();
+        connect(vm->selectionManager(), &KisSelectionManager::currentSelectionChanged, this, [this]() {
+            if (!d->selectionFill || d->fillingSelection || !isSelectionFillActive()) return;
+            d->fillingSelection = true;
+            // Selections and fills are applied in the background: let the
+            // lasso land, fill it, then let the fill land before deselecting.
+            QTimer::singleShot(0, this, [this]() {
+                KisViewManager *v = viewManager();
+                KisImageSP image; if (v) image = v->image();
+                if (image) image->waitForDone();
+                // The lasso announces an empty selection when it starts.
+                if (v && v->selection() && !v->selection()->selectedExactRect().isEmpty()) {
+                    triggerAction(QStringLiteral("fill_selection_foreground_color"));
+                    if (image) image->waitForDone();
+                    triggerAction(QStringLiteral("deselect"));
+                    if (image) image->waitForDone();
+                }
+                QTimer::singleShot(0, this, [this]() { d->fillingSelection = false; });
+            });
+        });
+        connect(KoToolManager::instance(), &KoToolManager::changedTool, this, [this]() {
+            if (KoToolManager::instance()->activeToolId() != QLatin1String("KisToolSelectOutline")) d->selectionFill = false;
+        });
+    }
+    Q_EMIT paintModeChanged(d->paintMode);
 }
 
 void IkInterfaceManager::ensureBrushTool()
@@ -943,35 +1083,74 @@ void IkInterfaceManager::requestLayout()
 
 void IkInterfaceManager::showMainMenu(QWidget *anchor)
 {
+    // "Options": a grid of the common file and app actions. The full set of
+    // Krita menus stays one tap away under Tools.
+    IkActionGrid *grid = new IkActionGrid(i18n("Options"));
+    QPointer<IkPopover> pop = IkMenus::create(d->mw);
+    grid->onTriggered = [pop]() { if (pop) pop->dismiss(); };
+    QPointer<QWidget> anchorGuard = anchor;
+    auto later = [this](std::function<void()> f) { QTimer::singleShot(0, this, f); };
+    grid->addItem(QStringLiteral("plus"), i18nc("new canvas", "New"), [this, later]() {
+        later([this]() { IkNewCanvasDialog::showNewCanvas(d->mw); });
+    });
+    grid->addItem(QStringLiteral("open"), i18n("Open"), [this, later]() { later([this]() { triggerAction(QStringLiteral("file_open")); }); });
+    grid->addItem(QStringLiteral("save"), i18n("Save"), [this, later]() { later([this]() { triggerAction(QStringLiteral("file_save")); }); },
+                  d->mw->activeView() != nullptr);
+    grid->addItem(QStringLiteral("import"), i18n("Import"), [this, later]() {
+        later([this]() { triggerAction(QStringLiteral("import_layer_from_file")); });
+    }, d->mw->activeView() != nullptr);
+    grid->addItem(QStringLiteral("layout"), i18n("Layout"), [this, later, anchorGuard]() {
+        later([this, anchorGuard]() { showLayoutMenu(anchorGuard); });
+    });
+    grid->addItem(QStringLiteral("share"), i18n("Export"), [this, later]() {
+        later([this]() { triggerAction(QStringLiteral("file_export_file")); });
+    }, d->mw->activeView() != nullptr);
+    grid->addItem(QStringLiteral("wrench"), i18n("Tools"), [this, later, anchorGuard]() {
+        later([this, anchorGuard]() { showKritaMenus(anchorGuard); });
+    });
+    grid->addItem(QStringLiteral("help"), i18n("Help"), [this, later, anchorGuard]() {
+        later([this, anchorGuard]() { showNamedMenu(QStringLiteral("help"), anchorGuard); });
+    });
+    grid->addItem(QStringLiteral("settings"), i18n("Settings"), [this, later]() { later([this]() { showSettings(); }); });
+    grid->addItem(QStringLiteral("home"), i18n("Gallery"), [this, later]() { later([this]() { goHome(); }); });
+    grid->addItem(QStringLiteral("brush"), i18n("Brushes"), [this, later]() { later([this]() { showBrushLibrary(); }); });
+    const bool editing = isEditingInterface();
+    grid->addItem(QStringLiteral("edit-interface"), editing ? i18n("Done Editing") : i18n("Edit Interface"), [this, later, editing]() {
+        later([this, editing]() { setEditingInterface(!editing); });
+    }, d->layout(d->mode) && d->onCanvasPage());
+    pop->setContent(grid);
+    pop->popup(anchor, IkPopover::Below);
+}
+
+void IkInterfaceManager::showLayoutMenu(QWidget *anchor)
+{
+    IkActionGrid *grid = new IkActionGrid(i18n("Layout"));
+    QPointer<IkPopover> pop = IkMenus::create(d->mw);
+    grid->onTriggered = [pop]() { if (pop) pop->dismiss(); };
+    const struct { Mode mode; const char *icon; } modes[] = {{Desktop, "system"}, {Kriate, "brush"}, {Minimal, "minus"}, {Classic, "grid"}};
+    for (const auto &m : modes) {
+        QAction *a = d->modeActions.value(int(m.mode));
+        if (!a || !a->isVisible()) continue;
+        IkGridTile *t = grid->addItem(QString::fromLatin1(m.icon), modeDisplayName(m.mode), [a]() { a->trigger(); });
+        t->setCheckable(true);
+        t->setChecked(d->mode == m.mode);
+    }
+    grid->addItem(QStringLiteral("edit-interface"), i18n("Edit Interface"), [this]() {
+        QTimer::singleShot(0, this, [this]() { setEditingInterface(true); });
+    }, d->layout(d->mode) && d->onCanvasPage());
+    pop->setContent(grid);
+    pop->popup(anchor, IkPopover::Below);
+}
+
+void IkInterfaceManager::showKritaMenus(QWidget *anchor)
+{
+    // Every Krita menu (File, Edit, View, Image, Layer, Select, Filter, ...).
     QMenu menu(d->mw);
-    QAction *gallery = menu.addAction(IkStyle::icon(QStringLiteral("home")), i18n("Gallery"));
-    connect(gallery, &QAction::triggered, this, &IkInterfaceManager::goHome);
-    menu.addSeparator();
     if (d->mw->menuBar()) {
         const QList<QAction *> top = d->mw->menuBar()->actions();
         for (QAction *a : top) {
             if (a->isVisible() && a->menu()) menu.addAction(a);
         }
-    }
-    menu.addSeparator();
-    QMenu *layouts = menu.addMenu(IkStyle::icon(QStringLiteral("grid")), i18n("Interface Layout"));
-    for (Mode m : {Desktop, Kriate, Minimal, Classic}) {
-        if (QAction *a = d->modeActions.value(int(m))) {
-            if (a->isVisible()) layouts->addAction(a);
-        }
-    }
-    layouts->addSeparator();
-    layouts->addAction(d->followDefaultAction);
-    menu.addAction(action(QStringLiteral("ikriate_brush_studio")));
-    menu.addAction(action(QStringLiteral("ikriate_appearance")));
-    if (d->layout(d->mode) && d->onCanvasPage()) {
-        QAction *edit = menu.addAction(IkStyle::icon(QStringLiteral("edit-interface")), i18n("Edit Interface"));
-        edit->setCheckable(true);
-        edit->setChecked(isEditingInterface());
-        connect(edit, &QAction::toggled, this, [this](bool on) {
-            // After the menu has closed.
-            QTimer::singleShot(0, this, [this, on]() { setEditingInterface(on); });
-        });
     }
     const QPoint pos = anchor ? anchor->mapToGlobal(QPoint(0, anchor->height() + 4)) : QCursor::pos();
     menu.exec(pos);
@@ -1038,6 +1217,15 @@ void IkInterfaceManager::showBrushEditor()
     // The editor normally hangs off a tool bar button that the IKriate layouts
     // hide; centre it in the window instead.
     QTimer::singleShot(0, this, [this]() {
+        // The editor may sit inside a pop-up frame: look inside every window.
+        for (QWidget *top : QApplication::topLevelWidgets()) {
+            if (!top->isVisible()) continue;
+            QList<QWidget *> candidates = top->findChildren<QWidget *>();
+            candidates.prepend(top);
+            for (QWidget *w : candidates) {
+                if (w->inherits("KisPaintOpPresetsEditor") && w->isVisible()) IkBrushSettings::adoptEditor(w, this, true);
+            }
+        }
         const QList<QWidget *> tops = QApplication::topLevelWidgets();
         for (QWidget *w : tops) {
             if (w->isVisible() && w->inherits("KisPaintOpPresetsEditor")) {

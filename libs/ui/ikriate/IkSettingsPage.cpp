@@ -51,6 +51,8 @@
 #include "IkSkinManager.h"
 #include "IkStyle.h"
 #include "IkWidgets.h"
+#include "IkMenus.h"
+#include "IkReferences.h"
 
 namespace
 {
@@ -95,23 +97,13 @@ IkPanel *card(QWidget *parent)
     return p;
 }
 
-/// Miniature drawing of a layout, shown by the PREVIEW buttons.
-class IkLayoutPreview : public QWidget
+/// Paints a schematic of layout @p mode (bars, panels, the page) into @p r.
+void paintLayoutSchematic(QPainter &p, const QRectF &r, IkInterfaceManager::Mode m_mode, const QPalette &pal)
 {
-public:
-    IkLayoutPreview(IkInterfaceManager::Mode mode, QWidget *parent) : QWidget(parent), m_mode(mode)
     {
-        setMinimumSize(IkStyle::scaled(420),IkStyle::scaled(280));
-    }
-
-protected:
-    void paintEvent(QPaintEvent *) override
-    {
-        QPainter p(this);
-        p.setRenderHint(QPainter::Antialiasing);
-        const QPalette pal = palette();
-        const QRectF r = QRectF(rect()).adjusted(6, 6, -6, -6);
-        const QColor chrome = IkStyle::color(IkStyle::Raised, pal);
+        // Bars a step lighter than the panels around the preview.
+        const QColor chrome = IkStyle::mix(IkStyle::color(IkStyle::Raised, pal), IkStyle::color(IkStyle::Text, pal), 0.16);
+        p.save();
         const QColor surround = IkStyle::color(IkStyle::CanvasSurround, pal);
         const QColor accent = IkStyle::color(IkStyle::Accent, pal);
         p.setPen(Qt::NoPen);
@@ -151,6 +143,55 @@ protected:
             box(paper, Qt::white, 2);
             break;
         }
+        p.restore();
+    }
+}
+
+class IkLayoutPreview : public QWidget
+{
+public:
+    IkLayoutPreview(IkInterfaceManager::Mode mode, QWidget *parent) : QWidget(parent), m_mode(mode)
+    {
+        setMinimumSize(IkStyle::scaled(420), IkStyle::scaled(280));
+    }
+
+protected:
+    void paintEvent(QPaintEvent *) override
+    {
+        QPainter p(this);
+        p.setRenderHint(QPainter::Antialiasing);
+        paintLayoutSchematic(p, QRectF(rect()).adjusted(6, 6, -6, -6), m_mode, palette());
+    }
+
+private:
+    IkInterfaceManager::Mode m_mode;
+};
+
+/// Small screen preview of a layout; tap to see it larger.
+class IkLayoutThumb : public QAbstractButton
+{
+public:
+    IkLayoutThumb(IkInterfaceManager::Mode mode, QWidget *parent) : QAbstractButton(parent), m_mode(mode)
+    {
+        setCursor(Qt::PointingHandCursor);
+        setToolTip(i18nc("show a preview of the layout", "Preview"));
+        setFixedSize(IkStyle::scaled(150), IkStyle::scaled(100));
+    }
+    bool selected {false};
+
+protected:
+    void paintEvent(QPaintEvent *) override
+    {
+        QPainter p(this);
+        p.setRenderHint(QPainter::Antialiasing);
+        const QPalette pal = palette();
+        const QRectF r = QRectF(rect()).adjusted(2, 2, -2, -2);
+        paintLayoutSchematic(p, r.adjusted(2, 2, -2, -2), m_mode, pal);
+        if (selected || isDown()) {
+            p.setBrush(Qt::NoBrush);
+            p.setPen(QPen(IkStyle::color(IkStyle::Accent, pal), 2.5));
+            p.drawRoundedRect(r, 10, 10);
+        }
     }
 
 private:
@@ -161,23 +202,23 @@ private:
 class IkLayoutRow : public QWidget
 {
 public:
-    IkLayoutRow(const QString &title, QWidget *parent) : QWidget(parent), m_title(title)
+    IkLayoutRow(IkInterfaceManager::Mode mode, const QString &title, QWidget *parent) : QWidget(parent), m_title(title)
     {
         setCursor(Qt::PointingHandCursor);
-        setMinimumHeight(IkStyle::touchFirst() ? 120 : 104);
-        preview = new IkTextButton(i18nc("show a preview of the layout", "PREVIEW"), IkTextButton::Filled, this);
-        preview->setFontScale(1.3, QFont::DemiBold);
-        preview->setRadius(8);
+        thumb = new IkLayoutThumb(mode, this);
+        preview = thumb;
+        setMinimumHeight(thumb->height() + IkStyle::scaled(20));
     }
     bool selected {false};
     std::function<void()> onSelect;
-    IkTextButton *preview {nullptr};
+    QAbstractButton *preview {nullptr};
+    IkLayoutThumb *thumb {nullptr};
 
 protected:
     void resizeEvent(QResizeEvent *) override
     {
-        const QSize s = preview->sizeHint();
-        preview->setGeometry(width() - s.width() - 30, (height() - s.height()) / 2, s.width(), s.height());
+        const QSize s = preview->size();
+        preview->setGeometry(width() - s.width() - 18, (height() - s.height()) / 2, s.width(), s.height());
     }
     void paintEvent(QPaintEvent *) override
     {
@@ -381,10 +422,12 @@ void IkSettingsPage::reload()
     const int mode = d->manager ? int(d->manager->preferredMode()) : int(IkInterfaceManager::platformDefaultMode());
     for (int i = 0; i < d->layoutRows.size(); ++i) {
         d->layoutRows[i]->selected = i == mode;
+        d->layoutRows[i]->thumb->selected = i == mode;
+        d->layoutRows[i]->thumb->update();
         d->layoutRows[i]->update();
     }
     const int scale = KConfigGroup(KSharedConfig::openConfig(), "IKriate").readEntry("InterfaceScale", 100);
-    d->scale->setCurrentIndex(d->scales.indexOf(scale) >= 0 ? d->scales.indexOf(scale) : d->scales.indexOf(100));
+    d->scale->setValueText(QStringLiteral("%1%").arg(scale));
     d->font->setValueText(qApp->font().family());
     {
         QSignalBlocker b1(d->hwAccel), b2(d->ghosting), b3(d->autoSave);
@@ -392,6 +435,27 @@ void IkSettingsPage::reload()
         d->hwAccel->setChecked(KisOpenGL::getUserPreferredOpenGLRendererConfig() != KisOpenGL::RendererNone);
         d->ghosting->setChecked(brushGhostingRemoved());
     }
+}
+
+void IkSettingsPage::applyScale(int pct)
+{
+    if (pct == KConfigGroup(KSharedConfig::openConfig(), "IKriate").readEntry("InterfaceScale", 100)) return;
+    KConfigGroup(KSharedConfig::openConfig(), "IKriate").writeEntry("InterfaceScale", pct);
+    KSharedConfig::openConfig()->sync();
+    d->scale->setValueText(QStringLiteral("%1%").arg(pct));
+#ifdef Q_OS_ANDROID
+    // Android scales everything through the screen density, live.
+    KisConfig cfg(false);
+    const qreal target = cfg.androidScalingLastInitialScale() * pct / 100.0;
+    cfg.setAndroidScalingTargetScale(target);
+    if (KisAndroidScaling *scaling = KisAndroidScaling::instance()) {
+        Q_EMIT scaling->sigJniSetPrimaryScreenScale(target);
+    }
+#else
+    IkStyle::setUiScale(pct / 100.0);
+    IkStyle::applyInterfaceFont();
+#endif
+    if (d->manager) d->manager->rebuildInterface();
 }
 
 QWidget *IkSettingsPage::buildThemePage()
@@ -426,50 +490,65 @@ QWidget *IkSettingsPage::buildThemePage()
     wells->addWidget(d->accent);
     cl->addLayout(wells);
     connect(d->tint, &QAbstractButton::clicked, this, [this]() {
-        IkSkinManager::Settings s = IkSkinManager::instance()->settings();
-        QMenu menu(this);
-        QAction *pick = menu.addAction(i18n("Choose Tint Colour..."));
-        QMenu *strength = menu.addMenu(i18n("Strength"));
-        for (int v : {0, 15, 30, 45, 60, 80, 100}) {
-            QAction *a = strength->addAction(v == 0 ? i18n("Off") : QStringLiteral("%1%").arg(v));
-            a->setCheckable(true);
-            a->setChecked(s.tintStrength == v);
-            a->setData(v);
-        }
-        QAction *picked = menu.exec(d->tint->mapToGlobal(QPoint(0, d->tint->height())));
-        if (!picked) return;
-        if (picked == pick) {
-            const QColor c = QColorDialog::getColor(s.tint, this, i18n("Tint"));
-            if (!c.isValid()) return;
-            s.tint = c;
-            if (s.tintStrength <= 0) s.tintStrength = 30;
-        } else {
-            s.tintStrength = picked->data().toInt();
-        }
-        s.skinId.clear();
-        IkSkinManager::instance()->setSettings(s);
-        reload();
+        const IkSkinManager::Settings s = IkSkinManager::instance()->settings();
+        IkHsbPicker *picker = new IkHsbPicker();
+        picker->setColor(s.tint.isValid() ? s.tint : QColor(0xA8, 0x55, 0xF7));
+        picker->setStrength(s.tintStrength);
+        // Re-skinning restyles the whole app, so apply after a short pause.
+        QTimer *apply = new QTimer(picker);
+        apply->setSingleShot(true);
+        apply->setInterval(180);
+        connect(apply, &QTimer::timeout, this, [this, picker]() {
+            IkSkinManager::Settings st = IkSkinManager::instance()->settings();
+            st.tint = picker->color();
+            st.tintStrength = picker->strength();
+            st.skinId.clear();
+            IkSkinManager::instance()->setSettings(st);
+            d->tint->setColor(st.tint);
+            d->tint->setEmpty(st.tintStrength <= 0);
+        });
+        picker->onColorChanged = [apply, picker](const QColor &) {
+            if (picker->strength() <= 0) picker->setStrength(30);
+            apply->start();
+        };
+        picker->onStrengthChanged = [apply](int) { apply->start(); };
+        IkPopover *pop = IkMenus::popup(picker, d->tint, IkPopover::Below);
+        pop->setAccentOutline(true);
     });
     connect(d->accent, &QAbstractButton::clicked, this, [this]() {
-        IkSkinManager::Settings s = IkSkinManager::instance()->settings();
-        QMenu menu(this);
-        QAction *pick = menu.addAction(i18n("Choose Accent Colour..."));
-        QAction *reset = menu.addAction(i18n("Use the Theme's Accent"));
-        reset->setEnabled(s.overrideAccent);
-        QAction *picked = menu.exec(d->accent->mapToGlobal(QPoint(0, d->accent->height())));
-        if (picked == pick) {
-            const QColor c = QColorDialog::getColor(d->accent->color(), this, i18n("Accent"));
-            if (!c.isValid()) return;
-            s.overrideAccent = true;
-            s.accent = c;
-        } else if (picked == reset) {
-            s.overrideAccent = false;
-        } else {
-            return;
-        }
-        s.skinId.clear();
-        IkSkinManager::instance()->setSettings(s);
-        reload();
+        IkHsbPicker *picker = new IkHsbPicker();
+        picker->setColor(d->accent->color());
+        QTimer *apply = new QTimer(picker);
+        apply->setSingleShot(true);
+        apply->setInterval(180);
+        connect(apply, &QTimer::timeout, this, [this, picker]() {
+            IkSkinManager::Settings st = IkSkinManager::instance()->settings();
+            st.overrideAccent = true;
+            st.accent = picker->color();
+            st.skinId.clear();
+            IkSkinManager::instance()->setSettings(st);
+            d->accent->setColor(st.accent);
+        });
+        picker->onColorChanged = [apply](const QColor &) { apply->start(); };
+        QWidget *box = new QWidget();
+        QVBoxLayout *bl = new QVBoxLayout(box);
+        bl->setContentsMargins(0, 0, 0, 0);
+        picker->setParent(box);
+        bl->addWidget(picker);
+        IkTextButton *themeAccent = new IkTextButton(i18n("Use the Theme's Accent"), IkTextButton::Link, box);
+        themeAccent->setEnabled(IkSkinManager::instance()->settings().overrideAccent);
+        bl->addWidget(themeAccent, 0, Qt::AlignHCenter);
+        IkPopover *pop = IkMenus::popup(box, d->accent, IkPopover::Below);
+        pop->setAccentOutline(true);
+        QPointer<IkPopover> guard = pop;
+        connect(themeAccent, &QAbstractButton::clicked, this, [this, guard]() {
+            IkSkinManager::Settings st = IkSkinManager::instance()->settings();
+            st.overrideAccent = false;
+            st.skinId.clear();
+            IkSkinManager::instance()->setSettings(st);
+            if (guard) guard->dismiss();
+            reload();
+        });
     });
     l->addWidget(colors);
 
@@ -483,7 +562,7 @@ QWidget *IkSettingsPage::buildThemePage()
     ll->addWidget(new IkSectionHeader(i18n("Layout"), layouts));
     ll->addSpacing(14);
     for (IkInterfaceManager::Mode m : {IkInterfaceManager::Desktop, IkInterfaceManager::Kriate, IkInterfaceManager::Minimal}) {
-        IkLayoutRow *r = new IkLayoutRow(IkInterfaceManager::modeDisplayName(m), layouts);
+        IkLayoutRow *r = new IkLayoutRow(m, IkInterfaceManager::modeDisplayName(m), layouts);
         r->setToolTip(IkInterfaceManager::modeDescription(m));
         r->onSelect = [this, m]() {
             if (d->manager) d->manager->setMode(m);
@@ -520,27 +599,34 @@ QWidget *IkSettingsPage::buildThemePage()
     il->addWidget(new IkSectionHeader(i18n("Interface"), iface));
     d->scale = new IkChoiceRow(i18n("Scale"), iface);
     d->scale->setBordered(true);
-    QStringList scaleNames;
-    for (int s : d->scales) scaleNames << QStringLiteral("%1%").arg(s);
-    d->scale->setChoices(scaleNames, d->scales.indexOf(100));
     d->scale->setMinimumHeight(IkStyle::touchSize() + 30);
-    connect(d->scale, &IkChoiceRow::chosen, this, [this](int i) {
-        const int pct = d->scales.value(i, 100);
-        KConfigGroup(KSharedConfig::openConfig(), "IKriate").writeEntry("InterfaceScale", pct);
-        KSharedConfig::openConfig()->sync();
-#ifdef Q_OS_ANDROID
-        // Android scales everything through the screen density, live.
-        KisConfig cfg(false);
-        const qreal target = cfg.androidScalingLastInitialScale() * pct / 100.0;
-        cfg.setAndroidScalingTargetScale(target);
-        if (KisAndroidScaling *scaling = KisAndroidScaling::instance()) {
-            Q_EMIT scaling->sigJniSetPrimaryScreenScale(target);
-        }
-#else
-        IkStyle::setUiScale(pct / 100.0);
-        IkStyle::applyInterfaceFont();
-#endif
-        if (d->manager) d->manager->rebuildInterface();
+    // No list: tapping opens a slider (75-200 %, in steps of 5).
+    connect(d->scale, &IkChoiceRow::chosen, this, [this](int) {
+        const int current = KConfigGroup(KSharedConfig::openConfig(), "IKriate").readEntry("InterfaceScale", 100);
+        QWidget *box = new QWidget();
+        QVBoxLayout *bl = new QVBoxLayout(box);
+        bl->setContentsMargins(IkStyle::scaled(16), IkStyle::scaled(8), IkStyle::scaled(16), IkStyle::scaled(8));
+        bl->setSpacing(IkStyle::scaled(10));
+        QLabel *value = new QLabel(QStringLiteral("%1%").arg(current), box);
+        value->setAlignment(Qt::AlignCenter);
+        value->setFont(IkStyle::font(1.3));
+        value->setForegroundRole(QPalette::Highlight);
+        bl->addWidget(value);
+        IkSlider *slider = new IkSlider(box);
+        const int lo = 75, hi = 200;
+        slider->setValue(qreal(current - lo) / (hi - lo));
+        bl->addWidget(slider);
+        auto pctOf = [lo, hi](qreal t) { return lo + qRound(t * (hi - lo) / 5.0) * 5; };
+        connect(slider, &IkSlider::valueEdited, box, [value, pctOf](qreal t) { value->setText(QStringLiteral("%1%").arg(pctOf(t))); });
+        IkPopover *pop = IkMenus::popup(box, d->scale, IkPopover::Below, QSize(d->scale->width(), box->sizeHint().height() + 50));
+        pop->setAccentOutline(true);
+        QPointer<IkPopover> guard = pop;
+        // Rebuilding the interface is heavy: apply when the finger lifts.
+        connect(slider, &IkSlider::interactionFinished, this, [this, slider, pctOf, guard]() {
+            const int pct = pctOf(slider->value());
+            if (guard) guard->dismiss();
+            applyScale(pct);
+        });
     });
     il->addWidget(d->scale);
     d->font = new IkChoiceRow(i18n("Font"), iface);
@@ -580,6 +666,13 @@ QWidget *IkSettingsPage::buildThemePage()
         if (d->manager) d->manager->rebuildInterface();
     });
     il->addWidget(d->font);
+    IkChoiceRow *refs = new IkChoiceRow(i18n("Reference Images"), iface);
+    refs->setBordered(true);
+    refs->setMinimumHeight(IkStyle::touchSize() + 30);
+    refs->setChoices({i18n("On the Canvas"), i18n("Floating")}, int(IkReferences::placement()));
+    refs->setToolTip(i18n("On the canvas: images move and zoom with the canvas. Floating: images stay where you put them while the canvas moves."));
+    connect(refs, &IkChoiceRow::chosen, this, [](int i) { IkReferences::setPlacement(IkReferences::Placement(i)); });
+    il->addWidget(refs);
     il->addStretch(1);
     row->addWidget(iface, 1);
     l->addLayout(row, 1);

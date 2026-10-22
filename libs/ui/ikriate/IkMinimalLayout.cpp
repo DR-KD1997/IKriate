@@ -56,10 +56,13 @@ IkMinimalLayout::IkMinimalLayout(IkInterfaceManager *mgr)
     IkIconButton *select = toolsAdd(button(m_tools, QStringLiteral("select-rect"), i18n("Selection")));
     connect(select, &QAbstractButton::clicked, this, [this, select]() { showSelectionPopover(select, IkPopover::Below); });
     m_toolButtons << qMakePair(QPointer<IkIconButton>(select), QStringLiteral("KisToolSelectRectangular"));
-    toolsAdd(toolButton(m_tools, QStringLiteral("transform"), i18n("Transform"), QStringLiteral("KisToolTransform")));
+    toolsAdd(transformButton(m_tools));
     toolsAdd(toolButton(m_tools, QStringLiteral("fill"), i18n("Fill"), QStringLiteral("KritaFill/KisToolFill")));
-    IkIconButton *smudge = toolsAdd(button(m_tools, QStringLiteral("smudge"), i18n("Smudge")));
-    connect(smudge, &QAbstractButton::clicked, this, [this]() { this->manager()->setPaintMode(IkInterfaceManager::Smudge); });
+    IkIconButton *smudge = toolsAdd(button(m_tools, QStringLiteral("smudge"), i18n("Smudge, blur or liquify")));
+    connect(smudge, &QAbstractButton::clicked, this, [this, smudge]() {
+        this->manager()->setSmudgeVariant(this->manager()->smudgeVariant());
+        showSmudgeOptions(smudge);
+    });
     m_smudgeButtons << smudge;
     toolsAdd(symmetryButton(m_tools));
     IkIconButton *all = toolsAdd(button(m_tools, QStringLiteral("tools"), i18n("All tools")));

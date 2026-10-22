@@ -36,6 +36,9 @@
 #include "IkSkinManager.h"
 #include "IkStyle.h"
 #include "IkWidgets.h"
+#include <QTimer>
+#include "IkMenus.h"
+#include "IkReferences.h"
 
 namespace
 {
@@ -195,10 +198,12 @@ void IkLayout::closeTransient()
 
 void IkLayout::raisePopovers()
 {
+    IkReferences::raiseFloating();
     IkPractice::raiseActive();
-    for (IkPopover *p : {m_colorPop.data(), m_layersPop.data(), m_brushPop.data(), m_toolsPop.data(), m_optionsPop.data(),
-                         m_adjustPop.data(), m_symmetryPop.data()}) {
-        if (p) p->raiseToTop();
+    // Every open popover in the window (the layout's own and the ones opened
+    // through IkMenus: options, layer actions, reference images, ...).
+    for (IkPopover *p : host()->findChildren<IkPopover *>(QString(), Qt::FindDirectChildrenOnly)) {
+        if (p->isOpen()) p->raiseToTop();
     }
     syncEditOverlay();
 }
@@ -249,6 +254,81 @@ IkIconButton *IkLayout::symmetryButton(QWidget *parent)
     connect(b, &QAbstractButton::clicked, this, [this, b]() { toggleSymmetryPopover(b, IkPopover::Below); });
     m_symmetryButtons << b;
     return b;
+}
+
+IkIconButton *IkLayout::transformButton(QWidget *parent)
+{
+    IkIconButton *b = button(parent, QStringLiteral("transform"), i18n("Transform"));
+    connect(b, &QAbstractButton::clicked, this, [this, b]() {
+        m_manager->activateTransform(m_manager->transformMode());
+        showTransformOptions(b);
+    });
+    m_toolButtons << qMakePair(QPointer<IkIconButton>(b), QStringLiteral("KisToolTransform"));
+    return b;
+}
+
+void IkLayout::showOptionStrip(QWidget *anchor, const QList<StripItem> &items)
+{
+    closePopovers();
+    QWidget *strip = new QWidget();
+    QHBoxLayout *l = new QHBoxLayout(strip);
+    l->setContentsMargins(4, 2, 4, 2);
+    l->setSpacing(IkStyle::scaled(10));
+    QPointer<IkPopover> pop = IkMenus::create(host());
+    for (const StripItem &item : items) {
+        IkIconButton *b = new IkIconButton(item.icon, item.tip, strip);
+        b->setVariant(IkIconButton::Tile);
+        b->setEdge(IkStyle::touchSize() + IkStyle::scaled(10));
+        b->setIconPixelSize(IkStyle::scaled(28));
+        b->setActive(item.active);
+        const std::function<void()> action = item.action;
+        connect(b, &QAbstractButton::clicked, this, [pop, action]() {
+            if (pop) pop->dismiss();
+            if (action) action();
+        });
+        l->addWidget(b);
+    }
+    pop->setContent(strip);
+    pop->popup(anchor, IkPopover::Placement(placementFor(anchor, IkPopover::Below)));
+}
+
+void IkLayout::showTransformOptions(QWidget *anchor)
+{
+    IkInterfaceManager *m = m_manager;
+    const int mode = m->transformMode();
+    auto activate = [m](int mode) { return [m, mode]() { m->activateTransform(mode); }; };
+    showOptionStrip(anchor, {
+        {QStringLiteral("transform-basic"), i18n("Basic: move, scale and rotate"), activate(IkInterfaceManager::TransformBasic),
+         mode == IkInterfaceManager::TransformBasic},
+        {QStringLiteral("transform-anchor"), i18n("Anchor: pin points and bend around them"), activate(IkInterfaceManager::TransformAnchor),
+         mode == IkInterfaceManager::TransformAnchor},
+        {QStringLiteral("transform-distort"), i18n("Distort: move the corners (perspective)"), activate(IkInterfaceManager::TransformDistort),
+         mode == IkInterfaceManager::TransformDistort},
+        {QStringLiteral("transform-warp"), i18n("Warp"), activate(IkInterfaceManager::TransformWarp),
+         mode == IkInterfaceManager::TransformWarp},
+        {QStringLiteral("transform-flip"), i18n("Flip"), [this, anchor]() {
+             QPointer<QWidget> a = anchor;
+             QTimer::singleShot(0, this, [this, a]() {
+                 if (!a) return;
+                 showOptionStrip(a, {{QStringLiteral("transform-flip"), i18n("Flip horizontally"),
+                                      [this]() { m_manager->flipLayer(true); }, false},
+                                     {QStringLiteral("flip-v"), i18n("Flip vertically"),
+                                      [this]() { m_manager->flipLayer(false); }, false}});
+             });
+         }, false},
+    });
+}
+
+void IkLayout::showSmudgeOptions(QWidget *anchor)
+{
+    IkInterfaceManager *m = m_manager;
+    const int v = m->smudgeVariant();
+    auto choose = [m](int variant) { return [m, variant]() { m->setSmudgeVariant(variant); }; };
+    showOptionStrip(anchor, {
+        {QStringLiteral("smudge"), i18n("Smudge"), choose(IkInterfaceManager::SmudgeSmear), v == IkInterfaceManager::SmudgeSmear},
+        {QStringLiteral("blur"), i18n("Blur"), choose(IkInterfaceManager::SmudgeBlur), v == IkInterfaceManager::SmudgeBlur},
+        {QStringLiteral("liquify"), i18n("Liquify"), choose(IkInterfaceManager::SmudgeLiquify), v == IkInterfaceManager::SmudgeLiquify},
+    });
 }
 
 void IkLayout::toggleSymmetryPopover(QWidget *anchor, int placement)
@@ -364,18 +444,31 @@ void IkLayout::showToolsPopover(QWidget *anchor, int placement)
         {QStringLiteral("select-shape"), i18n("Select shapes"), QStringLiteral("InteractionTool")},
         {QStringLiteral("assistant"), i18n("Drawing assistants"), QStringLiteral("KisAssistantTool")},
         {QStringLiteral("reference"), i18n("Reference images"), QStringLiteral("ToolReferenceImages")},
+        {QStringLiteral("selection-fill"), i18n("Selection Fill: lasso a shape to fill it"), QStringLiteral("ikriate:selection-fill")},
+        {QStringLiteral("lasso"), i18n("Freehand selection"), QStringLiteral("KisToolSelectOutline")},
     };
     int i = 0;
     for (const T &t : tools) {
         IkIconButton *b = button(grid, t.icon, t.tip);
         b->setVariant(IkIconButton::Tile);
         b->setEdge(IkStyle::touchSize() + 10);
-        b->setActive(KoToolManager::instance()->activeToolId() == t.id);
+        const bool fillActive = m_manager->isSelectionFillActive();
+        b->setActive(t.id == QLatin1String("ikriate:selection-fill") ? fillActive
+                     : (KoToolManager::instance()->activeToolId() == t.id && !(fillActive && t.id == QLatin1String("KisToolSelectOutline"))));
         const QString id = t.id;
-        connect(b, &QAbstractButton::clicked, this, [this, p, id]() {
-            m_manager->setPaintMode(IkInterfaceManager::Draw);
-            m_manager->activateTool(id);
+        QPointer<QWidget> anchorGuard = anchor;
+        connect(b, &QAbstractButton::clicked, this, [this, p, id, anchorGuard]() {
             p->dismiss();
+            if (id == QLatin1String("ikriate:selection-fill")) {
+                m_manager->activateSelectionFill();
+            } else if (id == QLatin1String("ToolReferenceImages")) {
+                IkReferences::buttonClicked(m_manager, anchorGuard);
+            } else if (id == QLatin1String("KisToolTransform")) {
+                m_manager->activateTransform(m_manager->transformMode());
+            } else {
+                m_manager->setPaintMode(IkInterfaceManager::Draw);
+                m_manager->activateTool(id);
+            }
         });
         g->addWidget(b, i / 4, i % 4);
         ++i;

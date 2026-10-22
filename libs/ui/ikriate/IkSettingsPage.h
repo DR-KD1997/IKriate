@@ -40,6 +40,7 @@ public Q_SLOTS:
     void reload();
 
 private:
+    void applyScale(int percent);
     void showSection(int section);
     QWidget *buildThemePage();
     QWidget *buildLanguagePage();

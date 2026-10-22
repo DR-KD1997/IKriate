@@ -101,6 +101,20 @@ protected:
     /// X / Y / radial symmetry; the button lights up while symmetry is on.
     IkIconButton *symmetryButton(QWidget *parent);
     void toggleSymmetryPopover(QWidget *anchor, int placement);
+    /// Transform button: activates the transform tool and shows its modes
+    /// (Basic, Anchor, Distort, Warp, Flip).
+    IkIconButton *transformButton(QWidget *parent);
+    void showTransformOptions(QWidget *anchor);
+    /// Smudge, Blur and Liquify.
+    void showSmudgeOptions(QWidget *anchor);
+    struct StripItem {
+        QString icon;
+        QString tip;
+        std::function<void()> action;
+        bool active;
+    };
+    /// A row of icon tiles in a popover next to @p anchor.
+    void showOptionStrip(QWidget *anchor, const QList<StripItem> &items);
     void toggleLayersPopover(QWidget *anchor, int placement);
     void toggleBrushPopover(QWidget *anchor, int placement);
     void showToolsPopover(QWidget *anchor, int placement);

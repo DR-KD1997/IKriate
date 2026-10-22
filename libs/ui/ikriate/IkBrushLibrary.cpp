@@ -53,7 +53,7 @@ const char *const kFavouritesTag = "★ My Favorites";
 const char *const kRecentKey = "RecentBrushes";
 const int kMaxRecent = 24;
 
-enum Kind { NewBrushes, Recent, Favourites, Tag, All };
+enum Kind { NewBrushes, Recent, Favourites, Tag, All, SelectionFill };
 
 struct Category {
     Kind kind;
@@ -84,6 +84,8 @@ QList<Category> builtInCategories()
         {Tag, i18nc("brush category", "Pixel Art"), QStringLiteral("pixel"), QStringLiteral("Pixel Art")},
         {Tag, i18nc("brush category", "Effects"), QStringLiteral("effects"), QStringLiteral("Effects")},
         {Tag, i18nc("brush category", "Basic"), QStringLiteral("basic"), QStringLiteral("Basic")},
+        // Not a category: picks the Selection Fill brush (lasso + fill).
+        {SelectionFill, i18nc("brush", "Selection Fill"), QStringLiteral("selection-fill"), QString()},
     };
 }
 
@@ -477,6 +479,11 @@ void IkBrushLibrary::reload()
 void IkBrushLibrary::selectCategory(int row)
 {
     if (row < 0 || row >= d->categories->categories.size()) return;
+    if (d->categories->categories.at(row).kind == SelectionFill) {
+        if (d->manager) d->manager->activateSelectionFill();
+        Q_EMIT presetActivated();
+        return;
+    }
     d->categories->current = row;
     d->categories->update();
     populatePresets();
@@ -511,6 +518,8 @@ void IkBrushLibrary::populatePresets()
         }
         break;
     }
+    case SelectionFill:
+        break;
     case NewBrushes:
     case All: {
         KisResourceModel all(ResourceType::PaintOpPresets);

@@ -102,5 +102,34 @@
         <file>symmetry.svg</file>
         <file>timer.svg</file>
             <file>save.svg</file>
-    </qresource>
+        <file>blur.svg</file>
+    <file>brush-head.svg</file>
+    <file>chevron-left.svg</file>
+    <file>clip.svg</file>
+    <file>close-path.svg</file>
+    <file>copy.svg</file>
+    <file>file.svg</file>
+    <file>flip-v.svg</file>
+    <file>import.svg</file>
+    <file>layout.svg</file>
+    <file>liquify.svg</file>
+    <file>lock-alpha.svg</file>
+    <file>mask.svg</file>
+    <file>paint-drop.svg</file>
+    <file>picture.svg</file>
+    <file>pin-off.svg</file>
+    <file>pin.svg</file>
+    <file>select-layer.svg</file>
+    <file>selection-fill.svg</file>
+    <file>share.svg</file>
+    <file>sparkles.svg</file>
+    <file>stroke.svg</file>
+    <file>transform-anchor.svg</file>
+    <file>transform-basic.svg</file>
+    <file>transform-distort.svg</file>
+    <file>transform-flip.svg</file>
+    <file>transform-warp.svg</file>
+    <file>wand.svg</file>
+    <file>wrench.svg</file>
+</qresource>
 </RCC>

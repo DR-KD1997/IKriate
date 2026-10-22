@@ -25,15 +25,25 @@ public:
 
     void paintPath(KoPathShape &path, QPainter &painter, const KoViewConverter &converter) override;
     void addPathShape(KoPathShape* pathShape) override;
+    void paint(QPainter &painter, const KoViewConverter &converter) override;
+    QRectF decorationsRect() const override;
+
+    /// IKriate: on-canvas buttons next to the last point while drawing.
+    enum Button { NoButton, CloseButton, FinishButton };
+    Button buttonAt(const QPointF &viewPoint) const;
 
     using KoCreatePathTool::createOptionWidgets;
     using KoCreatePathTool::endPathWithoutLastPoint;
     using KoCreatePathTool::endPath;
     using KoCreatePathTool::cancelPath;
     using KoCreatePathTool::removeLastPoint;
+    using KoCreatePathTool::closeAndEndPath;
 
 private:
     KisToolPath* const m_parentTool;
+    QPointF m_closeCentre;
+    QPointF m_finishCentre;
+    bool m_buttonsShown {false};
 };
 
 typedef KisDelegatedTool<KisToolShape,
@@ -66,6 +76,7 @@ public:
 
 protected:
     void requestStrokeCancellation() override;
+    bool m_buttonPress {false};
     void requestStrokeEnd() override;
 
 protected Q_SLOTS:

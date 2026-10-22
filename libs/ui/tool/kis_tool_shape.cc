@@ -25,6 +25,11 @@
 #include <ksharedconfig.h>
 
 #include <kis_debug.h>
+#include <brushengine/kis_paintop_settings.h>
+#include <brushengine/kis_paintop_preset.h>
+#include "kis_coordinates_converter.h"
+#include "kis_canvas2.h"
+#include <QPainter>
 #include <kis_canvas_resource_provider.h>
 #include <brushengine/kis_paintop_registry.h>
 #include <kis_paint_layer.h>
@@ -271,4 +276,27 @@ void KisToolShape::addPathShape(KoPathShape* pathShape, const KUndo2MagicString&
         addShape(pathShape);
 
     }
+}
+
+void KisToolShape::paintBrushPreview(QPainter *painter, const QPainterPath &viewPath)
+{
+    if (viewPath.isEmpty() || nodePaintAbility() != KisTool::PAINT) return;
+    // The selection tools share these shape tools' code; they paint nothing.
+    if (QLatin1String(metaObject()->className()).startsWith(QLatin1String("KisToolSelect"))) return;
+    if (strokeStyle() == KisToolShapeUtils::StrokeStyleNone) return;
+    KisCanvas2 *kritaCanvas = dynamic_cast<KisCanvas2*>(canvas());
+    KisPaintOpPresetSP preset = currentPaintOpPreset();
+    if (!kritaCanvas || !preset || !preset->settings()) return;
+
+    const qreal zoom = kritaCanvas->coordinatesConverter()->effectiveZoom();
+    const qreal width = qMax<qreal>(1.0, preset->settings()->paintOpSize() * zoom);
+    QColor color = (strokeStyle() == KisToolShapeUtils::StrokeStyleBackground ? currentBgColor() : currentFgColor()).toQColor();
+    color.setAlphaF(qBound<qreal>(0.25, preset->settings()->paintOpOpacity(), 1.0) * 0.85);
+
+    painter->save();
+    painter->setRenderHint(QPainter::Antialiasing);
+    painter->setBrush(Qt::NoBrush);
+    painter->setPen(QPen(color, width, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+    painter->drawPath(viewPath);
+    painter->restore();
 }

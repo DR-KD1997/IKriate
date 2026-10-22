@@ -265,6 +265,16 @@ void KisToolPolylineBase::paint(QPainter& gc, const KoViewConverter &converter)
         path.addEllipse(basePoint, SNAPPING_HANDLE_RADIUS, SNAPPING_HANDLE_RADIUS);
     }
 
+    {
+        // IKriate: the line as it will be painted, then the outline on top.
+        QPainterPath stroke;
+        for (int i = 0; i < m_points.size(); ++i) {
+            if (i == 0) stroke.moveTo(pixelToView(m_points.at(i)));
+            else stroke.lineTo(pixelToView(m_points.at(i)));
+        }
+        if (m_dragging && !m_points.empty()) stroke.lineTo(pixelToView(m_dragEnd));
+        paintBrushPreview(&gc, stroke);
+    }
     paintToolOutline(&gc, path);
     KisToolPaint::paint(gc,converter);
 }

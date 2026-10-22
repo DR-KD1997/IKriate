@@ -40,6 +40,7 @@
 #include "IkStrokePreview.h"
 #include "IkStyle.h"
 #include "IkWidgets.h"
+#include "IkReferences.h"
 
 namespace
 {
@@ -103,7 +104,10 @@ IkDesktopLayout::IkDesktopLayout(IkInterfaceManager *mgr)
     topBox->addWidget(actionButton(m_top, QStringLiteral("undo"), i18n("Undo"), QStringLiteral("edit_undo")));
     topBox->addWidget(actionButton(m_top, QStringLiteral("redo"), i18n("Redo"), QStringLiteral("edit_redo")));
     topBox->addWidget(symmetryButton(m_top));
-    topBox->addWidget(toolButton(m_top, QStringLiteral("reference"), i18n("Reference images"), QStringLiteral("ToolReferenceImages")));
+    IkIconButton *reference = button(m_top, QStringLiteral("reference"), i18n("Reference images"));
+    connect(reference, &QAbstractButton::clicked, this, [this, reference]() { IkReferences::buttonClicked(manager(), reference); });
+    m_toolButtons << qMakePair(QPointer<IkIconButton>(reference), QStringLiteral("ToolReferenceImages"));
+    topBox->addWidget(reference);
     top->addWidget(new IkSeparatorLine(m_top));
     auto barStyle = [](IkIconButton *b) {
         b->setVariant(IkIconButton::Ghost);
@@ -170,6 +174,7 @@ IkDesktopLayout::IkDesktopLayout(IkInterfaceManager *mgr)
         return b;
     };
     railButton(toolButton(m_rail, QStringLiteral("move"), i18n("Move"), QStringLiteral("KritaTransform/KisToolMove")));
+    railButton(transformButton(m_rail));
     IkIconButton *brush = railButton(button(m_rail, QStringLiteral("brush"), i18n("Brush (tap again for the brush library)")));
     connect(brush, &QAbstractButton::clicked, this, [this]() {
         const bool already = manager()->paintMode() == IkInterfaceManager::Draw && manager()->isBrushToolActive();
@@ -184,8 +189,11 @@ IkDesktopLayout::IkDesktopLayout(IkInterfaceManager *mgr)
                                                                                      : IkInterfaceManager::Erase);
     });
     m_eraseButtons << eraser;
-    IkIconButton *smudge = railButton(button(m_rail, QStringLiteral("smudge"), i18n("Smudge")));
-    connect(smudge, &QAbstractButton::clicked, this, [this]() { manager()->setPaintMode(IkInterfaceManager::Smudge); });
+    IkIconButton *smudge = railButton(button(m_rail, QStringLiteral("smudge"), i18n("Smudge, blur or liquify")));
+    connect(smudge, &QAbstractButton::clicked, this, [this, smudge]() {
+        manager()->setSmudgeVariant(manager()->smudgeVariant());
+        showSmudgeOptions(smudge);
+    });
     m_smudgeButtons << smudge;
     railButton(toolButton(m_rail, QStringLiteral("fill"), i18n("Fill"), QStringLiteral("KritaFill/KisToolFill")));
     railButton(toolButton(m_rail, QStringLiteral("select-rect"), i18n("Rectangle selection"), QStringLiteral("KisToolSelectRectangular")));

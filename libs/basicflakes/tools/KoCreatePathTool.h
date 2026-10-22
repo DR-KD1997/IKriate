@@ -19,6 +19,7 @@ class KoPathShape;
 class KoShapeStroke;
 
 class KoCreatePathToolPrivate;
+class KoPathPoint;
 
 #define KoCreatePathTool_ID "CreatePathTool"
 
@@ -96,6 +97,13 @@ protected:
     void endPathWithoutLastPoint();
     void cancelPath();
     void removeLastPoint();
+    /// IKriate: drops the point following the pointer, closes the outline
+    /// back to its first point and finishes the path.
+    void closeAndEndPath();
+    /// IKriate: the path being drawn (null when none) and its active point
+    /// (the one following the pointer).
+    KoPathShape *pathInProgress() const;
+    KoPathPoint *activePathPoint() const;
 
     bool addPathShapeImpl(KoPathShape* pathShape, bool tryMergeOnly);
 

@@ -55,6 +55,12 @@ public Q_SLOTS:
     virtual void patternRotationSettingChanged(qreal value);
     virtual void patternScaleSettingChanged(qreal value);
 
+    /**
+     * IKriate: on a paint layer, previews @p viewPath (view coordinates) as
+     * it will be painted: in the stroke colour, as wide as the brush.
+     */
+    void paintBrushPreview(QPainter *painter, const QPainterPath &viewPath);
+
 protected:
     QWidget* createOptionWidget() override;
 

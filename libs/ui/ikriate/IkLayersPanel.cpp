@@ -39,6 +39,7 @@
 #include "IkInterfaceManager.h"
 #include "IkStyle.h"
 #include "IkWidgets.h"
+#include "IkMenus.h"
 
 namespace
 {
@@ -327,23 +328,44 @@ void IkLayersPanel::activate(KisNodeSP node)
 
 void IkLayersPanel::showLayerMenu(KisNodeSP node, const QPoint &globalPos)
 {
+    Q_UNUSED(globalPos);
     activate(node);
+    if (!node) return;
     KisImageSP image = d->image.toStrongRef();
-    QMenu menu(this);
 
-    // Opacity slider in the menu
-    QWidgetAction *opacityAction = new QWidgetAction(&menu);
-    QWidget *ow = new QWidget(&menu);
-    QHBoxLayout *ol = new QHBoxLayout(ow);
-    ol->setContentsMargins(12, 4, 12, 4);
-    QLabel *ol1 = new QLabel(i18n("Opacity"), ow);
-    ol->addWidget(ol1);
+    // A sheet in the mockup's style: name, blend mode, opacity, then a grid of
+    // actions; the rarer commands sit behind "...".
+    IkActionGrid *grid = new IkActionGrid(node->name());
+    grid->setCentredTitle(true);
+    QPointer<IkPopover> pop = IkMenus::create(window());
+    grid->onTriggered = [pop]() { if (pop) pop->dismiss(); };
+
+    const QStringList ops = {COMPOSITE_OVER, COMPOSITE_MULT, COMPOSITE_SCREEN, COMPOSITE_OVERLAY, COMPOSITE_SOFT_LIGHT_PHOTOSHOP,
+                             COMPOSITE_HARD_LIGHT, COMPOSITE_DARKEN, COMPOSITE_LIGHTEN, COMPOSITE_DODGE, COMPOSITE_BURN,
+                             COMPOSITE_ADD, COMPOSITE_DIFF, COMPOSITE_COLOR, COMPOSITE_LUMINIZE, COMPOSITE_HUE, COMPOSITE_SATURATION};
+    QStringList opNames;
+    for (const QString &op : ops) opNames << KoCompositeOpRegistry::instance().getKoID(op).name().toUpper();
+    IkChoiceRow *blend = new IkChoiceRow(QString(), grid);
+    blend->setCentered(true);
+    blend->setChoices(opNames, qMax(0, ops.indexOf(node->compositeOpId())));
+    if (ops.indexOf(node->compositeOpId()) < 0) blend->setValueText(blendName(node).toUpper());
+    blend->setMinimumHeight(IkStyle::touchSize());
+    connect(blend, &IkChoiceRow::chosen, this, [this, node, ops](int i) {
+        const QString op = ops.value(i);
+        const KoCompositeOp *cop = node->colorSpace() ? node->colorSpace()->compositeOp(op) : nullptr;
+        if (cop && d->vm && d->vm->nodeManager()) d->vm->nodeManager()->setNodeCompositeOp(node, cop);
+    });
+    grid->addHeaderWidget(blend);
+
+    QWidget *ow = new QWidget(grid);
+    QVBoxLayout *ol = new QVBoxLayout(ow);
+    ol->setContentsMargins(4, 0, 4, 0);
+    ol->setSpacing(2);
     IkSlider *opacity = new IkSlider(ow);
-    opacity->setMinimumWidth(IkStyle::scaled(160));
     opacity->setValue(node->opacity() / 255.0);
     QLabel *ov = new QLabel(QStringLiteral("%1%").arg(qRound(node->opacity() / 2.55)), ow);
-    ov->setMinimumWidth(IkStyle::scaled(40));
-    ol->addWidget(opacity, 1);
+    ov->setAlignment(Qt::AlignCenter);
+    ol->addWidget(opacity);
     ol->addWidget(ov);
     const quint8 originalOpacity = node->opacity();
     connect(opacity, &IkSlider::valueEdited, this, [node, ov](qreal v) mutable {
@@ -357,55 +379,68 @@ void IkLayersPanel::showLayerMenu(KisNodeSP node, const QPoint &globalPos)
         node->setOpacity(originalOpacity);
         if (d->vm && d->vm->nodeManager()) d->vm->nodeManager()->setNodeOpacity(node, finalOpacity);
     });
-    opacityAction->setDefaultWidget(ow);
-    menu.addAction(opacityAction);
+    grid->addHeaderWidget(ow);
 
-    // Blending modes (the common ones; the full list is in Layer Properties)
-    QMenu *blend = menu.addMenu(i18n("Blending Mode: %1", blendName(node)));
-    const QStringList ops = {COMPOSITE_OVER, COMPOSITE_MULT, COMPOSITE_SCREEN, COMPOSITE_OVERLAY, COMPOSITE_SOFT_LIGHT_PHOTOSHOP,
-                             COMPOSITE_HARD_LIGHT, COMPOSITE_DARKEN, COMPOSITE_LIGHTEN, COMPOSITE_DODGE, COMPOSITE_BURN,
-                             COMPOSITE_ADD, COMPOSITE_DIFF, COMPOSITE_COLOR, COMPOSITE_LUMINIZE, COMPOSITE_HUE, COMPOSITE_SATURATION};
-    for (const QString &op : ops) {
-        QAction *a = blend->addAction(KoCompositeOpRegistry::instance().getKoID(op).name());
-        a->setCheckable(true);
-        a->setChecked(node->compositeOpId() == op);
-        connect(a, &QAction::triggered, this, [this, node, op]() {
-            const KoCompositeOp *cop = node->colorSpace() ? node->colorSpace()->compositeOp(op) : nullptr;
-            if (cop && d->vm && d->vm->nodeManager()) d->vm->nodeManager()->setNodeCompositeOp(node, cop);
-        });
-    }
-    menu.addSeparator();
-    QAction *rename = menu.addAction(i18n("Rename..."));
-    connect(rename, &QAction::triggered, this, [this, node]() {
-        bool ok = false;
-        const QString name = QInputDialog::getText(this, i18n("Rename Layer"), i18n("Name:"), QLineEdit::Normal, node->name(), &ok);
-        if (ok && !name.isEmpty() && d->vm && d->vm->nodeManager()) d->vm->nodeManager()->setNodeName(node, name);
-    });
-    auto addCommand = [&](const QString &text, const QString &actionName) {
-        QAction *a = menu.addAction(text);
-        connect(a, &QAction::triggered, this, [this, actionName]() { if (d->manager) d->manager->triggerAction(actionName); });
-        return a;
+    auto command = [this](const QString &actionName) {
+        return [this, actionName]() { if (d->manager) d->manager->triggerAction(actionName); };
     };
-    addCommand(i18n("Duplicate"), QStringLiteral("duplicatelayer"));
-    addCommand(i18n("Merge Down"), QStringLiteral("merge_layer"));
-    addCommand(i18n("Move Up"), QStringLiteral("move_layer_up"));
-    addCommand(i18n("Move Down"), QStringLiteral("move_layer_down"));
-    menu.addSeparator();
-    QAction *clip = addCommand(i18n("Clip to Layer Below"), QStringLiteral("toggle_layer_inherit_alpha"));
-    clip->setCheckable(true);
-    clip->setChecked(KisLayerPropertiesIcons::nodeProperty(node, KisLayerPropertiesIcons::inheritAlpha, false).toBool());
-    QAction *alpha = addCommand(i18n("Lock Transparency"), QStringLiteral("toggle_layer_alpha_lock"));
-    alpha->setCheckable(true);
-    alpha->setChecked(KisLayerPropertiesIcons::nodeProperty(node, KisLayerPropertiesIcons::alphaLocked, false).toBool());
-    QAction *lock = addCommand(i18n("Lock Layer"), QStringLiteral("toggle_layer_lock"));
+    const bool visible = node->visible();
+    grid->addItem(visible ? QStringLiteral("eye") : QStringLiteral("eye-off"), visible ? i18n("Hide") : i18n("Show"),
+                  [node, image, visible]() {
+                      KisLayerPropertiesIcons::setNodePropertyAutoUndo(node, KisLayerPropertiesIcons::visible, !visible, image);
+                  });
+    grid->addItem(QStringLiteral("copy"), i18n("Duplicate"), command(QStringLiteral("duplicatelayer")));
+    grid->addItem(QStringLiteral("file"), i18n("Clear"), command(QStringLiteral("clear")), node->isEditable());
+    const bool locked = node->userLocked();
+    IkGridTile *lock = grid->addItem(locked ? QStringLiteral("lock") : QStringLiteral("unlock"), locked ? i18n("Unlock") : i18n("Lock"),
+                                     command(QStringLiteral("toggle_layer_lock")));
     lock->setCheckable(true);
-    lock->setChecked(node->userLocked());
-    menu.addSeparator();
-    addCommand(i18n("Clear"), QStringLiteral("clear"));
-    addCommand(i18n("Properties..."), QStringLiteral("layer_properties"));
-    addCommand(i18n("Delete"), QStringLiteral("remove_layer"));
-    Q_UNUSED(image);
-    menu.exec(globalPos);
+    lock->setChecked(locked);
+    grid->addItem(QStringLiteral("merge"), i18n("Merge"), command(QStringLiteral("merge_layer")), node->prevSibling() != nullptr);
+    grid->addItem(QStringLiteral("mask"), i18n("Mask"), command(QStringLiteral("add_new_transparency_mask")));
+    const bool clipped = KisLayerPropertiesIcons::nodeProperty(node, KisLayerPropertiesIcons::inheritAlpha, false).toBool();
+    IkGridTile *clip = grid->addItem(QStringLiteral("clip"), i18n("Clip"), command(QStringLiteral("toggle_layer_inherit_alpha")),
+                                     node->prevSibling() != nullptr || clipped);
+    clip->setCheckable(true);
+    clip->setChecked(clipped);
+    grid->addItem(QStringLiteral("select-layer"), i18n("Select"), command(QStringLiteral("selectopaque")));
+    grid->addItem(QStringLiteral("trash"), i18n("Delete"), command(QStringLiteral("remove_layer")));
+
+    // "..." : rename, order, transparency lock, properties.
+    QHBoxLayout *moreRow = new QHBoxLayout();
+    moreRow->addStretch(1);
+    IkIconButton *more = new IkIconButton(QStringLiteral("more"), i18n("More layer commands"), grid);
+    moreRow->addWidget(more);
+    static_cast<QVBoxLayout *>(grid->layout())->addLayout(moreRow);
+    connect(more, &QAbstractButton::clicked, this, [this, node, more, pop]() {
+        QMenu menu(this);
+        QAction *rename = menu.addAction(i18n("Rename..."));
+        auto addCommand = [&](const QString &text, const QString &actionName) {
+            QAction *a = menu.addAction(text);
+            connect(a, &QAction::triggered, this, [this, actionName]() { if (d->manager) d->manager->triggerAction(actionName); });
+            return a;
+        };
+        addCommand(i18n("Move Up"), QStringLiteral("move_layer_up"));
+        addCommand(i18n("Move Down"), QStringLiteral("move_layer_down"));
+        QAction *alpha = addCommand(i18n("Lock Transparency"), QStringLiteral("toggle_layer_alpha_lock"));
+        alpha->setCheckable(true);
+        alpha->setChecked(KisLayerPropertiesIcons::nodeProperty(node, KisLayerPropertiesIcons::alphaLocked, false).toBool());
+        addCommand(i18n("Properties..."), QStringLiteral("layer_properties"));
+        QAction *picked = menu.exec(more->mapToGlobal(QPoint(0, more->height())));
+        if (picked) {
+            if (pop) pop->dismiss();
+        }
+        if (picked == rename) {
+            bool ok = false;
+            const QString name = QInputDialog::getText(this, i18n("Rename Layer"), i18n("Name:"), QLineEdit::Normal, node->name(), &ok);
+            if (ok && !name.isEmpty() && d->vm && d->vm->nodeManager()) d->vm->nodeManager()->setNodeName(node, name);
+        }
+    });
+
+    pop->setContent(grid);
+    // Beside the layer list, on the side with more room.
+    const QPoint centre = mapTo(window(), rect().center());
+    pop->popup(this, centre.x() > window()->width() / 2 ? IkPopover::Left : IkPopover::Right);
 }
 
 bool IkLayersPanel::eventFilter(QObject *watched, QEvent *event)

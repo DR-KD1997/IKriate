@@ -395,6 +395,7 @@ void KisToolRectangleBase::paintRectangle(QPainter &gc, const QRectF &imageRect)
     }
 
     getRotatedPath(path, viewRect.center(), getRotationAngle());
+    paintBrushPreview(&gc, path);
     path.addPath(drawX(pixelToView(m_dragStart)));
     path.addPath(drawX(pixelToView(m_dragCenter)));
     paintToolOutline(&gc, path);

@@ -22,6 +22,10 @@ management, and replaces the interface with a modern, minimal one built around t
 | **Symmetry** | The symmetry button (all three layouts) paints mirrored left and right, top and bottom, both, or radially with 2–16 sections. |
 | **Layer colours** | The three-circles button adjusts the selected layer's hue, saturation and brightness, or its colour balance, with a live preview. |
 | **Edit Interface** | **More › Edit Interface** pauses the tools so you can drag buttons between the bars and columns of a layout. Each layout remembers its own arrangement, and **Reset** puts it back. |
+| **Transform and smudge** | Transform offers Basic, Anchor, Distort, Warp and Flip; Smudge offers Smudge, Blur and Liquify. |
+| **Vector tools** | The pen and shape tools preview the stroke at the brush's size and colour with the points along the path. ✓ paints the path, ◎ closes it first. |
+| **Selection Fill** | A lasso that fills its shape with the current colour (in the brush library and the tools grid). |
+| **Reference images** | Imported from the reference button: on the canvas (they move with it and can be adjusted) or floating over the interface (they stay put while the canvas moves). |
 | **Practice** | The lightbulb on the home screen starts guided exercises: timed drawing from your own reference images, memory drawing, value studies and warm-ups. |
 | **Auto-Save** | When you go back to the gallery, changes are saved without asking. New artworks go to *Pictures/IKriate* (*Documents/IKriate* on Android). You can turn this off in **Settings**. |
 | **Skins and tinting** | Follow-system, light and dark themes, an accent colour and a tint for the interface, plus bundled and custom skins (**Settings › Theme**). Interface scale and font change immediately, without a restart. |
