@@ -47,6 +47,7 @@
 #include "IkPractice.h"
 #include "IkStyle.h"
 #include "IkWidgets.h"
+#include "IkMenus.h"
 
 namespace
 {
@@ -575,41 +576,51 @@ void IkHomeScreen::openDocument(const QUrl &url)
 
 void IkHomeScreen::showDocumentMenu(const QUrl &url, const QPoint &globalPos)
 {
-    QMenu menu(this);
-    QAction *open = menu.addAction(IkStyle::icon(QStringLiteral("open")), i18n("Open"));
+    // Two buttons: favourite (star) and delete (trash). Tapping the artwork
+    // itself opens it.
+    QWidget *win = window();
+    QWidget *anchor = new QWidget(win); // where the finger was; never shown
+    anchor->setGeometry(QRect(win->mapFromGlobal(globalPos), QSize(1, 1)));
+    QWidget *row = new QWidget();
+    QHBoxLayout *l = new QHBoxLayout(row);
+    l->setContentsMargins(4, 0, 4, 0);
+    l->setSpacing(IkStyle::scaled(14));
+    IkPopover *pop = IkMenus::create(win);
+    pop->setAccentOutline(true);
+    connect(pop, &QObject::destroyed, anchor, &QObject::deleteLater);
+    QPointer<IkPopover> guard = pop;
+
     const bool fav = favoriteDocuments().contains(url);
-    QAction *star = menu.addAction(IkStyle::icon(QStringLiteral("star")), fav ? i18n("Remove from Favorites") : i18n("Add to Favorites"));
-    QAction *folder = nullptr;
-#ifndef Q_OS_ANDROID
-    if (url.isLocalFile()) folder = menu.addAction(IkStyle::icon(QStringLiteral("open")), i18n("Show in Folder"));
-#endif
-    menu.addSeparator();
-    QAction *forget = menu.addAction(i18n("Remove from Gallery"));
-    QAction *bin = nullptr;
-    if (url.isLocalFile() && QFileInfo::exists(url.toLocalFile())) {
-        bin = menu.addAction(IkStyle::icon(QStringLiteral("trash")), i18n("Move to Recycle Bin"));
-    }
-    QAction *picked = menu.exec(globalPos);
-    if (!picked) return;
-    if (picked == open) {
-        openDocument(url);
-    } else if (picked == star) {
+    IkIconButton *star = new IkIconButton(QStringLiteral("star"), fav ? i18n("Remove from Favorites") : i18n("Add to Favorites"), row);
+    star->setEdge(IkStyle::touchSize() + IkStyle::scaled(8));
+    star->setIconPixelSize(IkStyle::scaled(30));
+    star->setActive(fav);
+    l->addWidget(star);
+    connect(star, &QAbstractButton::clicked, this, [this, url, fav, guard]() {
+        if (guard) guard->dismiss();
         setFavoriteDocument(url, !fav);
         reload();
-    } else if (picked == folder) {
-        QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo(url.toLocalFile()).absolutePath()));
-    } else if (picked == forget) {
+    });
+
+    IkIconButton *trash = new IkIconButton(QStringLiteral("trash"), i18n("Move to Recycle Bin"), row);
+    trash->setEdge(IkStyle::touchSize() + IkStyle::scaled(8));
+    trash->setIconPixelSize(IkStyle::scaled(30));
+    l->addWidget(trash);
+    connect(trash, &QAbstractButton::clicked, this, [this, url, guard]() {
+        if (guard) guard->dismiss();
+        if (url.isLocalFile() && QFileInfo::exists(url.toLocalFile())) {
+            QString error;
+            if (!IkRecycleBin::moveToBin(url.toLocalFile(), &error)) {
+                QMessageBox::warning(this, i18n("Recycle Bin"), error);
+                return;
+            }
+        }
+        // Gone from the gallery either way (a missing file is just forgotten).
         KisRecentFilesManager::instance()->remove(url);
         setFavoriteDocument(url, false);
-    } else if (picked == bin) {
-        QString error;
-        if (IkRecycleBin::moveToBin(url.toLocalFile(), &error)) {
-            KisRecentFilesManager::instance()->remove(url);
-            setFavoriteDocument(url, false);
-        } else {
-            QMessageBox::warning(this, i18n("Recycle Bin"), error);
-        }
-    }
+    });
+    pop->setContent(row);
+    pop->popup(anchor, IkPopover::Below);
 }
 
 void IkHomeScreen::setCreateMenuOpen(bool open)

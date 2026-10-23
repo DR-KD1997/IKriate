@@ -81,6 +81,9 @@ public:
 
     KisMainWindow *mainWindow() const;
     bool isEditingInterface() const;
+    /// The part of the window the canvas shows in (without the Desktop
+    /// layout's side panels).
+    QRect canvasArea() const;
     KisViewManager *viewManager() const;
     QAction *action(const QString &name) const;
     IkHomeScreen *homeScreen() const;

@@ -39,6 +39,9 @@ public:
 public Q_SLOTS:
     void reload();
 
+protected:
+    void changeEvent(QEvent *event) override;
+
 private:
     void applyScale(int percent);
     void showSection(int section);

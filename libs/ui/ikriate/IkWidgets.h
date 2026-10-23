@@ -466,6 +466,8 @@ public:
     void setModal(bool modal);
     /// Translucent dark backdrop behind the popover (dialog-like sheets).
     void setDimBackground(bool dim);
+    /// An X at the top right that closes the popover (window-like sheets).
+    void setCloseButton(bool show);
 
 Q_SIGNALS:
     void dismissed();
@@ -483,6 +485,7 @@ private:
     QSize m_requested;
     bool m_modal {false};
     bool m_dim {false};
+    QPointer<QWidget> m_close;
 };
 
 

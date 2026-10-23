@@ -32,6 +32,10 @@ public:
         maybeShowDialog(false);
     }
 
+    /// IKriate: sets the interface scale directly (100 = the device's own
+    /// density) and remembers it; used by the Settings slider.
+    void setInterfaceScalePercent(int percent);
+
 Q_SIGNALS:
     void sigInterfaceScaleChanged();
     void sigJniSetPrimaryScreenScale(qreal scale);

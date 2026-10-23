@@ -58,7 +58,7 @@ IkMinimalLayout::IkMinimalLayout(IkInterfaceManager *mgr)
     m_toolButtons << qMakePair(QPointer<IkIconButton>(select), QStringLiteral("KisToolSelectRectangular"));
     toolsAdd(transformButton(m_tools));
     toolsAdd(toolButton(m_tools, QStringLiteral("fill"), i18n("Fill"), QStringLiteral("KritaFill/KisToolFill")));
-    IkIconButton *smudge = toolsAdd(button(m_tools, QStringLiteral("smudge"), i18n("Smudge, blur or liquify")));
+    IkIconButton *smudge = toolsAdd(button(m_tools, QStringLiteral("smudge"), i18n("Smudge or blur")));
     connect(smudge, &QAbstractButton::clicked, this, [this, smudge]() {
         this->manager()->setSmudgeVariant(this->manager()->smudgeVariant());
         showSmudgeOptions(smudge);

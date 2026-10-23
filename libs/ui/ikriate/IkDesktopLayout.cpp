@@ -189,7 +189,7 @@ IkDesktopLayout::IkDesktopLayout(IkInterfaceManager *mgr)
                                                                                      : IkInterfaceManager::Erase);
     });
     m_eraseButtons << eraser;
-    IkIconButton *smudge = railButton(button(m_rail, QStringLiteral("smudge"), i18n("Smudge, blur or liquify")));
+    IkIconButton *smudge = railButton(button(m_rail, QStringLiteral("smudge"), i18n("Smudge or blur")));
     connect(smudge, &QAbstractButton::clicked, this, [this, smudge]() {
         manager()->setSmudgeVariant(manager()->smudgeVariant());
         showSmudgeOptions(smudge);

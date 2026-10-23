@@ -42,6 +42,8 @@ struct KRITAUI_EXPORT KisFillActionFactory : public KisOperation
      * - "pattern" --- current pattern
      */
     void run(const QString &fillSource, KisViewManager *view);
+    /// IKriate: fills @p selection instead of the view's current selection.
+    void run(const QString &fillSource, KisViewManager *view, KisSelectionSP selection);
 };
 
 struct KRITAUI_EXPORT KisClearActionFactory : public KisNoParameterActionFactory {

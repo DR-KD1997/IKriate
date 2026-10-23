@@ -12,6 +12,11 @@
 #include <QLineEdit>
 #include <QPainter>
 #include <QVBoxLayout>
+#include <QColorDialog>
+
+#include <KConfigGroup>
+#include <KSharedConfig>
+#include <klocalizedstring.h>
 
 #include "IkStyle.h"
 #include "IkWidgets.h"
@@ -112,10 +117,16 @@ IkGridTile *IkActionGrid::addItem(const QString &icon, const QString &label, std
 
 namespace
 {
-class IkPreviewDot : public QWidget
+constexpr int kSwatchCount = 6;
+
+class IkPreviewDot : public QAbstractButton
 {
 public:
-    using QWidget::QWidget;
+    explicit IkPreviewDot(QWidget *parent) : QAbstractButton(parent)
+    {
+        setCursor(Qt::PointingHandCursor);
+        setToolTip(i18n("More colours, and the colours of this palette"));
+    }
     QColor color;
 
 protected:
@@ -205,12 +216,50 @@ IkHsbPicker::IkHsbPicker(QWidget *parent)
     IkPreviewDot *dot = new IkPreviewDot(this);
     dot->setFixedSize(IkStyle::scaled(84), IkStyle::scaled(84));
     m_preview = dot;
+    connect(dot, &QAbstractButton::clicked, this, &IkHsbPicker::openPaletteDialog);
     bottom->addWidget(dot, 0, Qt::AlignVCenter);
     l->addLayout(bottom);
 
-    setSwatches({QColor(0xF2, 0x2C, 0x2C), QColor(0xFF, 0x9A, 0x1A), QColor(0xA8, 0x55, 0xF7), QColor(0x1F, 0xF0, 0xA0),
-                 QColor(0xF3, 0xE6, 0xD2), QColor(0x22, 0x22, 0x22)});
+    setSwatches(savedSwatches());
     sync();
+}
+
+QList<QColor> IkHsbPicker::savedSwatches()
+{
+    const QList<QColor> defaults = {QColor(0xF2, 0x2C, 0x2C), QColor(0xFF, 0x9A, 0x1A), QColor(0xA8, 0x55, 0xF7),
+                                    QColor(0x1F, 0xF0, 0xA0), QColor(0xF3, 0xE6, 0xD2), QColor(0x22, 0x22, 0x22)};
+    const QStringList saved = KConfigGroup(KSharedConfig::openConfig(), "IKriate").readEntry("PickerSwatches", QStringList());
+    QList<QColor> colors;
+    for (int i = 0; i < kSwatchCount; ++i) {
+        const QColor c(saved.value(i));
+        colors << (c.isValid() ? c : defaults.value(i));
+    }
+    return colors;
+}
+
+void IkHsbPicker::openPaletteDialog()
+{
+    // The full colour dialog: a large palette plus "custom colours", whose
+    // first slots are this picker's swatches. Changing those slots changes
+    // the swatches shown under the sliders.
+    const QList<QColor> swatches = savedSwatches();
+    for (int i = 0; i < kSwatchCount; ++i) QColorDialog::setCustomColor(i, swatches.at(i));
+    QColorDialog dialog(color(), window());
+    dialog.setOption(QColorDialog::DontUseNativeDialog);
+    dialog.setWindowTitle(i18n("Colours"));
+    const bool accepted = dialog.exec() == QDialog::Accepted;
+    QList<QColor> updated;
+    QStringList names;
+    for (int i = 0; i < kSwatchCount; ++i) {
+        updated << QColorDialog::customColor(i);
+        names << updated.last().name();
+    }
+    KConfigGroup(KSharedConfig::openConfig(), "IKriate").writeEntry("PickerSwatches", names);
+    setSwatches(updated);
+    if (accepted && dialog.selectedColor().isValid()) {
+        setColor(dialog.selectedColor());
+        if (onColorChanged) onColorChanged(color());
+    }
 }
 
 void IkHsbPicker::setSwatches(const QList<QColor> &colors)

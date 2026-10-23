@@ -21,6 +21,11 @@
 #include <QWindow>
 
 #include "IkStyle.h"
+#include "IkWidgets.h"
+#include <klocalizedstring.h>
+#include <QLayout>
+#include <QPushButton>
+#include <QDialogButtonBox>
 
 namespace
 {
@@ -142,8 +147,71 @@ QPixmap grabBehind(QWidget *window)
 #endif
 }
 
+namespace
+{
+const char kCloseName[] = "ikWindowClose";
+
+/// Windows that get an X at the top right: dialogs, tool windows and big
+/// pop-ups (the brush editor), not menus or drop-down lists.
+bool wantsCloseButton(QWidget *w)
+{
+    if (qobject_cast<QMenu *>(w) || w->inherits("QComboBoxPrivateContainer")) return false;
+    const Qt::WindowType type = w->windowType();
+    if (qobject_cast<QDialog *>(w) || type == Qt::Dialog || type == Qt::Sheet || type == Qt::Tool) return true;
+    if (type == Qt::Popup) {
+        if (w->property("ikCloseButton").toBool() || w->inherits("KisPaintOpPresetsEditor")) return true;
+        for (QWidget *c : w->findChildren<QWidget *>()) {
+            if (c->inherits("KisPaintOpPresetsEditor")) return true;
+        }
+    }
+    return false;
+}
+
+void placeCloseButton(QWidget *w)
+{
+    if (QWidget *close = w->findChild<QWidget *>(QLatin1String(kCloseName), Qt::FindDirectChildrenOnly)) {
+        close->move(w->width() - close->width() - IkStyle::scaled(10), IkStyle::scaled(6));
+        close->raise();
+    }
+}
+
+void addCloseButton(QWidget *w)
+{
+    QWidget *close = w->findChild<QWidget *>(QLatin1String(kCloseName), Qt::FindDirectChildrenOnly);
+    if (!close) {
+        IkIconButton *b = new IkIconButton(QStringLiteral("close"), i18n("Close"), w);
+        b->setObjectName(QLatin1String(kCloseName));
+        b->setEdge(IkStyle::touchSize() - 6);
+        QObject::connect(b, &QAbstractButton::clicked, w, [w]() {
+            if (QDialog *dialog = qobject_cast<QDialog *>(w)) dialog->reject();
+            else w->hide();
+        });
+        close = b;
+        // Room for it above a dialog's content (pop-ups such as the brush
+        // editor have free space at the top right already).
+        if (QLayout *l = (w->windowType() == Qt::Popup) ? nullptr : w->layout()) {
+            QMargins m = l->contentsMargins();
+            m.setTop(m.top() + b->height() + IkStyle::scaled(4));
+            l->setContentsMargins(m);
+        }
+        // The X replaces labelled "Close" buttons.
+        for (QDialogButtonBox *box : w->findChildren<QDialogButtonBox *>()) {
+            if (QPushButton *c = box->button(QDialogButtonBox::Close)) c->hide();
+        }
+        for (QPushButton *p : w->findChildren<QPushButton *>()) {
+            const QString text = p->text().remove(QLatin1Char('&'));
+            if (text == i18n("Close") || text == QLatin1String("Close")) p->hide();
+        }
+    }
+    placeCloseButton(w);
+    close->show();
+    close->raise();
+}
+}
+
 void IkWindowFrames::decorate(QWidget *window)
 {
+    if (wantsCloseButton(window)) addCloseButton(window);
     IkFrameOverlay *overlay = overlayOf(window);
     if (!overlay) overlay = new IkFrameOverlay(window);
     overlay->setGeometry(window->rect());
@@ -206,6 +274,7 @@ bool IkWindowFrames::eventFilter(QObject *watched, QEvent *event)
 #endif
         break;
     case QEvent::Resize:
+        placeCloseButton(w);
         if (overlayOf(w)) updateShape(w);
         break;
     case QEvent::WindowStateChange:
@@ -224,7 +293,9 @@ bool IkWindowFrames::eventFilter(QObject *watched, QEvent *event)
         if (ce->child()->objectName() == QLatin1String(kOverlayName)) break;
         if (IkFrameOverlay *overlay = overlayOf(w)) {
             QPointer<IkFrameOverlay> guard = overlay;
-            QTimer::singleShot(0, overlay, [guard]() {
+            QPointer<QWidget> close = w->findChild<QWidget *>(QLatin1String(kCloseName), Qt::FindDirectChildrenOnly);
+            QTimer::singleShot(0, overlay, [guard, close]() {
+                if (close) close->raise();
                 if (guard) guard->raise();
             });
         }

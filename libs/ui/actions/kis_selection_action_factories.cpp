@@ -217,12 +217,15 @@ void KisReselectActionFactory::run(KisViewManager *view)
 
 void KisFillActionFactory::run(const QString &fillSource, KisViewManager *view)
 {
+    run(fillSource, view, view->selection());
+}
+
+void KisFillActionFactory::run(const QString &fillSource, KisViewManager *view, KisSelectionSP selection)
+{
     KisNodeSP node = view->activeNode();
     if (!node || !node->hasEditablePaintDevice()) return;
 
     KisImageWSP image = view->image();
-
-    KisSelectionSP selection = view->selection();
 
     bool usePattern = false;
     bool useBgColor = false;

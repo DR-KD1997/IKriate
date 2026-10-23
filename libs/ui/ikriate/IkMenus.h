@@ -78,7 +78,11 @@ public:
     std::function<void(const QColor &)> onColorChanged;
     std::function<void(int)> onStrengthChanged;
 
+    /// The colours of the swatch row (Settings; changed in the palette dialog).
+    static QList<QColor> savedSwatches();
+
 private:
+    void openPaletteDialog();
     void sync();
 
     qreal m_h {0}, m_s {0}, m_v {1};

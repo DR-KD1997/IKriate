@@ -131,5 +131,12 @@
     <file>transform-warp.svg</file>
     <file>wand.svg</file>
     <file>wrench.svg</file>
+    <file>liquify-bloat.svg</file>
+    <file>liquify-ccw.svg</file>
+    <file>liquify-cw.svg</file>
+    <file>liquify-pinch.svg</file>
+    <file>liquify-push.svg</file>
+    <file>liquify-restore.svg</file>
+    <file>sliders-horizontal.svg</file>
 </qresource>
 </RCC>

@@ -10,6 +10,8 @@
 #include <QApplication>
 #include <QDoubleValidator>
 #include <QHBoxLayout>
+
+#include <klocalizedstring.h>
 #include <QLineEdit>
 #include <QMenu>
 #include <QScroller>
@@ -1432,6 +1434,26 @@ void IkPopover::setDimBackground(bool dim)
 {
     m_dim = dim;
     static_cast<IkScrim *>(m_scrim)->dim = dim;
+}
+
+void IkPopover::setCloseButton(bool show)
+{
+    if (show == bool(m_close)) return;
+    QVBoxLayout *l = static_cast<QVBoxLayout *>(layout());
+    if (show) {
+        IkIconButton *close = new IkIconButton(QStringLiteral("close"), i18n("Close"), this);
+        close->setEdge(IkStyle::touchSize() - 4);
+        connect(close, &QAbstractButton::clicked, this, &IkPopover::dismiss);
+        // A row of its own above the content.
+        QHBoxLayout *row = new QHBoxLayout();
+        row->setContentsMargins(0, 0, 0, 0);
+        row->addStretch(1);
+        row->addWidget(close);
+        l->insertLayout(0, row);
+        m_close = close;
+    } else {
+        delete m_close.data();
+    }
 }
 
 bool IkPopover::isOpen() const { return isVisible(); }

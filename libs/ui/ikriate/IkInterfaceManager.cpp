@@ -52,6 +52,7 @@
 #include "KisView.h"
 #include "KisDocument.h"
 #include "kis_selection_manager.h"
+#include "actions/kis_selection_action_factories.h"
 #include <KisRecentFilesManager.h>
 #include "KisViewManager.h"
 #include "canvas/kis_canvas2.h"
@@ -72,6 +73,7 @@
 #include "IkWindowFrames.h"
 #include "IkNewCanvasDialog.h"
 #include "IkMenus.h"
+#include "IkLiquify.h"
 #include "IkBrushSettings.h"
 #include "IkReferences.h"
 #include "IkSettingsPage.h"
@@ -177,6 +179,10 @@ IkInterfaceManager::IkInterfaceManager(KisMainWindow *mainWindow)
     createActions();
     new IkTouchGestures(this);
     new IkWindowFrames(this);
+    // The liquify bar belongs to the transform tool.
+    connect(KoToolManager::instance(), &KoToolManager::changedTool, this, []() {
+        if (KoToolManager::instance()->activeToolId() != QLatin1String("KisToolTransform")) IkLiquify::hide();
+    });
     QTimer::singleShot(0, this, &IkInterfaceManager::slotDeferredInit);
 }
 
@@ -687,6 +693,7 @@ void IkInterfaceManager::slotStackPageChanged()
 void IkInterfaceManager::closeTransientWindows()
 {
     IkPractice::stopActive();
+    IkLiquify::hide();
     // IKriate pop-overs (layout pop-overs, brush library, settings, practice, ...)
     const QList<IkPopover *> popovers = d->mw->findChildren<IkPopover *>();
     for (IkPopover *p : popovers) {
@@ -759,8 +766,14 @@ bool IkInterfaceManager::eventFilter(QObject *watched, QEvent *event)
         break;
     case QEvent::Show:
         if (watched == d->mw && d->initialized) {
-            // KMainWindow re-applies saved dockers when shown; re-assert the layout.
-            QTimer::singleShot(0, this, &IkInterfaceManager::slotStackPageChanged);
+            // KMainWindow re-applies saved dockers when shown; re-assert the
+            // layout. (Not a page change: Android hides and re-shows the
+            // window when the interface scale changes, and open pop-overs
+            // such as the scale slider must stay open.)
+            QTimer::singleShot(0, this, [this]() {
+                applyMode();
+                IkReferences::setFloatingVisible(this, d->onCanvasPage() && d->mode != Classic);
+            });
         }
         break;
     default:
@@ -842,7 +855,14 @@ int IkInterfaceManager::transformMode() const
 
 int IkInterfaceManager::smudgeVariant() const
 {
-    return ikConfig().readEntry("SmudgeVariant", int(SmudgeSmear));
+    const int v = ikConfig().readEntry("SmudgeVariant", int(SmudgeSmear));
+    return v == SmudgeLiquify ? int(SmudgeSmear) : v;
+}
+
+QRect IkInterfaceManager::canvasArea() const
+{
+    if (!d->stack) return d->mw->rect();
+    return d->stack->geometry().marginsRemoved(d->stack->contentsMargins());
 }
 
 void IkInterfaceManager::activateTransform(int mode)
@@ -857,9 +877,10 @@ void IkInterfaceManager::activateTransform(int mode)
     case TransformLiquify: kritaMode = Liquify; break;
     default: break;
     }
-    if (mode != TransformLiquify) ikConfig().writeEntry("TransformMode", mode);
+    ikConfig().writeEntry("TransformMode", mode);
     setPaintMode(Draw);
     activateTool(QStringLiteral("KisToolTransform"));
+    if (mode != TransformLiquify) IkLiquify::hide();
     // The tool object exists once it has been activated on this canvas.
     QTimer::singleShot(0, this, [this, kritaMode]() {
         KisViewManager *vm = viewManager();
@@ -867,6 +888,9 @@ void IkInterfaceManager::activateTransform(int mode)
         if (KoToolBase *tool = KoToolManager::instance()->toolById(vm->canvasBase(), QStringLiteral("KisToolTransform"))) {
             tool->setProperty("transformMode", kritaMode);
         }
+        // Liquify gets its own bar (strength and modes) once the tool's
+        // options exist.
+        if (kritaMode == Liquify) QTimer::singleShot(50, this, [this]() { IkLiquify::show(this); });
     });
 }
 
@@ -883,11 +907,9 @@ void IkInterfaceManager::flipLayer(bool horizontal)
 
 void IkInterfaceManager::setSmudgeVariant(int variant)
 {
+    // Liquify moved to the transform options.
+    if (variant == SmudgeLiquify) variant = SmudgeSmear;
     ikConfig().writeEntry("SmudgeVariant", variant);
-    if (variant == SmudgeLiquify) {
-        activateTransform(TransformLiquify);
-        return;
-    }
     setPaintMode(Smudge);
     ensureBrushTool();
     d->settingMode = true;
@@ -930,9 +952,18 @@ void IkInterfaceManager::activateSelectionFill()
                 if (image) image->waitForDone();
                 // The lasso announces an empty selection when it starts.
                 if (v && v->selection() && !v->selection()->selectedExactRect().isEmpty()) {
-                    triggerAction(QStringLiteral("fill_selection_foreground_color"));
+                    // Keep the shape, take the lasso's selection back out of the
+                    // history, and fill the shape: one undo step, no selection.
+                    KisSelectionSP shape = new KisSelection(*v->selection());
+                    triggerAction(QStringLiteral("edit_undo"));
                     if (image) image->waitForDone();
-                    triggerAction(QStringLiteral("deselect"));
+                    if (v->selection()) {
+                        // Undo did not remove it (e.g. merged into another step).
+                        triggerAction(QStringLiteral("deselect"));
+                        if (image) image->waitForDone();
+                    }
+                    KisFillActionFactory fill;
+                    fill.run(QStringLiteral("fg"), v, shape);
                     if (image) image->waitForDone();
                 }
                 QTimer::singleShot(0, this, [this]() { d->fillingSelection = false; });
@@ -1213,7 +1244,27 @@ void IkInterfaceManager::showBrushEditor()
     ensureBrushTool();
     QAction *editor = action(QStringLiteral("show_brush_editor"));
     if (!editor) return;
-    editor->trigger();
+    // Once the editor's window exists, show or hide it directly (its X just
+    // hides it, which Krita's toggle does not always notice); the first
+    // time, Krita's action creates and opens it.
+    QWidget *window = nullptr;
+    for (QWidget *top : QApplication::topLevelWidgets()) {
+        if (top->inherits("KisPaintOpPresetsEditor")) window = top;
+        for (QWidget *w : top->findChildren<QWidget *>()) {
+            if (w->inherits("KisPaintOpPresetsEditor")) window = top;
+        }
+        if (window) break;
+    }
+    if (window && window != d->mw) {
+        if (window->isVisible()) {
+            window->hide();
+            return;
+        }
+        window->show();
+        window->raise();
+    } else {
+        editor->trigger();
+    }
     // The editor normally hangs off a tool bar button that the IKriate layouts
     // hide; centre it in the window instead.
     QTimer::singleShot(0, this, [this]() {
@@ -1226,23 +1277,16 @@ void IkInterfaceManager::showBrushEditor()
                 if (w->inherits("KisPaintOpPresetsEditor") && w->isVisible()) IkBrushSettings::adoptEditor(w, this, true);
             }
         }
-        const QList<QWidget *> tops = QApplication::topLevelWidgets();
-        for (QWidget *w : tops) {
-            if (w->isVisible() && w->inherits("KisPaintOpPresetsEditor")) {
-                const QRect g = d->mw->geometry();
-                const QSize s = w->size().boundedTo(g.size() - QSize(40, 40));
-                w->resize(s);
-                w->move(g.center() - QPoint(s.width() / 2, s.height() / 2));
-            }
-        }
-        const QList<QWidget *> kids = d->mw->findChildren<QWidget *>();
-        for (QWidget *w : kids) {
-            if (w->isVisible() && w->inherits("KisPaintOpPresetsEditor") && w->isWindow()) {
-                const QRect g = d->mw->geometry();
-                const QSize s = w->size().boundedTo(g.size() - QSize(40, 40));
-                w->resize(s);
-                w->move(g.center() - QPoint(s.width() / 2, s.height() / 2));
-            }
+        // Centre the editor's window (it may be a pop-up frame around it).
+        for (QWidget *top : QApplication::topLevelWidgets()) {
+            if (!top->isVisible() || top == d->mw) continue;
+            bool hasEditor = top->inherits("KisPaintOpPresetsEditor");
+            for (QWidget *w : top->findChildren<QWidget *>()) hasEditor |= w->inherits("KisPaintOpPresetsEditor");
+            if (!hasEditor) continue;
+            const QRect g = d->mw->geometry();
+            const QSize size = top->size().boundedTo(g.size() - QSize(40, 40));
+            top->resize(size);
+            top->move(g.center() - QPoint(size.width() / 2, size.height() / 2));
         }
     });
 }
@@ -1267,6 +1311,7 @@ void IkInterfaceManager::showBrushLibrary()
     if (!d->brushes) {
         d->brushes = new IkPopover(d->mw);
         d->brushes->setRadius(16);
+        d->brushes->setCloseButton(true);
         IkBrushLibrary *lib = new IkBrushLibrary(this, d->brushes);
         d->brushes->setContent(lib);
     }
@@ -1285,6 +1330,7 @@ void IkInterfaceManager::showSettings()
         d->settings->setRole(IkStyle::Background);
         d->settings->setRadius(18);
         d->settings->setDimBackground(true);
+        d->settings->setCloseButton(true);
         IkSettingsPage *page = new IkSettingsPage(d->mw, d->settings);
         page->setManager(this);
         d->settings->setContent(page);

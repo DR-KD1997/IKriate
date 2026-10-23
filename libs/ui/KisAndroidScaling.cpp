@@ -34,7 +34,7 @@ KisAndroidScaling::KisAndroidScaling(KisConfig &cfg, KisApplication *app)
     }
 
     qreal scale = getValidInitialScale(cfg);
-    if (scale >= 1.0) {
+    if (scale >= 0.5) {
         setPrimaryScreenScale(scale);
     } else {
         // Reset the configuration, it wasn't valid or the screen changed.
@@ -61,9 +61,18 @@ KisAndroidScaling::KisAndroidScaling(KisConfig &cfg, KisApplication *app)
             &KisAndroidScaling::slotJniScalingDialogActive,
             Qt::QueuedConnection);
 
-    // IKriate has no splash/donation dialog to wait for: offer interface
-    // scaling once the event loop is running and the main window is up.
-    QTimer::singleShot(1500, this, &KisAndroidScaling::slotSplashDialogDismissed);
+    // IKriate: no scaling dialog on startup; the scale is set in Settings.
+}
+
+void KisAndroidScaling::setInterfaceScalePercent(int percent)
+{
+    if (m_initialPrimaryScreenDevicePixelRatio <= 0.0) return;
+    const qreal target = m_initialPrimaryScreenDevicePixelRatio * qBound(50, percent, 300) / 100.0;
+    setPrimaryScreenScale(target);
+    KisConfig cfg(false);
+    cfg.setAndroidScalingLastInitialScale(m_initialPrimaryScreenDevicePixelRatio);
+    cfg.setAndroidScalingTargetScale(target);
+    cfg.setAndroidScalingAskOnStartup(false);
 }
 
 KisAndroidScaling *KisAndroidScaling::instance()
@@ -143,7 +152,8 @@ void KisAndroidScaling::setPrimaryScreenScale(qreal scale)
         if (screen) {
             QPlatformScreen *platformScreen = screen->handle();
             if (platformScreen) {
-                qreal actualScale = qMax(1.0, scale);
+                // IKriate: allow scales below 100% too.
+                qreal actualScale = qMax(0.5, scale);
                 qreal densityAdjustment = actualScale / m_initialPrimaryScreenDevicePixelRatio;
                 if (!qFuzzyCompare(densityAdjustment, platformScreen->densityAdjustment())) {
                     platformScreen->setDensityAdjustment(densityAdjustment);

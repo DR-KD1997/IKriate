@@ -39,6 +39,7 @@
 #include <QTimer>
 #include "IkMenus.h"
 #include "IkReferences.h"
+#include "IkLiquify.h"
 
 namespace
 {
@@ -199,6 +200,7 @@ void IkLayout::closeTransient()
 void IkLayout::raisePopovers()
 {
     IkReferences::raiseFloating();
+    IkLiquify::raiseAndPlace();
     IkPractice::raiseActive();
     // Every open popover in the window (the layout's own and the ones opened
     // through IkMenus: options, layer actions, reference images, ...).
@@ -306,6 +308,8 @@ void IkLayout::showTransformOptions(QWidget *anchor)
          mode == IkInterfaceManager::TransformDistort},
         {QStringLiteral("transform-warp"), i18n("Warp"), activate(IkInterfaceManager::TransformWarp),
          mode == IkInterfaceManager::TransformWarp},
+        {QStringLiteral("liquify"), i18n("Liquify"), activate(IkInterfaceManager::TransformLiquify),
+         mode == IkInterfaceManager::TransformLiquify},
         {QStringLiteral("transform-flip"), i18n("Flip"), [this, anchor]() {
              QPointer<QWidget> a = anchor;
              QTimer::singleShot(0, this, [this, a]() {
@@ -327,7 +331,6 @@ void IkLayout::showSmudgeOptions(QWidget *anchor)
     showOptionStrip(anchor, {
         {QStringLiteral("smudge"), i18n("Smudge"), choose(IkInterfaceManager::SmudgeSmear), v == IkInterfaceManager::SmudgeSmear},
         {QStringLiteral("blur"), i18n("Blur"), choose(IkInterfaceManager::SmudgeBlur), v == IkInterfaceManager::SmudgeBlur},
-        {QStringLiteral("liquify"), i18n("Liquify"), choose(IkInterfaceManager::SmudgeLiquify), v == IkInterfaceManager::SmudgeLiquify},
     });
 }
 

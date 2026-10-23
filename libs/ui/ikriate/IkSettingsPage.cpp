@@ -418,7 +418,8 @@ void IkSettingsPage::reload()
     d->themeMode->setCurrentIndex(int(s.themeMode));
     d->tint->setColor(s.tint);
     d->tint->setEmpty(s.tintStrength <= 0);
-    d->accent->setColor(s.overrideAccent ? s.accent : IkSkinManager::instance()->skin(s.skinId).accent);
+    // What the interface actually shows (the skin's accent, or the override).
+    d->accent->setColor(qApp->palette().color(QPalette::Highlight));
     const int mode = d->manager ? int(d->manager->preferredMode()) : int(IkInterfaceManager::platformDefaultMode());
     for (int i = 0; i < d->layoutRows.size(); ++i) {
         d->layoutRows[i]->selected = i == mode;
@@ -437,6 +438,19 @@ void IkSettingsPage::reload()
     }
 }
 
+void IkSettingsPage::changeEvent(QEvent *event)
+{
+    QWidget::changeEvent(event);
+    // A new skin, accent or tint arrives as a palette change: keep the
+    // Tint and Accent chips in step with the colours on screen.
+    if (event->type() == QEvent::PaletteChange && d->accent) {
+        const IkSkinManager::Settings s = IkSkinManager::instance()->settings();
+        d->accent->setColor(qApp->palette().color(QPalette::Highlight));
+        d->tint->setColor(s.tint);
+        d->tint->setEmpty(s.tintStrength <= 0);
+    }
+}
+
 void IkSettingsPage::applyScale(int pct)
 {
     if (pct == KConfigGroup(KSharedConfig::openConfig(), "IKriate").readEntry("InterfaceScale", 100)) return;
@@ -444,18 +458,14 @@ void IkSettingsPage::applyScale(int pct)
     KSharedConfig::openConfig()->sync();
     d->scale->setValueText(QStringLiteral("%1%").arg(pct));
 #ifdef Q_OS_ANDROID
-    // Android scales everything through the screen density, live.
-    KisConfig cfg(false);
-    const qreal target = cfg.androidScalingLastInitialScale() * pct / 100.0;
-    cfg.setAndroidScalingTargetScale(target);
-    if (KisAndroidScaling *scaling = KisAndroidScaling::instance()) {
-        Q_EMIT scaling->sigJniSetPrimaryScreenScale(target);
-    }
+    // Android scales everything through the screen density, live; nothing
+    // needs rebuilding.
+    if (KisAndroidScaling *scaling = KisAndroidScaling::instance()) scaling->setInterfaceScalePercent(pct);
 #else
     IkStyle::setUiScale(pct / 100.0);
     IkStyle::applyInterfaceFont();
-#endif
     if (d->manager) d->manager->rebuildInterface();
+#endif
 }
 
 QWidget *IkSettingsPage::buildThemePage()
@@ -582,8 +592,9 @@ QWidget *IkSettingsPage::buildThemePage()
             pl->addWidget(new IkLayoutPreview(m, content), 1);
             pop->setContent(content);
             pop->setDimBackground(true);
+            pop->setCloseButton(true);
             connect(pop, &IkPopover::dismissed, pop, &QObject::deleteLater);
-            pop->popup(nullptr, IkPopover::Center, QSize(560, 460));
+            pop->popup(nullptr, IkPopover::Center, QSize(560, 500));
             Q_UNUSED(r);
         });
         d->layoutRows << r;
@@ -621,12 +632,29 @@ QWidget *IkSettingsPage::buildThemePage()
         IkPopover *pop = IkMenus::popup(box, d->scale, IkPopover::Below, QSize(d->scale->width(), box->sizeHint().height() + 50));
         pop->setAccentOutline(true);
         QPointer<IkPopover> guard = pop;
+#ifdef Q_OS_ANDROID
+        // Live while the slider moves (at most every 120 ms; each change
+        // re-renders the whole window).
+        QTimer *throttle = new QTimer(box);
+        throttle->setSingleShot(true);
+        throttle->setInterval(120);
+        connect(throttle, &QTimer::timeout, this, [this, slider, pctOf]() { applyScale(pctOf(slider->value())); });
+        connect(slider, &IkSlider::valueEdited, box, [throttle](qreal) {
+            if (!throttle->isActive()) throttle->start();
+        });
+        connect(slider, &IkSlider::interactionFinished, this, [this, slider, pctOf, throttle]() {
+            throttle->stop();
+            applyScale(pctOf(slider->value()));
+        });
+        Q_UNUSED(guard);
+#else
         // Rebuilding the interface is heavy: apply when the finger lifts.
         connect(slider, &IkSlider::interactionFinished, this, [this, slider, pctOf, guard]() {
             const int pct = pctOf(slider->value());
             if (guard) guard->dismiss();
             applyScale(pct);
         });
+#endif
     });
     il->addWidget(d->scale);
     d->font = new IkChoiceRow(i18n("Font"), iface);
@@ -675,7 +703,78 @@ QWidget *IkSettingsPage::buildThemePage()
     il->addWidget(refs);
     il->addStretch(1);
     row->addWidget(iface, 1);
-    l->addLayout(row, 1);
+    l->addLayout(row);
+
+    // ---- skins ----
+    IkPanel *skins = card(page);
+    QVBoxLayout *sl = new QVBoxLayout(skins);
+    sl->setContentsMargins(40, 20, 40, 26);
+    sl->setSpacing(4);
+    sl->addWidget(new IkSectionHeader(i18n("Skins"), skins));
+    QLabel *hint = new QLabel(i18n("Light and dark skins used by the theme setting. Add your own .ikskin or .colors files."), skins);
+    hint->setWordWrap(true);
+    hint->setForegroundRole(QPalette::PlaceholderText);
+    sl->addWidget(hint);
+    QWidget *skinList = new QWidget(skins);
+    QVBoxLayout *skinRows = new QVBoxLayout(skinList);
+    skinRows->setContentsMargins(0, 8, 0, 8);
+    skinRows->setSpacing(2);
+    sl->addWidget(skinList);
+    auto rebuildSkins = [this, skinList, skinRows]() {
+        while (QLayoutItem *it = skinRows->takeAt(0)) {
+            delete it->widget();
+            delete it;
+        }
+        const IkSkinManager::Settings s = IkSkinManager::instance()->settings();
+        for (const IkSkin &skin : IkSkinManager::instance()->availableSkins()) {
+            const bool dark = IkSkinManager::isDarkSkin(skin);
+            const bool used = skin.id == (dark ? s.darkSkinId : s.lightSkinId);
+            IkNavRow *r = new IkNavRow(used ? QStringLiteral("check") : (dark ? QStringLiteral("dark") : QStringLiteral("light")),
+                                       skin.name, skinList);
+            r->setSelected(used);
+            r->setToolTip(skin.description);
+            const QString id = skin.id;
+            connect(r, &QAbstractButton::clicked, this, [this, id]() {
+                IkSkinManager::Settings st = IkSkinManager::instance()->settings();
+                st.skinId = id;
+                IkSkinManager::instance()->setSettings(st);
+                QTimer::singleShot(0, this, [this]() { d->pages->setCurrentIndex(ThemeSection); });
+            });
+            skinRows->addWidget(r);
+        }
+    };
+    rebuildSkins();
+    connect(IkSkinManager::instance(), &IkSkinManager::sigSkinChanged, skinList, rebuildSkins);
+    QHBoxLayout *buttons = new QHBoxLayout();
+    QPushButton *import = new QPushButton(i18n("Import Skin..."), skins);
+    QPushButton *folder = new QPushButton(i18n("Open Skins Folder"), skins);
+    buttons->addWidget(import);
+    buttons->addWidget(folder);
+    buttons->addStretch(1);
+    sl->addLayout(buttons);
+    connect(import, &QPushButton::clicked, this, [this, rebuildSkins]() {
+        KoFileDialog dlg(this, KoFileDialog::OpenFile, QStringLiteral("IKriateImportSkin"));
+        dlg.setCaption(i18n("Import Skin"));
+        dlg.setNameFilter(i18n("Skins (*.ikskin *.colors)"));
+        const QString file = dlg.filename();
+        if (file.isEmpty()) return;
+        QString error;
+        const QString id = IkSkinManager::instance()->importSkin(file, &error);
+        if (id.isEmpty()) {
+            QMessageBox::warning(this, i18n("Import Skin"), error);
+            return;
+        }
+        IkSkinManager::Settings st = IkSkinManager::instance()->settings();
+        st.skinId = id;
+        IkSkinManager::instance()->setSettings(st);
+        rebuildSkins();
+    });
+    connect(folder, &QPushButton::clicked, this, []() {
+        QDesktopServices::openUrl(QUrl::fromLocalFile(IkSkinManager::instance()->userSkinsFolder()));
+    });
+    skins->setMinimumWidth(IkStyle::scaled(600));
+    skins->setMaximumWidth(IkStyle::scaled(760));
+    l->addWidget(skins, 0, Qt::AlignHCenter);
     l->addStretch(1);
     return page;
 }
@@ -808,74 +907,6 @@ QWidget *IkSettingsPage::buildAdvancedPage()
     }
     l->addWidget(g);
 
-    // ---- skins ----
-    IkPanel *skins = card(page);
-    QVBoxLayout *sl = new QVBoxLayout(skins);
-    sl->setContentsMargins(40, 20, 40, 26);
-    sl->setSpacing(4);
-    sl->addWidget(new IkSectionHeader(i18n("Skins"), skins));
-    QLabel *hint = new QLabel(i18n("Light and dark skins used by the theme setting. Add your own .ikskin or .colors files."), skins);
-    hint->setWordWrap(true);
-    hint->setForegroundRole(QPalette::PlaceholderText);
-    sl->addWidget(hint);
-    QWidget *skinList = new QWidget(skins);
-    QVBoxLayout *skinRows = new QVBoxLayout(skinList);
-    skinRows->setContentsMargins(0, 8, 0, 8);
-    skinRows->setSpacing(2);
-    sl->addWidget(skinList);
-    auto rebuildSkins = [this, skinList, skinRows]() {
-        while (QLayoutItem *it = skinRows->takeAt(0)) {
-            delete it->widget();
-            delete it;
-        }
-        const IkSkinManager::Settings s = IkSkinManager::instance()->settings();
-        for (const IkSkin &skin : IkSkinManager::instance()->availableSkins()) {
-            const bool dark = IkSkinManager::isDarkSkin(skin);
-            const bool used = skin.id == (dark ? s.darkSkinId : s.lightSkinId);
-            IkNavRow *r = new IkNavRow(used ? QStringLiteral("check") : (dark ? QStringLiteral("dark") : QStringLiteral("light")),
-                                       skin.name, skinList);
-            r->setSelected(used);
-            r->setToolTip(skin.description);
-            const QString id = skin.id;
-            connect(r, &QAbstractButton::clicked, this, [this, id]() {
-                IkSkinManager::Settings st = IkSkinManager::instance()->settings();
-                st.skinId = id;
-                IkSkinManager::instance()->setSettings(st);
-                QTimer::singleShot(0, this, [this]() { d->pages->setCurrentIndex(AdvancedSection); });
-            });
-            skinRows->addWidget(r);
-        }
-    };
-    rebuildSkins();
-    connect(IkSkinManager::instance(), &IkSkinManager::sigSkinChanged, skinList, rebuildSkins);
-    QHBoxLayout *buttons = new QHBoxLayout();
-    QPushButton *import = new QPushButton(i18n("Import Skin..."), skins);
-    QPushButton *folder = new QPushButton(i18n("Open Skins Folder"), skins);
-    buttons->addWidget(import);
-    buttons->addWidget(folder);
-    buttons->addStretch(1);
-    sl->addLayout(buttons);
-    connect(import, &QPushButton::clicked, this, [this, rebuildSkins]() {
-        KoFileDialog dlg(this, KoFileDialog::OpenFile, QStringLiteral("IKriateImportSkin"));
-        dlg.setCaption(i18n("Import Skin"));
-        dlg.setNameFilter(i18n("Skins (*.ikskin *.colors)"));
-        const QString file = dlg.filename();
-        if (file.isEmpty()) return;
-        QString error;
-        const QString id = IkSkinManager::instance()->importSkin(file, &error);
-        if (id.isEmpty()) {
-            QMessageBox::warning(this, i18n("Import Skin"), error);
-            return;
-        }
-        IkSkinManager::Settings st = IkSkinManager::instance()->settings();
-        st.skinId = id;
-        IkSkinManager::instance()->setSettings(st);
-        rebuildSkins();
-    });
-    connect(folder, &QPushButton::clicked, this, []() {
-        QDesktopServices::openUrl(QUrl::fromLocalFile(IkSkinManager::instance()->userSkinsFolder()));
-    });
-    l->addWidget(skins);
     l->addStretch(1);
     return page;
 }

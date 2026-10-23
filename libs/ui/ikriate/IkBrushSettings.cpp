@@ -251,11 +251,7 @@ IkBrushSettingsPanel::IkBrushSettingsPanel(IkInterfaceManager *manager, QWidget 
         if (!d->editor) return;
         if (QAbstractButton *b = d->editor->findChild<QAbstractButton *>(QString::fromLatin1(name))) b->click();
     };
-    IkIconButton *close = new IkIconButton(QStringLiteral("close"), i18n("Close"), header);
-    connect(close, &QAbstractButton::clicked, this, [this]() {
-        if (d->editor) d->editor->hide();
-    });
-    buttons->addWidget(close);
+    // The window's own X (top right, IkWindowFrames) closes the editor.
     buttons->addStretch(1);
     IkIconButton *saveNew = new IkIconButton(QStringLiteral("share"), i18n("Save as a new brush"), header);
     connect(saveNew, &QAbstractButton::clicked, this, [click]() { click("saveNewBrushPresetButton"); });
@@ -623,7 +619,20 @@ void adoptEditor(QWidget *editor, IkInterfaceManager *manager, bool on)
     IkBrushSettingsPanel *panel = editor->findChild<IkBrushSettingsPanel *>(QStringLiteral("IkBrushSettingsPanel"));
     const bool adopted = panel && panel->isVisibleTo(editor);
     if (on == adopted) {
-        if (panel && on) panel->reload();
+        if (panel && on) {
+            // Krita shows some of its own controls again when the editor
+            // reopens; keep them hidden.
+            for (const char *name : {"frmOptionWidgetContainer", "currentBrushNameLabel", "renameBrushPresetButton",
+                                     "currentBrushEngineIcon", "currentBrushEngineLabel", "reloadPresetButton",
+                                     "dirtyPresetIndicatorButton", "saveNewBrushPresetButton", "saveBrushPresetButton",
+                                     "engineFilterLabel", "brushEngineComboBox", "eraserBrushSizeCheckBox",
+                                     "eraserBrushOpacityCheckBox", "dirtyPresetCheckBox", "wdgLodAvailability",
+                                     "viewOptionButton", "brokenPresetIndicatorButton", "renameBrushNameTextField",
+                                     "updateBrushNameButton", "cancelBrushNameUpdateButton"}) {
+                if (QWidget *w = editor->findChild<QWidget *>(QString::fromLatin1(name))) w->hide();
+            }
+            panel->reload();
+        }
         return;
     }
     // Krita's parts the IKriate panel replaces or makes redundant.

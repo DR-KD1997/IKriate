@@ -77,7 +77,7 @@ IkKriateLayout::IkKriateLayout(IkInterfaceManager *mgr)
         if (already) setLibraryOpen(!m_libraryOpen);
     });
     m_eraseButtons << eraser;
-    IkIconButton *smudge = add(button(m_top, QStringLiteral("smudge"), i18n("Smudge, blur or liquify")));
+    IkIconButton *smudge = add(button(m_top, QStringLiteral("smudge"), i18n("Smudge or blur")));
     connect(smudge, &QAbstractButton::clicked, this, [this, smudge]() {
         manager()->setSmudgeVariant(manager()->smudgeVariant());
         showSmudgeOptions(smudge);
