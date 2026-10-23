@@ -286,8 +286,8 @@ void IkHsbPicker::setSwatches(const QList<QColor> &colors)
 void IkHsbPicker::setColor(const QColor &c)
 {
     if (!c.isValid()) return;
-    qreal h, s, v;
-    c.getHsvF(&h, &s, &v);
+    // float in Qt 6, qreal in Qt 5.
+    const qreal h = c.hsvHueF(), s = c.hsvSaturationF(), v = c.valueF();
     if (h >= 0) m_h = qMin<qreal>(h, 0.9999);
     m_s = s;
     m_v = v;

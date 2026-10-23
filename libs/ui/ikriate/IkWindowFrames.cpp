@@ -157,7 +157,11 @@ bool wantsCloseButton(QWidget *w)
 {
     if (qobject_cast<QMenu *>(w) || w->inherits("QComboBoxPrivateContainer")) return false;
     const Qt::WindowType type = w->windowType();
-    if (qobject_cast<QDialog *>(w) || type == Qt::Dialog || type == Qt::Sheet || type == Qt::Tool) return true;
+    if (qobject_cast<QDialog *>(w) || type == Qt::Dialog || type == Qt::Sheet || type == Qt::Tool) {
+        // On Windows and Linux the window manager's title bar already has a
+        // close button; frameless windows (all of them on Android) need ours.
+        return (w->windowFlags() & Qt::FramelessWindowHint) != 0;
+    }
     if (type == Qt::Popup) {
         if (w->property("ikCloseButton").toBool() || w->inherits("KisPaintOpPresetsEditor")) return true;
         for (QWidget *c : w->findChildren<QWidget *>()) {

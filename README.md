@@ -22,7 +22,7 @@ management, and replaces the interface with a modern, minimal one built around t
 | **Symmetry** | The symmetry button (all three layouts) paints mirrored left and right, top and bottom, both, or radially with 2–16 sections. |
 | **Layer colours** | The three-circles button adjusts the selected layer's hue, saturation and brightness, or its colour balance, with a live preview. |
 | **Edit Interface** | **More › Edit Interface** pauses the tools so you can drag buttons between the bars and columns of a layout. Each layout remembers its own arrangement, and **Reset** puts it back. |
-| **Transform and smudge** | Transform offers Basic, Anchor, Distort, Warp and Flip; Smudge offers Smudge, Blur and Liquify. |
+| **Transform and smudge** | Transform offers Basic, Anchor, Distort, Warp, Liquify and Flip; Liquify has its own bar with strength and Push, Pinch, Bloat, Swirl and Restore. Smudge offers Smudge and Blur. |
 | **Vector tools** | The pen and shape tools preview the stroke at the brush's size and colour with the points along the path. ✓ paints the path, ◎ closes it first. |
 | **Selection Fill** | A lasso that fills its shape with the current colour (in the brush library and the tools grid). |
 | **Reference images** | Imported from the reference button: on the canvas (they move with it and can be adjusted) or floating over the interface (they stay put while the canvas moves). |
