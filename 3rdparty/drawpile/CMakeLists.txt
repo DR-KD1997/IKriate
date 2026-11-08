@@ -113,7 +113,6 @@ file(GLOB _dp_zstd_sources
 add_library(dp_zstd STATIC ${_dp_zstd_sources})
 target_include_directories(dp_zstd SYSTEM PUBLIC ${CMAKE_CURRENT_LIST_DIR}/zstd)
 target_compile_definitions(dp_zstd PRIVATE ZSTD_DISABLE_ASM ZSTD_MULTITHREAD=0 ZSTD_LEGACY_SUPPORT=0)
-add_library(zstd::libzstd ALIAS dp_zstd)
 
 # WebP, as Krita finds it.
 if(NOT TARGET dpwebp::dpwebp)
@@ -151,5 +150,5 @@ target_include_directories(ikdrawpile INTERFACE ${CMAKE_CURRENT_LIST_DIR}/src)
 if(UNIX AND NOT APPLE)
     # Keep the vendored libmypaint/SQLite symbols out of kritaui's export table.
     target_link_options(ikdrawpile INTERFACE
-        "LINKER:--exclude-libs,libdpclient.a:libdpserver.a:libdpshared.a:libdpimpex.a:libdpengine.a:libdpmsg.a:libdpdb.a:libdpdb_qt.a:libdpcommon.a:libdp_zstd.a:libcmake-config.a")
+        "LINKER:--exclude-libs,libdpclient.a:libdpserver.a:libdpshared.a:libdpimpex.a:libdpengine.a:libdpmsg.a:libdpdb.a:libdpdb_qt.a:libdpcommon.a:libdp_zstd.a:libdp_psd_sdk.a:libcmake-config.a")
 endif()

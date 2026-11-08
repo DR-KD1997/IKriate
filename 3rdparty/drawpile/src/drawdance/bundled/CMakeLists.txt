@@ -1,17 +1,17 @@
 # SPDX-License-Identifier: MIT
 
-add_library(parson OBJECT parson/parson.c parson/parson.h)
+add_library(dp_parson OBJECT parson/parson.c parson/parson.h)
 target_include_directories(
-    parson SYSTEM PUBLIC ${CMAKE_CURRENT_LIST_DIR}/parson)
+    dp_parson SYSTEM PUBLIC ${CMAKE_CURRENT_LIST_DIR}/parson)
 
-add_library(qgrayraster OBJECT qgrayraster/qgrayraster.c
+add_library(dp_qgrayraster OBJECT qgrayraster/qgrayraster.c
                                qgrayraster/qgrayraster_inc.h
                                qgrayraster/qgrayraster_p.h
                                qgrayraster/qrasterdefs_p.h)
 target_include_directories(
-    qgrayraster SYSTEM PUBLIC ${CMAKE_CURRENT_LIST_DIR}/qgrayraster)
+    dp_qgrayraster SYSTEM PUBLIC ${CMAKE_CURRENT_LIST_DIR}/qgrayraster)
 
-add_library(mypaint OBJECT libmypaint/brushsettings-gen.h
+add_library(dp_mypaint OBJECT libmypaint/brushsettings-gen.h
             libmypaint/config.h libmypaint/fastapprox/cast.h
             libmypaint/fastapprox/fasterf.h libmypaint/fastapprox/fastexp.h
             libmypaint/fastapprox/fastgamma.h
@@ -31,10 +31,10 @@ add_library(mypaint OBJECT libmypaint/brushsettings-gen.h
             libmypaint/mypaint-surface.h libmypaint/rng-double.c
             libmypaint/rng-double.h )
 target_include_directories(
-    mypaint SYSTEM PUBLIC ${CMAKE_CURRENT_LIST_DIR}/libmypaint)
+    dp_mypaint SYSTEM PUBLIC ${CMAKE_CURRENT_LIST_DIR}/libmypaint)
 
-add_library(uthash INTERFACE)
-target_include_directories(uthash SYSTEM INTERFACE "uthash")
+add_library(dp_uthash INTERFACE)
+target_include_directories(dp_uthash SYSTEM INTERFACE "uthash")
 
 add_library(bundled_sqlite3 OBJECT
     sqlite3/dbdata.c
@@ -128,9 +128,9 @@ if(CLIENT OR TOOLS)
     psd_sdk/Psdstdint.h
     )
 
-    add_library(psd_sdk STATIC ${psd_sdk_sources})
+    add_library(dp_psd_sdk STATIC ${psd_sdk_sources})
     target_include_directories(
-        psd_sdk SYSTEM PUBLIC ${CMAKE_CURRENT_LIST_DIR}/psd_sdk)
+        dp_psd_sdk SYSTEM PUBLIC ${CMAKE_CURRENT_LIST_DIR}/psd_sdk)
 endif()
 
 # The project root adds compiler warnings and tidy to all targets, but

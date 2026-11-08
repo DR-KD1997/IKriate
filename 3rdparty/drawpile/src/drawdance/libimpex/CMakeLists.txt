@@ -30,7 +30,7 @@ dp_target_sources(dpimpex
 
 target_include_directories(dpimpex PUBLIC ${CMAKE_CURRENT_LIST_DIR})
 target_link_libraries(dpimpex PUBLIC
-    dpengine dpmsg dpcommon dpwebp::dpwebp psd_sdk
+    dpengine dpmsg dpcommon dpwebp::dpwebp dp_psd_sdk
     "Qt${QT_VERSION_MAJOR}::Core" "Qt${QT_VERSION_MAJOR}::Xml"
 )
 

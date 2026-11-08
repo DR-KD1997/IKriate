@@ -31,5 +31,5 @@ dp_target_sources(dpmsg
 )
 
 target_include_directories(dpmsg PUBLIC ${CMAKE_CURRENT_LIST_DIR})
-target_link_libraries(dpmsg PUBLIC dpcommon uthash parson)
+target_link_libraries(dpmsg PUBLIC dpcommon dp_uthash dp_parson)
 
