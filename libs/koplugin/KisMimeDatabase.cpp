@@ -210,6 +210,21 @@ void KisMimeDatabase::fillMimeData()
         mimeType.suffixes = QStringList() << "r8";
         s_mimeDatabase << mimeType;
 
+        mimeType.mimeType = "application/x-drawpile-project";
+        mimeType.description = i18nc("description of a file type", "Drawpile Project");
+        mimeType.suffixes = QStringList() << "dppr";
+        s_mimeDatabase << mimeType;
+
+        mimeType.mimeType = "application/x-drawpile-canvas";
+        mimeType.description = i18nc("description of a file type", "Drawpile Canvas");
+        mimeType.suffixes = QStringList() << "dpcs";
+        s_mimeDatabase << mimeType;
+
+        mimeType.mimeType = "image/qoi";
+        mimeType.description = i18nc("description of a file type", "QOI Image");
+        mimeType.suffixes = QStringList() << "qoi";
+        s_mimeDatabase << mimeType;
+
         mimeType.mimeType = "application/x-spriter";
         mimeType.description = i18nc("description of a file type", "Spriter SCML");
         mimeType.suffixes = QStringList() << "scml";

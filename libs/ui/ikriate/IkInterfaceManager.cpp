@@ -76,6 +76,12 @@
 #include "IkLiquify.h"
 #include "IkBrushSettings.h"
 #include "IkReferences.h"
+#include "online/IkOnlinePage.h"
+#include "online/IkSession.h"
+#include "online/IkOnlineCommon.h"
+#ifdef Q_OS_ANDROID
+#include <KisAndroidExitInfo.h>
+#endif
 #include "IkSettingsPage.h"
 #include "IkSkinManager.h"
 #include "IkStyle.h"
@@ -115,6 +121,7 @@ struct IkInterfaceManager::Private
 
     QPointer<QStackedWidget> stack;
     QPointer<IkHomeScreen> home;
+    QPointer<IkSessionOverlay> session;
     QScopedPointer<IkDesktopLayout> desktop;
     QScopedPointer<IkKriateLayout> kriate;
     QScopedPointer<IkMinimalLayout> minimal;
@@ -447,7 +454,30 @@ void IkInterfaceManager::slotDeferredInit()
     }
     d->home = d->mw->findChild<IkHomeScreen *>();
     if (d->home) d->home->setManager(this);
+    // Online sessions: the pill over the canvas, and the main window for the
+    // session's prompts.
+    IkSession::instance()->setMainWindow(d->mw);
+    d->session = new IkSessionOverlay(d->mw);
+    connect(IkSession::instance(), &IkSession::stateChanged, this, &IkInterfaceManager::slotLayoutPanels, Qt::QueuedConnection);
     d->mw->installEventFilter(this);
+
+#ifdef Q_OS_ANDROID
+    // From Drawpile: if Android closed IKriate last time because the device
+    // ran out of memory, say so (once) instead of leaving it a mystery.
+    QTimer::singleShot(2500, this, [this]() {
+        const KisAndroidExitInfo last = KisAndroidExitInfo::getLast();
+        if (!last.looksLikeForegroundResourceExhaustionExit() || !d->mw) return;
+        KConfigGroup group(KSharedConfig::openConfig(), "IKriate");
+        const QString seen = last.buildLogString();
+        if (group.readEntry("LastMemoryExitNotice", QString()) == seen) return;
+        group.writeEntry("LastMemoryExitNotice", seen);
+        ikAskInPopover(d->mw, i18n("IKriate Was Closed"),
+                       i18n("Android closed IKriate last time because the device ran out of memory. "
+                            "Autosave keeps your work, and fewer layers, a smaller canvas or closing other "
+                            "apps leave more room (memory and undo limits are in Settings › Advanced › All Settings › Performance)."),
+                       QString(), false, i18n("OK"), [](const QString &) {}, []() {});
+    });
+#endif
 
     if (QAction *canvasOnly = action(QStringLiteral("view_show_canvas_only"))) {
         connect(canvasOnly, &QAction::toggled, this, &IkInterfaceManager::slotCanvasOnlyToggled);
@@ -736,6 +766,7 @@ void IkInterfaceManager::slotLayoutPanels()
     // Panels of the Desktop layout sit beside the canvas, not over it.
     const QMargins margins = (active && d->onCanvasPage()) ? l->reservedMargins() : QMargins();
     if (d->stack->contentsMargins() != margins) d->stack->setContentsMargins(margins);
+    if (d->session) d->session->relayout(canvasArea(), d->onCanvasPage() && d->mw->activeView() && !d->canvasOnly);
     if (qEnvironmentVariableIsSet("IKRIATE_DEBUG_WIDGETS")) {
         for (const QPoint &pt : {QPoint(800, 15), QPoint(800, 300)}) {
             QWidget *w = d->mw->childAt(pt);
@@ -1145,6 +1176,24 @@ void IkInterfaceManager::showMainMenu(QWidget *anchor)
     grid->addItem(QStringLiteral("settings"), i18n("Settings"), [this, later]() { later([this]() { showSettings(); }); });
     grid->addItem(QStringLiteral("home"), i18n("Gallery"), [this, later]() { later([this]() { goHome(); }); });
     grid->addItem(QStringLiteral("brush"), i18n("Brushes"), [this, later]() { later([this]() { showBrushLibrary(); }); });
+    // Share this artwork in an online session (or, in one, open the Online tab).
+    if (IkSession::instance()->isActive()) {
+        grid->addItem(QStringLiteral("globe"), i18n("Online"), [this, later]() {
+            later([this]() {
+                goHome();
+                QTimer::singleShot(400, this, [this]() {
+                    if (d->home) d->home->showPage(IkHomeScreen::OnlinePage);
+                });
+            });
+        });
+    } else {
+        grid->addItem(QStringLiteral("globe"), i18n("Host Online"), [this, later]() {
+            later([this]() {
+                KisView *v = d->mw->activeView();
+                IkHostDialog::show(d->mw, v ? v->document() : nullptr);
+            });
+        });
+    }
     const bool editing = isEditingInterface();
     grid->addItem(QStringLiteral("edit-interface"), editing ? i18n("Done Editing") : i18n("Edit Interface"), [this, later, editing]() {
         later([this, editing]() { setEditingInterface(!editing); });

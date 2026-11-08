@@ -77,16 +77,32 @@ building for Android). Windows and Linux are unaffected, and `.kra` files stay c
 
 | Kept on Android | Left out on Android |
 |---|---|
-| Animation, onion skins, image-sequence export, MP4/GIF/WebM rendering (FFmpeg and Android's encoder, no sound) | Audio in animations (MLT, SDL); video import (already absent upstream on Android) |
+| Animation, onion skins, image-sequence export, MP4/WebM rendering with Android's own encoders, animated GIF (IKriate's giflib writer); no sound | FFmpeg (25 MB with its codecs) and its extra formats; audio in animations (MLT, SDL); video import (already absent upstream on Android) |
 | English plus Arabic, Chinese (simplified and traditional), French, German, Indonesian, Italian, Japanese, Korean, Polish, Portuguese (Portugal and Brazil), Russian, Spanish, Turkish, Ukrainian (`-PikriateLanguages=…` in Gradle) | Other interface languages |
 | PDF import | HEIF/AVIF, JPEG XL, OpenEXR and camera RAW import/export; SeExpr fill layers; OpenColorIO LUT management (already absent upstream) |
 | Storyboard and compositions panels; layers, colour, brushes, history, overview, palettes, patterns, grids, animation, recorder | Histogram, channels, task sets, log, snapshots, touch docker, digital mixer, specific and artistic colour selectors, preset history, arrange, vector libraries, gamut masks; the image split, clones array, separate channels, metadata editor, wavelet decompose, G'MIC and database explorer tools |
 | 62 curated brushes (`IKriate_Brushes_Tablet.bundle`, see `TABLET_PRESETS` in `make-bundles.py`) with the tips and patterns they use, three MyPaint brushes, RGBA brushes, 24 patterns | The rest of the brush set, most patterns, document templates (New Canvas presets remain), Krita's donation banners |
 
-`packaging/android/prune-tablet-libs.py` runs before packaging and deletes the dependency
-libraries of the features left out, but only those that nothing links any more. Its log is
-in the CI job. Bundled fonts are dropped only when the packaged fontconfig also reads
-`/system/fonts`. Identical code folding (`IKRIATE_ICF=safe`) is on for Android too.
+`packaging/android/prune-tablet-libs.py` runs before packaging (its log is in the CI job):
+
+- **ICU** (36 MB with its data) is replaced by `icu-stub/ikicu.c`, built with the NDK for
+  the ICU version Qt Core was linked against. Qt Core is ICU's only user (22 functions:
+  locale case mapping, `QCollator`, legacy text codecs). The stub forwards them to Android's
+  own ICU, public from Android 12; on older versions Qt falls back to its built-in code
+  (Unicode case mapping, code point order, UTF-8/16/32 and Latin-1). Windows and Linux keep
+  ICU, so nothing changes there; IKriate's own sorting does not depend on ICU.
+- Unused **Qt plugins and QML modules** go: QML debugging, the Quick Controls 2 styles other
+  than the default, Particles, LocalStorage, StateMachine, Graphical Effects, bearer, ICNS,
+  WBMP and EPS image formats.
+- Every third-party library in `lib/` that **nothing links any more** goes (FFmpeg, MLT,
+  SDL2 and the audio/video codecs, gettext's tools, second names of the same library, test
+  libraries). OpenSSL stays (Qt opens it by name), and so does the bundled zlib: Android's
+  own zlib may not carry the symbol versions the libraries ask for.
+- Bundled fonts go when the packaged fontconfig also reads `/system/fonts`; `build.gradle`
+  leaves the dependency packages' CMake, pkg-config, aclocal and documentation files and the
+  gettext/SeExpr translations out of the assets.
+
+Identical code folding (`IKRIATE_ICF=safe`) is on for Android too.
 
 ## Build options added by IKriate
 
@@ -135,6 +151,11 @@ marked `IKRIATE-REBRAND: skip` (the About dialog, which credits Krita by name).
 | `libs/ui/ikriate/IkWidgets.*`, `IkStyle.*`, `icons/` | Controls, palette-derived colours, Lucide line icons (ISC licence) |
 | `libs/ui/ikriate/IkSkinManager.*` | Skins, light/dark/follow-system, accent and tint |
 | `libs/ui/ikriate/IkLaunchScreen.*` | Keeps the Android launch screen up until the gallery is shown |
+| `libs/ui/ikriate/online/` | Online sessions: `IkSession` (Drawpile login, hosting, people, chat), `IkSessionMirror` (keeps a Krita document in sync with Drawpile's canvas), `IkOnlinePage` (Online tab, host dialog, canvas pill), `IkDrawpileFiles` (.dppr/.dpcs/.qoi) |
+| `3rdparty/drawpile/` | Drawpile 2.3.1's engine and networking, built as static libraries into kritaui (see its `IKRIATE-CHANGES.md`) |
+| `plugins/impex/drawpile/` | Import/export filters for .dppr, .dpcs and .qoi |
+| `libs/ui/animation/KisGifWriter.*`, `KisGifMediaEncoderRunnable.*` | Animated GIF rendering without FFmpeg (Android) |
+| `packaging/android/icu-stub/` | ICU stand-in for the Android package |
 | `libs/resources/IkPaths.h` | Separate user data location |
 | `krita/data/ikriate/`, `krita/data/input/ikriatetablet.profile` | Bundled skins, touch profile |
 | `packaging/branding/` | Icon and splash sources, bundle and rebranding scripts |

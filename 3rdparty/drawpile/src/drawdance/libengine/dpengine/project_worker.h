@@ -1,0 +1,196 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+#ifndef DPENGINE_PROJECT_WORKER_H
+#define DPENGINE_PROJECT_WORKER_H
+#include <dpcommon/common.h>
+
+typedef struct DP_CanvasState DP_CanvasState;
+typedef struct DP_DrawContext DP_DrawContext;
+typedef struct DP_Image DP_Image;
+typedef struct DP_Message DP_Message;
+typedef struct DP_Output DP_Output;
+typedef struct DP_ProjectInfo DP_ProjectInfo;
+typedef struct DP_ProjectPlayerControlParams DP_ProjectPlayerControlParams;
+typedef struct DP_ViewState DP_ViewState;
+
+
+typedef struct DP_ProjectWorker DP_ProjectWorker;
+
+typedef enum DP_ProjectWorkerEventType {
+    DP_PROJECT_WORKER_EVENT_OPEN_ERROR,
+    DP_PROJECT_WORKER_EVENT_CLOSE_ERROR,
+    DP_PROJECT_WORKER_EVENT_WRITE_ERROR,
+    DP_PROJECT_WORKER_EVENT_SESSION_OPEN_ERROR,
+    DP_PROJECT_WORKER_EVENT_SESSION_RESUME_ERROR,
+    DP_PROJECT_WORKER_EVENT_SESSION_CLOSE_ERROR,
+    DP_PROJECT_WORKER_EVENT_MESSAGE_RECORD_ERROR,
+    DP_PROJECT_WORKER_EVENT_SNAPSHOT_ERROR,
+    DP_PROJECT_WORKER_EVENT_THUMBNAIL_MAKE_ERROR,
+    DP_PROJECT_WORKER_EVENT_SESSION_TIMES_UPDATE_ERROR,
+    DP_PROJECT_WORKER_EVENT_SIZE_REPORT_ERROR,
+    DP_PROJECT_WORKER_EVENT_SAVE_ERROR,
+    DP_PROJECT_WORKER_EVENT_INFO_ERROR,
+    DP_PROJECT_WORKER_EVENT_PLAYER_PREPARE_ERROR,
+    DP_PROJECT_WORKER_EVENT_PLAYER_CONTROL_ERROR,
+    DP_PROJECT_WORKER_EVENT_OPEN,
+    DP_PROJECT_WORKER_EVENT_CLOSE,
+    DP_PROJECT_WORKER_EVENT_SESSION_TIMES_UPDATE,
+    DP_PROJECT_WORKER_EVENT_INFO_DONE,
+    DP_PROJECT_WORKER_EVENT_PLAYER_PREPARE_DONE,
+    DP_PROJECT_WORKER_EVENT_PLAYER_CONTROL_DONE,
+    DP_PROJECT_WORKER_EVENT_SIZE_REPORT,
+} DP_ProjectWorkerEventType;
+
+typedef struct DP_ProjectWorkerEventError {
+    unsigned int file_id;
+    int error;
+    const char *message;
+} DP_ProjectWorkerEventError;
+
+typedef struct DP_ProjectWorkerEvent {
+    DP_ProjectWorkerEventType type;
+    union {
+        unsigned int file_id;
+        unsigned int control_id;
+        long long session_id;
+        long long own_work_minutes;
+        size_t size_in_bytes;
+        double total_playback_seconds;
+        DP_ProjectWorkerEventError error;
+    } DP_ANONYMOUS(data);
+} DP_ProjectWorkerEvent;
+
+typedef void (*DP_ProjectWorkerHandleEventFn)(
+    void *user, const DP_ProjectWorkerEvent *event);
+
+// Third parameter will be null if it comes from a thumbnail make command. In
+// that case, the handler writes a thumbnail file along with the metadata.
+typedef bool (*DP_ProjectWorkerThumbWriteFn)(void *user, DP_Image *img,
+                                             DP_Output *output_or_null);
+
+typedef void (*DP_ProjectWorkerSyncFn)(void *user);
+
+typedef int (*DP_ProjectWorkerSaveStartFn)(void *user, const char **out_path);
+
+typedef int (*DP_ProjectWorkerSaveFinishFn)(void *user, int save_result);
+
+
+int DP_project_save_error_to_save_result(int result);
+
+
+DP_ProjectWorker *
+DP_project_worker_new(DP_ProjectWorkerHandleEventFn handle_event_fn,
+                      DP_ProjectWorkerThumbWriteFn thumb_write_fn, void *user);
+
+void DP_project_worker_free_join(DP_ProjectWorker *pw);
+
+// Calls the given sync function when the worker gets to it.
+void DP_project_worker_sync(DP_ProjectWorker *pw, DP_ProjectWorkerSyncFn fn,
+                            void *user);
+
+// Returns an id for the opened file, which is used to identify subsequent
+// outgoing events and incoming commands. Anything that doesn't pertain to the
+// current file is ignored.
+unsigned int DP_project_worker_open(DP_ProjectWorker *pw, const char *path,
+                                    unsigned int flags,
+                                    const char *continue_source_param,
+                                    long long continue_sequence_id);
+
+void DP_project_worker_close(DP_ProjectWorker *pw, unsigned int file_id);
+
+void DP_project_worker_session_open(DP_ProjectWorker *pw, unsigned int file_id,
+                                    int source_type, const char *source_param,
+                                    const char *protocol, unsigned int flags);
+
+void DP_project_worker_session_resume(DP_ProjectWorker *pw,
+                                      unsigned int file_id,
+                                      long long session_id,
+                                      const char *protocol);
+
+void DP_project_worker_session_close(DP_ProjectWorker *pw, unsigned int file_id,
+                                     unsigned int flags_to_set);
+
+long long DP_project_worker_time_msec(void);
+
+void DP_project_worker_message_record_noinc(DP_ProjectWorker *pw,
+                                            unsigned int file_id,
+                                            DP_Message *msg, unsigned int flags,
+                                            long long recorded_at_msec);
+
+void DP_project_worker_message_record_inc(DP_ProjectWorker *pw,
+                                          unsigned int file_id, DP_Message *msg,
+                                          unsigned int flags,
+                                          long long recorded_at_msec);
+
+// Takes ownership of body and DP_frees it later.
+void DP_project_worker_message_internal_record(DP_ProjectWorker *pw,
+                                               unsigned int file_id, int type,
+                                               unsigned int context_id,
+                                               void *body_or_null, size_t size,
+                                               unsigned int flags,
+                                               long long recorded_at_msec);
+
+void DP_project_worker_message_view_state_record(
+    DP_ProjectWorker *pw, unsigned int file_id, unsigned int context_id,
+    const DP_ViewState *vs, unsigned int flags, long long recorded_at_msec);
+
+void DP_project_worker_snapshot_open_noinc(DP_ProjectWorker *pw,
+                                           unsigned int file_id,
+                                           DP_CanvasState *cs,
+                                           unsigned int flags);
+
+void DP_project_worker_snapshot_open_inc(DP_ProjectWorker *pw,
+                                         unsigned int file_id,
+                                         DP_CanvasState *cs,
+                                         unsigned int flags);
+
+void DP_project_worker_snapshot_message_record_noinc(DP_ProjectWorker *pw,
+                                                     unsigned int file_id,
+                                                     DP_Message *msg,
+                                                     unsigned int flags);
+
+void DP_project_worker_snapshot_view_state_record(DP_ProjectWorker *pw,
+                                                  unsigned int file_id,
+                                                  unsigned int context_id,
+                                                  const DP_ViewState *vs,
+                                                  unsigned int flags);
+
+void DP_project_worker_snapshot_finish(DP_ProjectWorker *pw,
+                                       unsigned int file_id,
+                                       bool discard_other_snapshots);
+
+void DP_project_worker_thumbnail_make_noinc(DP_ProjectWorker *pw,
+                                            unsigned int file_id,
+                                            DP_CanvasState *cs);
+
+void DP_project_worker_session_times_update(DP_ProjectWorker *pw,
+                                            unsigned int file_id);
+
+void DP_project_worker_save_noinc(DP_ProjectWorker *pw, unsigned int file_id,
+                                  DP_CanvasState *cs,
+                                  DP_ProjectWorkerSaveStartFn start_fn,
+                                  DP_ProjectWorkerSaveFinishFn finish_fn,
+                                  void *user);
+
+void DP_project_worker_info(DP_ProjectWorker *pw, unsigned int file_id,
+                            unsigned int flags,
+                            void (*callback)(void *, const DP_ProjectInfo *),
+                            void *user);
+
+void DP_project_worker_player_prepare(DP_ProjectWorker *pw,
+                                      unsigned int file_id, DP_DrawContext *dc,
+                                      double max_delta_seconds,
+                                      long long snapshot_interval);
+
+void DP_project_worker_player_control(
+    DP_ProjectWorker *pw, unsigned int file_id,
+    const DP_ProjectPlayerControlParams *params);
+
+// Attempts to cancel whatever the project is currently doing. Returns whether
+// the given file id matched the open project. This doesn't clear out the queue
+// nor does every project command handle the cancellation gracefully, it's meant
+// for cancelling long-running stuff like timelapses or verifications where the
+// UI blocks the user from queuing up more stuff. Call DP_project_worker_sync to
+// figure out when the worker is free again.
+bool DP_project_worker_cancel(DP_ProjectWorker *pw, unsigned int file_id);
+
+#endif

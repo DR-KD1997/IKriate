@@ -32,13 +32,7 @@ using QJniObject = QAndroidJniObject;
 #include <mlt++/Mlt.h>
 #endif
 
-extern "C" {
-#include <libavutil/imgutils.h>
-#include <libavutil/pixfmt.h>
-#include <libswscale/swscale.h>
-}
-
-#include "KisLibavEncoderContext.h"
+#include <QVector>
 
 struct KisAndroidMediaEncoderRunnable::EncoderImage {
     uint8_t *bufferY;
@@ -50,6 +44,89 @@ struct KisAndroidMediaEncoderRunnable::EncoderImage {
     int pixelStrideU;
     int pixelStrideV;
 };
+
+namespace
+{
+/**
+ * A frame as YUV 4:2:0 (BT.601, limited range: what libswscale produced by
+ * default, and what Android's encoders expect), converted once and copied
+ * into each encoder buffer. IKriate does this itself so the Android package
+ * needs no FFmpeg.
+ */
+struct YuvFrame {
+    int width = 0;
+    int height = 0;
+    QVector<uint8_t> y, u, v;
+
+    int chromaWidth() const { return (width + 1) / 2; }
+    int chromaHeight() const { return (height + 1) / 2; }
+
+    /// @p image scaled to @p w x @p h with @p scaleFilter (as offered by the
+    /// render dialog: "neighbor" is nearest, anything else smooth).
+    void convert(const QImage &image, int w, int h, const QString &scaleFilter)
+    {
+        QImage rgb = image;
+        if (rgb.size() != QSize(w, h)) {
+            rgb = rgb.scaled(w, h, Qt::IgnoreAspectRatio,
+                             scaleFilter == QLatin1String("neighbor") ? Qt::FastTransformation
+                                                                       : Qt::SmoothTransformation);
+        }
+        if (rgb.format() != QImage::Format_RGB32 && rgb.format() != QImage::Format_ARGB32) {
+            rgb = rgb.convertToFormat(QImage::Format_RGB32);
+        }
+        width = w;
+        height = h;
+        y.resize(w * h);
+        u.resize(chromaWidth() * chromaHeight());
+        v.resize(chromaWidth() * chromaHeight());
+        for (int row = 0; row < h; ++row) {
+            const QRgb *line = reinterpret_cast<const QRgb *>(rgb.constScanLine(row));
+            uint8_t *out = y.data() + row * w;
+            for (int x = 0; x < w; ++x) {
+                const int r = qRed(line[x]), g = qGreen(line[x]), b = qBlue(line[x]);
+                out[x] = uint8_t(((66 * r + 129 * g + 25 * b + 128) >> 8) + 16);
+            }
+        }
+        for (int cy = 0; cy < chromaHeight(); ++cy) {
+            const QRgb *l0 = reinterpret_cast<const QRgb *>(rgb.constScanLine(cy * 2));
+            const QRgb *l1 = reinterpret_cast<const QRgb *>(rgb.constScanLine(qMin(cy * 2 + 1, h - 1)));
+            for (int cx = 0; cx < chromaWidth(); ++cx) {
+                const int x0 = cx * 2, x1 = qMin(cx * 2 + 1, w - 1);
+                const int r = (qRed(l0[x0]) + qRed(l0[x1]) + qRed(l1[x0]) + qRed(l1[x1]) + 2) / 4;
+                const int g = (qGreen(l0[x0]) + qGreen(l0[x1]) + qGreen(l1[x0]) + qGreen(l1[x1]) + 2) / 4;
+                const int b = (qBlue(l0[x0]) + qBlue(l0[x1]) + qBlue(l1[x0]) + qBlue(l1[x1]) + 2) / 4;
+                u[cy * chromaWidth() + cx] = uint8_t(((-38 * r - 74 * g + 112 * b + 128) >> 8) + 128);
+                v[cy * chromaWidth() + cx] = uint8_t(((112 * r - 94 * g - 18 * b + 128) >> 8) + 128);
+            }
+        }
+    }
+
+    /// Into an encoder buffer of any layout: separate planes, or U and V
+    /// interleaved in either order (pixel stride 2).
+    template<typename Image>
+    void copyTo(const Image &dst) const
+    {
+        for (int row = 0; row < height; ++row) {
+            memcpy(dst.bufferY + row * dst.rowStrideY, y.constData() + row * width, size_t(width));
+        }
+        for (int cy = 0; cy < chromaHeight(); ++cy) {
+            uint8_t *du = dst.bufferU + cy * dst.rowStrideU;
+            uint8_t *dv = dst.bufferV + cy * dst.rowStrideV;
+            const uint8_t *su = u.constData() + cy * chromaWidth();
+            const uint8_t *sv = v.constData() + cy * chromaWidth();
+            if (dst.pixelStrideU == 1 && dst.pixelStrideV == 1) {
+                memcpy(du, su, size_t(chromaWidth()));
+                memcpy(dv, sv, size_t(chromaWidth()));
+            } else {
+                for (int cx = 0; cx < chromaWidth(); ++cx) {
+                    du[cx * dst.pixelStrideU] = su[cx];
+                    dv[cx * dst.pixelStrideV] = sv[cx];
+                }
+            }
+        }
+    }
+};
+}
 
 class KisAndroidMediaEncoderRunnable::Format : public KisMediaEncoderFormat
 {
@@ -294,15 +371,30 @@ private:
     int m_formatId;
 };
 
-class KisAndroidMediaEncoderRunnable::Context : public KisLibavEncoderContext
+class KisAndroidMediaEncoderRunnable::Context
 {
 public:
     explicit Context(QString *outErrorMessage = nullptr)
-        : KisLibavEncoderContext(outErrorMessage)
+        : m_outErrorMessage(outErrorMessage)
     {
     }
 
-    ~Context() override
+    void setInternalErrorMessage(const QString &detail)
+    {
+        warnFile << "Media encoder error:" << detail;
+        // Internal encoder errors are only really useful for developers,
+        // so there's no point in translating them.
+        setErrorMessage(i18n("Internal error (%1)", detail));
+    }
+
+    void setErrorMessage(const QString &errorMessage)
+    {
+        if (m_outErrorMessage) {
+            *m_outErrorMessage = errorMessage;
+        }
+    }
+
+    ~Context()
     {
         clearEncoder();
     }
@@ -386,40 +478,6 @@ public:
         }
     }
 
-    int imageFormat() const
-    {
-        return m_imageFormat;
-    }
-
-    uint8_t **imageBuffers()
-    {
-        return m_imageBuffers;
-    }
-
-    int *imageLinesizes()
-    {
-        return m_imageLinesizes;
-    }
-
-    bool allocateImage(int outputWidth, int outputHeight, AVPixelFormat outputFormat)
-    {
-        // The Android encoder really shouldn't be changing
-        // pixel formats along the way, but just in case.
-        if (m_imageFormat != AV_PIX_FMT_NONE) {
-            m_imageFormat = AV_PIX_FMT_NONE;
-            av_freep(&m_imageBuffers[0]);
-        }
-
-        int result = av_image_alloc(m_imageBuffers, m_imageLinesizes, outputWidth, outputHeight, outputFormat, 32);
-        if (result >= 0) {
-            m_imageFormat = outputFormat;
-            return true;
-        } else {
-            setInternalErrorMessage(QStringLiteral("av_image_alloc error %1").arg(result));
-            return false;
-        }
-    }
-
 private:
     static bool isErrorResult(int result)
     {
@@ -428,9 +486,7 @@ private:
 
     QJniEnvironment m_env;
     QJniObject m_encoder;
-    uint8_t *m_imageBuffers[4] = {nullptr, nullptr, nullptr, nullptr};
-    int m_imageLinesizes[4] = {0, 0, 0, 0};
-    AVPixelFormat m_imageFormat = AV_PIX_FMT_NONE;
+    QString *m_outErrorMessage;
 };
 
 #ifdef HAVE_MLT
@@ -790,7 +846,7 @@ KisMediaEncoderRunnable::EncodeResult KisAndroidMediaEncoderRunnable::encode(QSt
 
     // Encode the frames.
     Frame frame;
-    int swsFlags = ctx.getSwsFlags(settings().scaleFilter);
+    YuvFrame yuv;
     while (nextFrame(frame)) {
         if (isCancelled()) {
             return EncodeResult::Cancelled;
@@ -812,17 +868,9 @@ KisMediaEncoderRunnable::EncodeResult KisAndroidMediaEncoderRunnable::encode(QSt
             }
         }
 
-        AVPixelFormat inputPixelFormat;
-        if (!ctx.convertFrame(inputImage, inputPixelFormat)) {
-            // Dito to the above, try to skip frames we don't understand, don't
-            // bother when there's audio involved.
-            if (audio) {
-                ctx.setInternalErrorMessage(QStringLiteral("failed to convert frame %1").arg(frame.path()));
-                return EncodeResult::Failed;
-            } else {
-                continue;
-            }
-        }
+        // Scaled and converted once, copied into the encoder for each
+        // instance of the frame.
+        yuv.convert(inputImage, outputWidth, outputHeight, settings().scaleFilter);
 
         int instances = frame.instances();
         for (int i = 0; i < instances; ++i) {
@@ -838,42 +886,10 @@ KisMediaEncoderRunnable::EncodeResult KisAndroidMediaEncoderRunnable::encode(QSt
                 return EncodeResult::Failed;
             }
 
-            // Map the buffer layout to a libswscale-befitting arrangement. The
-            // layout may either have the YUV components in separate buffers or it
-            // may have the U and V components combined into a single buffer, where
-            // either U or V can come first. Which one we get depends on hardware.
-            uint8_t *dstBuffers[4] = {nullptr, nullptr, nullptr, nullptr};
-            int dstLinesizes[4] = {0, 0, 0, 0};
-            AVPixelFormat outputPixelFormat;
-            if (encoderImage.pixelStrideU == 1 && encoderImage.pixelStrideV == 1) {
-                // Separate Y, U and V buffers.
-                outputPixelFormat = AV_PIX_FMT_YUV420P;
-                dstBuffers[0] = encoderImage.bufferY;
-                dstBuffers[1] = encoderImage.bufferU;
-                dstBuffers[2] = encoderImage.bufferV;
-                dstLinesizes[0] = encoderImage.rowStrideY;
-                dstLinesizes[1] = encoderImage.rowStrideU;
-                dstLinesizes[2] = encoderImage.rowStrideV;
-
-            } else if (encoderImage.pixelStrideU == 2 && encoderImage.pixelStrideV == 2
-                       && encoderImage.bufferU + 1 == encoderImage.bufferV) {
-                // One Y buffer and one combined UV buffer, U comes first.
-                outputPixelFormat = AV_PIX_FMT_NV12;
-                dstBuffers[0] = encoderImage.bufferY;
-                dstBuffers[1] = encoderImage.bufferU;
-                dstLinesizes[0] = encoderImage.rowStrideY;
-                dstLinesizes[1] = encoderImage.rowStrideU;
-
-            } else if (encoderImage.pixelStrideU == 2 && encoderImage.pixelStrideV == 2
-                       && encoderImage.bufferV + 1 == encoderImage.bufferU) {
-                // One Y buffer and one combined UV buffer, V comes first.
-                outputPixelFormat = AV_PIX_FMT_NV21;
-                dstBuffers[0] = encoderImage.bufferY;
-                dstBuffers[1] = encoderImage.bufferV;
-                dstLinesizes[0] = encoderImage.rowStrideY;
-                dstLinesizes[1] = encoderImage.rowStrideV;
-
-            } else {
+            // The layout has the YUV components in separate buffers or U and
+            // V combined into one, either first; which depends on hardware.
+            if (encoderImage.pixelStrideU < 1 || encoderImage.pixelStrideV < 1
+                || encoderImage.rowStrideY < outputWidth) {
                 ctx.setInternalErrorMessage(QStringLiteral("unknown buffer format u%1/%2 v%3/%4")
                                                 .arg(quintptr(encoderImage.bufferU), 0, 16)
                                                 .arg(encoderImage.pixelStrideU)
@@ -881,56 +897,7 @@ KisMediaEncoderRunnable::EncodeResult KisAndroidMediaEncoderRunnable::encode(QSt
                                                 .arg(encoderImage.pixelStrideV));
                 return EncodeResult::Failed;
             }
-
-            SwsContext *swsContext = ctx.getSwsContextFor(inputImage.width(),
-                                                          inputImage.height(),
-                                                          inputPixelFormat,
-                                                          outputWidth,
-                                                          outputHeight,
-                                                          outputPixelFormat,
-                                                          swsFlags);
-            if (!swsContext) {
-                ctx.setInternalErrorMessage(QStringLiteral("sws_getCachedContext"));
-                return EncodeResult::Failed;
-            }
-
-            if (instances == 1) {
-                // Just a single frame, scale it into the native buffer.
-                const uint8_t *srcBuffers[] = {inputImage.bits(), nullptr, nullptr, nullptr};
-                const int srcLinesizes[] = {inputImage.bytesPerLine(), 0, 0, 0};
-                sws_scale(swsContext, srcBuffers, srcLinesizes, 0, inputImage.height(), dstBuffers, dstLinesizes);
-
-            } else {
-                // Repeated frame, scale it into an intermediate buffer, then
-                // copy it over to the native one for each instance.
-                if (i == 0 || ctx.imageFormat() != outputPixelFormat) {
-                    if (ctx.imageFormat() != outputPixelFormat) {
-                        if (!ctx.allocateImage(outputWidth, outputHeight, outputPixelFormat)) {
-                            warnFile << "Encoder changed pixel format from" << int(ctx.imageFormat()) << "to"
-                                     << int(outputPixelFormat);
-                            return EncodeResult::Failed;
-                        }
-                    }
-
-                    const uint8_t *srcBuffers[] = {inputImage.bits(), nullptr, nullptr, nullptr};
-                    const int srcLinesizes[] = {inputImage.bytesPerLine(), 0, 0, 0};
-                    sws_scale(swsContext,
-                              srcBuffers,
-                              srcLinesizes,
-                              0,
-                              inputImage.height(),
-                              ctx.imageBuffers(),
-                              ctx.imageLinesizes());
-                }
-
-                av_image_copy2(dstBuffers,
-                               dstLinesizes,
-                               ctx.imageBuffers(),
-                               ctx.imageLinesizes(),
-                               outputPixelFormat,
-                               outputWidth,
-                               outputHeight);
-            }
+            yuv.copyTo(encoderImage);
 
             int commitResult = int(ctx.encoder().callMethod<jint>("commitVideo", "()I"));
             if (ctx.checkResult(QStringLiteral("commitVideo"), commitResult)) {

@@ -51,6 +51,7 @@ if (HEIF_FOUND)
 endif()
 
 add_subdirectory(krz)
+add_subdirectory(drawpile)
 
 if (WebP_FOUND)
     add_subdirectory(webp)

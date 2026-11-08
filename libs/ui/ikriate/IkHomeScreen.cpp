@@ -13,6 +13,7 @@
 #include <QDesktopServices>
 #include <QDir>
 #include <QFileInfo>
+#include <QGridLayout>
 #include <QLabel>
 #include <QListView>
 #include <QMenu>
@@ -48,10 +49,12 @@
 #include "IkStyle.h"
 #include "IkWidgets.h"
 #include "IkMenus.h"
+#include "online/IkOnlinePage.h"
 
 namespace
 {
 const char *const kFavoritesKey = "FavoriteDocuments";
+const char *const kSortKey = "GallerySort";
 
 QString prettyName(const QUrl &url)
 {
@@ -121,8 +124,8 @@ protected:
         p.setPen(QPen(accent, 3));
         p.drawLine(QPointF(logo.right() - 2, height() * 0.53), QPointF(wx + fm.horizontalAdvance(QStringLiteral("IKriate")) + 30, height() * 0.53));
 
-        // Tabs: favourites, home, settings
-        static const char *icons[3] = {"star", "home", "settings"};
+        // Tabs: online, gallery (home), settings
+        static const char *icons[3] = {"globe", "home", "settings"};
         for (int i = 0; i < 3; ++i) {
             const QRectF r = tabRect(i);
             const int s = qRound(height() * 0.36);
@@ -159,19 +162,128 @@ protected:
 
 // ----------------------------------------------------------------- gallery
 
+/// Names in the order people expect: case-insensitive, with runs of digits
+/// compared as numbers ("Untitled 2" before "Untitled 10"). Independent of
+/// ICU, which the Android package forwards to the system only on Android 12+.
+static int naturalCompare(const QString &a, const QString &b)
+{
+    int i = 0, j = 0;
+    while (i < a.size() && j < b.size()) {
+        if (a[i].isDigit() && b[j].isDigit()) {
+            int ie = i, je = j;
+            while (ie < a.size() && a[ie].isDigit()) ++ie;
+            while (je < b.size() && b[je].isDigit()) ++je;
+            // Compare by value: skip leading zeros, then length, then digits.
+            int is = i, js = j;
+            while (is < ie - 1 && a[is] == QLatin1Char('0')) ++is;
+            while (js < je - 1 && b[js] == QLatin1Char('0')) ++js;
+            if (ie - is != je - js) return (ie - is) - (je - js);
+            for (; is < ie; ++is, ++js) {
+                if (a[is] != b[js]) return a[is].unicode() - b[js].unicode();
+            }
+            i = ie;
+            j = je;
+        } else {
+            int ie = i, je = j;
+            while (ie < a.size() && !a[ie].isDigit()) ++ie;
+            while (je < b.size() && !b[je].isDigit()) ++je;
+            const int c = QStringView(a).mid(i, ie - i).compare(QStringView(b).mid(j, je - j), Qt::CaseInsensitive);
+            if (c != 0) return c;
+            i = ie;
+            j = je;
+        }
+    }
+    return (a.size() - i) - (b.size() - j);
+}
+
 class IkFavoritesFilter : public QSortFilterProxyModel
 {
 public:
     using QSortFilterProxyModel::QSortFilterProxyModel;
-    bool onlyFavorites {false};
     QSet<QString> favorites;
+    IkHomeScreen::SortMode mode {IkHomeScreen::SortFavoritesFirst};
 
 protected:
-    bool filterAcceptsRow(int row, const QModelIndex &parent) const override
+    // The recent documents model lists artworks most recently opened first,
+    // so its row order is the "last accessed" order.
+    bool lessThan(const QModelIndex &left, const QModelIndex &right) const override
     {
-        if (!onlyFavorites) return true;
-        const QUrl url = sourceModel()->index(row, 0, parent).data(Qt::UserRole + 1).toUrl();
-        return favorites.contains(url.toString());
+        const bool recentFirst = left.row() < right.row();
+        if (mode == IkHomeScreen::SortRecent) return recentFirst;
+        const QUrl lu = left.data(Qt::UserRole + 1).toUrl();
+        const QUrl ru = right.data(Qt::UserRole + 1).toUrl();
+        if (mode == IkHomeScreen::SortFavoritesFirst) {
+            const bool lf = favorites.contains(lu.toString());
+            const bool rf = favorites.contains(ru.toString());
+            if (lf != rf) return lf;
+            return recentFirst;
+        }
+        const int c = naturalCompare(prettyName(lu), prettyName(ru));
+        if (c == 0) return recentFirst;
+        return mode == IkHomeScreen::SortNameAscending ? c < 0 : c > 0;
+    }
+};
+
+/// "Sort:" with the current order's icon (gallery header).
+class IkSortButton : public QAbstractButton
+{
+public:
+    explicit IkSortButton(QWidget *parent) : QAbstractButton(parent)
+    {
+        setCursor(Qt::PointingHandCursor);
+        setAttribute(Qt::WA_Hover);
+        setToolTip(i18n("Sort artworks"));
+    }
+    IkHomeScreen::SortMode mode {IkHomeScreen::SortFavoritesFirst};
+
+    static QString iconFor(IkHomeScreen::SortMode m)
+    {
+        switch (m) {
+        case IkHomeScreen::SortFavoritesFirst: return QStringLiteral("star-filled");
+        case IkHomeScreen::SortRecent: return QStringLiteral("clock");
+        default: return QString();
+        }
+    }
+    static QString textFor(IkHomeScreen::SortMode m)
+    {
+        return m == IkHomeScreen::SortNameAscending ? QStringLiteral("A-Z")
+             : m == IkHomeScreen::SortNameDescending ? QStringLiteral("Z-A") : QString();
+    }
+
+    QSize sizeHint() const override
+    {
+        const QFontMetrics fm(IkStyle::font(1.5));
+        const int h = IkStyle::scaled(IkStyle::touchFirst() ? 54 : 46);
+        return QSize(fm.horizontalAdvance(i18nc("gallery sort button", "Sort:")) + h + IkStyle::scaled(40), h);
+    }
+
+protected:
+    void paintEvent(QPaintEvent *) override
+    {
+        QPainter p(this);
+        p.setRenderHint(QPainter::Antialiasing);
+        const QPalette pal = palette();
+        const QRectF r = QRectF(rect()).adjusted(1, 1, -1, -1);
+        p.setPen(QPen(IkStyle::color(IkStyle::Divider, pal), 1.5));
+        p.setBrush(IkStyle::color(underMouse() ? IkStyle::RaisedHover : IkStyle::Raised, pal));
+        p.drawRoundedRect(r, IkStyle::scaled(10), IkStyle::scaled(10));
+        const QFont f = IkStyle::font(1.5);
+        p.setFont(f);
+        p.setPen(IkStyle::color(IkStyle::MutedText, pal));
+        const QString label = i18nc("gallery sort button", "Sort:");
+        const int pad = IkStyle::scaled(14);
+        const QFontMetrics fm(f);
+        p.drawText(QRectF(r.left() + pad, r.top(), fm.horizontalAdvance(label) + 2, r.height()), Qt::AlignVCenter | Qt::AlignLeft, label);
+        const qreal x = r.left() + pad + fm.horizontalAdvance(label) + IkStyle::scaled(10);
+        const int s = qRound(r.height() * 0.62);
+        const QRectF ir(x, r.center().y() - s / 2.0, s, s);
+        const QString icon = iconFor(mode);
+        if (!icon.isEmpty()) {
+            const qreal dpr = devicePixelRatioF();
+            p.drawPixmap(ir, IkStyle::pixmap(icon, s, IkStyle::color(IkStyle::MutedText, pal), dpr), QRectF(0, 0, s * dpr, s * dpr));
+        } else {
+            p.drawText(QRectF(x, r.top(), r.right() - x - pad / 2, r.height()), Qt::AlignVCenter | Qt::AlignLeft, textFor(mode));
+        }
     }
 };
 
@@ -228,9 +340,10 @@ public:
             p->drawRoundedRect(page.adjusted(-1, -1, 1, 1), 9, 9);
         }
         if (favorites && favorites->contains(url.toString())) {
-            const int s = 22;
-            p->drawPixmap(QRectF(page.right() - s - 8, page.top() + 8, s, s),
-                          IkStyle::pixmap(QStringLiteral("star"), s, IkStyle::color(IkStyle::Accent, pal), p->device()->devicePixelRatioF()),
+            // A gold star on the top right corner of the page.
+            const int s = 30;
+            p->drawPixmap(QRectF(page.right() - s / 2 - 4, page.top() - s / 2 + 4, s, s),
+                          IkStyle::pixmap(QStringLiteral("star-filled"), s, QColor(250, 197, 72), p->device()->devicePixelRatioF()),
                           QRectF(0, 0, s * p->device()->devicePixelRatioF(), s * p->device()->devicePixelRatioF()));
         }
 
@@ -255,17 +368,23 @@ public:
 class IkGalleryPage : public QWidget
 {
 public:
-    IkGalleryPage(const QString &title, bool favoritesOnly, QWidget *parent) : QWidget(parent)
+    IkGalleryPage(const QString &title, QWidget *parent) : QWidget(parent)
     {
         QVBoxLayout *l = new QVBoxLayout(this);
         l->setContentsMargins(40, 26, 40, 0);
         l->setSpacing(12);
-        IkSectionHeader *header = new IkSectionHeader(title, this);
+        QWidget *top = new QWidget(this);
+        QGridLayout *tl = new QGridLayout(top);
+        tl->setContentsMargins(0, 0, 0, 0);
+        IkSectionHeader *header = new IkSectionHeader(title, top);
         header->setLarge(true);
-        l->addWidget(header);
+        tl->addWidget(header, 0, 0);
+        sort = new IkSortButton(top);
+        tl->addWidget(sort, 0, 0, Qt::AlignRight | Qt::AlignTop);
+        l->addWidget(top);
 
         filter = new IkFavoritesFilter(this);
-        filter->onlyFavorites = favoritesOnly;
+        filter->setDynamicSortFilter(true);
         filter->setSourceModel(&KisRecentDocumentsModelWrapper::instance()->model());
         delegate = new IkGalleryDelegate(this);
         delegate->favorites = &filter->favorites;
@@ -294,10 +413,18 @@ public:
         empty->setWordWrap(true);
         empty->setForegroundRole(QPalette::PlaceholderText);
         empty->setFont(IkStyle::font(1.15));
-        empty->setText(favoritesOnly ? i18n("Star artworks in the gallery to keep them here.")
-                                     : i18n("Your artworks will appear here.\nTap + to start a new canvas."));
+        empty->setText(i18n("Your artworks will appear here.\nTap + to start a new canvas."));
         l->addWidget(empty, 1);
         l->addSpacing(110); // room for the floating "+" bar
+    }
+
+    void setSortMode(IkHomeScreen::SortMode mode)
+    {
+        filter->mode = mode;
+        sort->mode = mode;
+        sort->update();
+        filter->invalidate();
+        filter->sort(0, Qt::AscendingOrder);
     }
 
     void refreshFavorites(const QList<QUrl> &favs)
@@ -305,6 +432,7 @@ public:
         filter->favorites.clear();
         for (const QUrl &u : favs) filter->favorites.insert(u.toString());
         filter->invalidate();
+        filter->sort(0, Qt::AscendingOrder);
         const bool none = filter->rowCount() == 0;
         empty->setVisible(none);
         view->setVisible(!none);
@@ -314,6 +442,7 @@ public:
     QListView *view {nullptr};
     IkFavoritesFilter *filter {nullptr};
     IkGalleryDelegate *delegate {nullptr};
+    IkSortButton *sort {nullptr};
     QLabel *empty {nullptr};
 };
 
@@ -402,7 +531,7 @@ struct IkHomeScreen::Private
     QPointer<IkInterfaceManager> manager;
     IkHomeHeader *header {nullptr};
     QStackedWidget *pages {nullptr};
-    IkGalleryPage *favorites {nullptr};
+    IkOnlinePage *online {nullptr};
     IkGalleryPage *gallery {nullptr};
     IkSettingsPage *settings {nullptr};
     IkDockPill *pill {nullptr};
@@ -436,20 +565,22 @@ IkHomeScreen::IkHomeScreen(KisMainWindow *mainWindow)
     l->addWidget(d->header);
 
     d->pages = new QStackedWidget(this);
-    d->favorites = new IkGalleryPage(i18nc("home tab title", "FAVORITES"), true, d->pages);
-    d->gallery = new IkGalleryPage(i18nc("home tab title", "GALLERY"), false, d->pages);
+    d->online = new IkOnlinePage(mainWindow, d->pages);
+    d->gallery = new IkGalleryPage(i18nc("home tab title", "GALLERY"), d->pages);
     d->settings = new IkSettingsPage(mainWindow, d->pages);
-    d->pages->addWidget(d->favorites);
+    d->pages->addWidget(d->online);
     d->pages->addWidget(d->gallery);
     d->pages->addWidget(d->settings);
     l->addWidget(d->pages, 1);
 
-    for (IkGalleryPage *g : {d->favorites, d->gallery}) {
+    {
+        IkGalleryPage *g = d->gallery;
         g->view->viewport()->installEventFilter(this);
-        connect(g->view, &QAbstractItemView::clicked, this, [this, g](const QModelIndex &idx) {
-            Q_UNUSED(g);
+        connect(g->view, &QAbstractItemView::clicked, this, [this](const QModelIndex &idx) {
             openDocument(idx.data(Qt::UserRole + 1).toUrl());
         });
+        g->setSortMode(sortMode());
+        connect(g->sort, &QAbstractButton::clicked, this, &IkHomeScreen::showSortMenu);
     }
     connect(&KisRecentDocumentsModelWrapper::instance()->model(), &QAbstractItemModel::rowsInserted, this, &IkHomeScreen::reload);
     connect(&KisRecentDocumentsModelWrapper::instance()->model(), &QAbstractItemModel::rowsRemoved, this, &IkHomeScreen::reload);
@@ -528,8 +659,9 @@ void IkHomeScreen::showPage(Page page)
     d->header->update();
     d->pages->setCurrentIndex(int(page));
     if (page == SettingsPage) d->settings->reload();
-    // The create bar is for the gallery pages.
-    const bool bar = page != SettingsPage;
+    if (page == OnlinePage) d->online->activate();
+    // The create bar is for the gallery.
+    const bool bar = page == GalleryPage;
     d->pill->setVisible(bar);
     d->fab->setVisible(bar);
     if (!bar) setCreateMenuOpen(false);
@@ -553,11 +685,67 @@ void IkHomeScreen::setFavoriteDocument(const QUrl &url, bool favorite)
     cfg.writeEntry(kFavoritesKey, list);
 }
 
+IkHomeScreen::SortMode IkHomeScreen::sortMode()
+{
+    const int m = KConfigGroup(KSharedConfig::openConfig(), "IKriate").readEntry(kSortKey, int(SortFavoritesFirst));
+    return (m >= SortFavoritesFirst && m <= SortNameDescending) ? SortMode(m) : SortFavoritesFirst;
+}
+
+void IkHomeScreen::setSortMode(SortMode mode)
+{
+    KConfigGroup(KSharedConfig::openConfig(), "IKriate").writeEntry(kSortKey, int(mode));
+    d->gallery->setSortMode(mode);
+}
+
+void IkHomeScreen::showSortMenu()
+{
+    // A column of the four orders under the Sort button.
+    IkPopover *pop = IkMenus::create(window());
+    pop->setAccentOutline(true);
+    QPointer<IkPopover> guard = pop;
+    QWidget *col = new QWidget();
+    QVBoxLayout *l = new QVBoxLayout(col);
+    l->setContentsMargins(2, 2, 2, 2);
+    l->setSpacing(IkStyle::scaled(6));
+    const SortMode current = sortMode();
+    const int edge = IkStyle::touchSize() + IkStyle::scaled(6);
+    const struct { SortMode mode; const char *icon; QString tip; } items[] = {
+        {SortFavoritesFirst, "star-filled", i18n("Favorites first, then most recently opened")},
+        {SortRecent, "clock", i18n("Most recently opened")},
+        {SortNameAscending, nullptr, i18n("By name, A to Z")},
+        {SortNameDescending, nullptr, i18n("By name, Z to A")},
+    };
+    for (const auto &it : items) {
+        QAbstractButton *b = nullptr;
+        if (it.icon) {
+            IkIconButton *ib = new IkIconButton(QString::fromLatin1(it.icon), it.tip, col);
+            ib->setEdge(edge);
+            ib->setIconPixelSize(IkStyle::scaled(30));
+            ib->setActive(it.mode == current);
+            b = ib;
+        } else {
+            IkTextButton *tb = new IkTextButton(it.mode == SortNameAscending ? QStringLiteral("A-Z") : QStringLiteral("Z-A"),
+                                                it.mode == current ? IkTextButton::Filled : IkTextButton::Plain, col);
+            tb->setFontScale(1.5);
+            tb->setRadius(IkStyle::scaled(8));
+            tb->setFixedSize(edge, edge);
+            tb->setToolTip(it.tip);
+            b = tb;
+        }
+        const SortMode mode = it.mode;
+        connect(b, &QAbstractButton::clicked, this, [this, mode, guard]() {
+            if (guard) guard->dismiss();
+            setSortMode(mode);
+        });
+        l->addWidget(b, 0, Qt::AlignHCenter);
+    }
+    pop->setContent(col);
+    pop->popup(d->gallery->sort, IkPopover::Below);
+}
+
 void IkHomeScreen::reload()
 {
-    const QList<QUrl> favs = favoriteDocuments();
-    d->favorites->refreshFavorites(favs);
-    d->gallery->refreshFavorites(favs);
+    d->gallery->refreshFavorites(favoriteDocuments());
 }
 
 void IkHomeScreen::openDocument(const QUrl &url)
@@ -700,7 +888,7 @@ bool IkHomeScreen::eventFilter(QObject *watched, QEvent *event)
     if (watched == this && event->type() == QEvent::MouseButtonPress && d->menuOpen) {
         setCreateMenuOpen(false);
     }
-    for (IkGalleryPage *g : {d->favorites, d->gallery}) {
+    for (IkGalleryPage *g : {d->gallery}) {
         if (watched == g->view->viewport() && event->type() == QEvent::MouseButtonRelease) {
             QMouseEvent *me = static_cast<QMouseEvent *>(event);
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)

@@ -218,3 +218,19 @@ QString KisAndroidExitInfo::buildLogString() const
 
     return message;
 }
+
+bool KisAndroidExitInfo::looksLikeForegroundResourceExhaustionExit() const
+{
+    if (!m_valid || m_importanceCode != int(Importance::Foreground)) {
+        return false;
+    }
+    switch (m_reasonCode) {
+    case int(Reason::LowMemory):
+    case int(Reason::ExcessiveResourceUsage):
+        return true;
+    case int(Reason::Signaled):
+        return !KisAndroidUtils::isLowMemoryKillReportSupported() && m_exitOrSignalCode == 9;
+    default:
+        return false;
+    }
+}

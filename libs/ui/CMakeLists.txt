@@ -572,7 +572,6 @@ if(ANDROID)
     list(APPEND kritaui_LIB_SRCS
         KisAndroidDonations.cpp
         animation/KisAndroidMediaEncoderRunnable.cpp
-        animation/KisLibavMediaEncoderRunnable.cpp
         animation/KisMediaEncoderFormatPreferencesDialog.cpp
         animation/KisMediaEncoderWrapper.cpp
     )
@@ -791,8 +790,17 @@ if (ANDROID)
     target_link_libraries(kritaui PRIVATE GLESv3)
     target_link_libraries(kritaui PUBLIC Qt${QT_MAJOR_VERSION}::Gui)
     target_link_libraries(kritaui PRIVATE Qt${QT_MAJOR_VERSION}::AndroidExtras)
+    # FFmpeg adds formats beyond Android's own encoders (MP4/H.264, and
+    # WebM where the device has VP8/VP9); the tablet package leaves it out.
     if(TARGET LibAV)
+        target_sources(kritaui PRIVATE animation/KisLibavMediaEncoderRunnable.cpp)
+        target_compile_definitions(kritaui PRIVATE HAVE_LIBAV)
         target_link_libraries(kritaui PRIVATE LibAV)
+    else()
+        # GIF without FFmpeg, through giflib (the GIF plugin's library).
+        target_sources(kritaui PRIVATE animation/KisGifWriter.cpp animation/KisGifMediaEncoderRunnable.cpp)
+        target_include_directories(kritaui PRIVATE ${GIF_INCLUDE_DIRS})
+        target_link_libraries(kritaui PRIVATE ${GIF_LIBRARIES})
     endif()
 endif()
 
@@ -830,6 +838,39 @@ target_include_directories(kritaui
 set_target_properties(kritaui
     PROPERTIES VERSION ${GENERIC_KRITA_LIB_VERSION} SOVERSION ${GENERIC_KRITA_LIB_SOVERSION}
 )
+# IKriate online sessions: Drawpile's engine and networking (3rdparty/drawpile)
+# and the IKriate code that uses them (ikriate/online), in a static library of
+# their own so that Drawpile's headers and Qt settings stay out of the rest of
+# kritaui. The library's objects end up in kritaui itself.
+if (NOT TARGET ikdrawpile)
+    add_subdirectory(${CMAKE_SOURCE_DIR}/3rdparty/drawpile ${CMAKE_BINARY_DIR}/3rdparty/drawpile)
+endif()
+file(GLOB IKRIATE_ONLINE_SRCS CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/ikriate/online/*.cpp)
+add_library(ikonline STATIC ${IKRIATE_ONLINE_SRCS})
+set_target_properties(ikonline PROPERTIES POSITION_INDEPENDENT_CODE ON AUTOMOC ON
+    CXX_VISIBILITY_PRESET hidden VISIBILITY_INLINES_HIDDEN ON)
+# Drawpile's headers use the signals/slots/emit keywords (the options come
+# after the directory's -D flags on the command line, so they win).
+if (MSVC AND NOT CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    target_compile_options(ikonline PRIVATE /UQT_NO_SIGNALS_SLOTS_KEYWORDS /UQT_STRICT_ITERATORS)
+else()
+    target_compile_options(ikonline PRIVATE -UQT_NO_SIGNALS_SLOTS_KEYWORDS -UQT_STRICT_ITERATORS)
+endif()
+target_compile_definitions(ikonline PRIVATE kritaui_EXPORTS)
+target_include_directories(ikonline PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_BINARY_DIR}
+    $<TARGET_PROPERTY:kritaui,INCLUDE_DIRECTORIES>)
+target_link_libraries(ikonline PRIVATE
+    ikdrawpile
+    KF${KF_MAJOR}::CoreAddons KF${KF_MAJOR}::I18n KF${KF_MAJOR}::ConfigCore KF${KF_MAJOR}::ItemViews
+    Qt${QT_MAJOR_VERSION}::Widgets Qt${QT_MAJOR_VERSION}::Network Qt${QT_MAJOR_VERSION}::Xml
+    kritaversion kritaimpex kritaimage kritalibbrush kritawidgets kritawidgetutils kritaresources)
+if (TARGET kritaui_autogen)
+    add_dependencies(ikonline kritaui_autogen)
+endif()
+target_link_libraries(kritaui PRIVATE ikonline)
+
 install(TARGETS kritaui  ${INSTALL_TARGETS_DEFAULT_ARGS})
 
 

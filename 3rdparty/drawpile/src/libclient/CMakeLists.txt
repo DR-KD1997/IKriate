@@ -1,0 +1,406 @@
+find_package(${QT_PACKAGE_NAME} REQUIRED COMPONENTS Gui)
+
+add_compile_definitions(
+    WIN32_LEAN_AND_MEAN
+    NOMINMAX
+)
+
+add_library(dpclient)
+
+target_sources(dpclient PRIVATE
+	document.cpp
+	document.h
+	settings_table.h
+	settings.cpp
+	settings.h
+	brushes/brush.cpp
+	brushes/brush.h
+	brushes/brushpresetmodel.cpp
+	brushes/brushpresetmodel.h
+	brushes/enums.h
+	brushes/lazybrush.cpp
+	brushes/lazybrush.h
+	brushes/lazythumbnail.cpp
+	brushes/lazythumbnail.h
+	canvas/acl.cpp
+	canvas/acl.h
+	canvas/blendmodes.cpp
+	canvas/blendmodes.h
+	canvas/canvasmodel.cpp
+	canvas/canvasmodel.h
+	canvas/canvasshortcuts.cpp
+	canvas/canvasshortcuts.h
+	canvas/documentmetadata.cpp
+	canvas/documentmetadata.h
+	canvas/layerlist.cpp
+	canvas/layerlist.h
+	canvas/paintengine.cpp
+	canvas/paintengine.h
+	canvas/point.h
+	canvas/reconnectstate.cpp
+	canvas/reconnectstate.h
+	canvas/selectionmodel.cpp
+	canvas/selectionmodel.h
+	canvas/tilecache.cpp
+	canvas/tilecache.h
+	canvas/timelinemodel.cpp
+	canvas/timelinemodel.h
+	canvas/transformmodel.cpp
+	canvas/transformmodel.h
+	canvas/userlist.cpp
+	canvas/userlist.h
+	config/config.cpp
+	config/config.h
+	config/memoryconfig.cpp
+	config/memoryconfig.h
+	parentalcontrols/parentalcontrols.cpp
+	parentalcontrols/parentalcontrols.h
+	drawdance/aclstate.cpp
+	drawdance/aclstate.h
+	drawdance/annotation.cpp
+	drawdance/annotation.h
+	drawdance/annotationlist.cpp
+	drawdance/annotationlist.h
+	drawdance/brushengine.cpp
+	drawdance/brushengine.h
+	drawdance/brushpreview.cpp
+	drawdance/brushpreview.h
+	drawdance/canvashistory.cpp
+	drawdance/canvashistory.h
+	drawdance/canvasstate.cpp
+	drawdance/canvasstate.h
+	drawdance/compress.h
+	drawdance/compress.cpp
+	drawdance/documentmetadata.cpp
+	drawdance/documentmetadata.h
+	drawdance/eventlog.cpp
+	drawdance/eventlog.h
+	drawdance/geom.cpp
+	drawdance/geom.h
+	drawdance/global.cpp
+	drawdance/global.h
+	drawdance/image.cpp
+	drawdance/image.h
+	drawdance/keyframe.cpp
+	drawdance/keyframe.h
+	drawdance/layercontent.cpp
+	drawdance/layercontent.h
+	drawdance/layergroup.cpp
+	drawdance/layergroup.h
+	drawdance/layerlist.cpp
+	drawdance/layerlist.h
+	drawdance/layerprops.cpp
+	drawdance/layerprops.h
+	drawdance/layerpropslist.cpp
+	drawdance/layerpropslist.h
+	drawdance/paintengine.cpp
+	drawdance/paintengine.h
+	drawdance/perf.cpp
+	drawdance/perf.h
+	drawdance/pixels.cpp
+	drawdance/pixels.h
+	drawdance/playback.cpp
+	drawdance/playback.h
+	drawdance/player.cpp
+	drawdance/player.h
+	drawdance/project.cpp
+	drawdance/project.h
+	drawdance/selection.cpp
+	drawdance/selection.h
+	drawdance/selectionset.cpp
+	drawdance/selectionset.h
+	drawdance/snapshotqueue.cpp
+	drawdance/snapshotqueue.h
+	drawdance/strokeworker.cpp
+	drawdance/strokeworker.h
+	drawdance/tile.cpp
+	drawdance/tile.h
+	drawdance/timeline.cpp
+	drawdance/timeline.h
+	drawdance/track.cpp
+	drawdance/track.h
+	drawdance/viewmode.cpp
+	drawdance/viewmode.h
+	drawdance/viewstate.h
+	drawdance/ziparchive.cpp
+	drawdance/ziparchive.h
+	export/animationsaverrunnable.cpp
+	export/animationsaverrunnable.h
+	export/canvassaverrunnable.cpp
+	export/canvassaverrunnable.h
+	export/projectsaver.cpp
+	export/projectsaver.h
+	export/thumbnailerrunnable.cpp
+	export/thumbnailerrunnable.h
+	export/videoexporthandle.h
+	export/videoformat.cpp
+	export/videoformat.h
+	import/animationimporter.cpp
+	import/animationimporter.h
+	import/canvasloaderrunnable.cpp
+	import/canvasloaderrunnable.h
+	import/loadresult.cpp
+	import/loadresult.h
+	import/recordingconverter.cpp
+	import/recordingconverter.h
+	io/files.cpp
+	io/files.h
+	io/pathinfo.cpp
+	io/pathinfo.h
+	io/tempfile.cpp
+	io/tempfile.h
+	net/announcementlist.cpp
+	net/announcementlist.h
+	net/authlistmodel.cpp
+	net/authlistmodel.h
+	net/banlistmodel.cpp
+	net/banlistmodel.h
+	net/client.cpp
+	net/client.h
+	net/invitelistmodel.cpp
+	net/invitelistmodel.h
+	net/login.cpp
+	net/login.h
+	net/loginsessions.cpp
+	net/loginsessions.h
+	net/message.cpp
+	net/message.h
+	net/server.cpp
+	net/server.h
+	net/sessionlistingmodel.cpp
+	net/sessionlistingmodel.h
+	project/metadata.cpp
+	project/metadata.h
+	project/projectrecorder.cpp
+	project/projectrecorder.h
+	project/projectwrangler.cpp
+	project/projectwrangler.h
+	project/recoverymodel.cpp
+	project/recoverymodel.h
+	project/resume.cpp
+	project/resume.h
+	tools/annotation.cpp
+	tools/annotation.h
+	tools/beziertool.cpp
+	tools/beziertool.h
+	tools/clickdetector.h
+	tools/colorpicker.cpp
+	tools/colorpicker.h
+	tools/enums.h
+	tools/floodfill.cpp
+	tools/floodfill.h
+	tools/gradient.cpp
+	tools/gradient.h
+	tools/freehand.cpp
+	tools/freehand.h
+	tools/inspector.cpp
+	tools/inspector.h
+	tools/laser.cpp
+	tools/laser.h
+	tools/lassofill.cpp
+	tools/lassofill.h
+	tools/magicwand.cpp
+	tools/magicwand.h
+	tools/pan.cpp
+	tools/pan.h
+	tools/rotation.cpp
+	tools/rotation.h
+	tools/selection.cpp
+	tools/selection.h
+	tools/shapetools.cpp
+	tools/shapetools.h
+	tools/tool.cpp
+	tools/tool.h
+	tools/toolcontroller.cpp
+	tools/toolcontroller.h
+	tools/toolproperties.cpp
+	tools/toolproperties.h
+	tools/transform.cpp
+	tools/transform.h
+	tools/utils.cpp
+	tools/utils.h
+	tools/zoom.cpp
+	tools/zoom.h
+	utils/annotations.cpp
+	utils/annotations.h
+	utils/asynctaskrunnable.cpp
+	utils/asynctaskrunnable.h
+	utils/avatarlistmodel.cpp
+	utils/avatarlistmodel.h
+	utils/avatarlistmodeldelegate.h
+	utils/brushshortcutmodel.cpp
+	utils/brushshortcutmodel.h
+	utils/canvasshortcutsmodel.cpp
+	utils/canvasshortcutsmodel.h
+	utils/canvastoimagerunnable.cpp
+	utils/canvastoimagerunnable.h
+	utils/certificatestoremodel.cpp
+	utils/certificatestoremodel.h
+	utils/checkerbackground.cpp
+	utils/checkerbackground.h
+	utils/clickeventfilter.cpp
+	utils/clickeventfilter.h
+	utils/colorscheme.cpp
+	utils/colorscheme.h
+	utils/compressedtimer.cpp
+	utils/compressedtimer.h
+	utils/cursors.cpp
+	utils/cursors.h
+	utils/customshortcutmodel.cpp
+	utils/customshortcutmodel.h
+	utils/debouncetimer.cpp
+	utils/debouncetimer.h
+	utils/funstuff.cpp
+	utils/funstuff.h
+	utils/hostpresetmodel.cpp
+	utils/hostpresetmodel.h
+	utils/html.cpp
+	utils/html.h
+	utils/html_gen.cpp
+	utils/icons.cpp
+	utils/icons.h
+	utils/identicon.cpp
+	utils/identicon.h
+	utils/images.cpp
+	utils/images.h
+	utils/keyframelayermodel.cpp
+	utils/keyframelayermodel.h
+	utils/kis_cubic_curve.cpp
+	utils/kis_cubic_curve.h
+	utils/listservermodel.cpp
+	utils/listservermodel.h
+	utils/logging.cpp
+	utils/logging.h
+	utils/qtguicompat.cpp
+	utils/qtguicompat.h
+	utils/scopedoverridecursor.h
+	utils/selectionalteration.cpp
+	utils/selectionalteration.h
+	utils/selectionoutlinegenerator.cpp
+	utils/selectionoutlinegenerator.h
+	utils/sessionfilterproxymodel.cpp
+	utils/sessionfilterproxymodel.h
+	utils/sessionidvalidator.cpp
+	utils/sessionidvalidator.h
+	utils/shortcutdetector.cpp
+	utils/shortcutdetector.h
+	utils/statedatabase.cpp
+	utils/statedatabase.h
+	utils/strings.cpp
+	utils/strings.h
+	utils/transformquad.h
+	utils/usernamevalidator.cpp
+	utils/usernamevalidator.h
+	utils/wasmpersistence.h
+	view/canvascontrollerbase.cpp
+	view/canvascontrollerbase.h
+	view/colorpickrenderer.cpp
+	view/colorpickrenderer.h
+	view/enums.h
+	view/hudaction.h
+	view/softwarecanvasrenderer.cpp
+	view/softwarecanvasrenderer.h
+	view/touchhandler.cpp
+	view/touchhandler.h
+	view/zoom.cpp
+	view/zoom.h
+)
+
+if(ANDROID)
+	target_sources(dpclient PRIVATE
+		utils/androidutils.cpp
+		utils/androidutils.h
+	)
+	if(TARGET ${QT_PACKAGE_NAME}::AndroidExtras)
+		target_link_libraries(dpclient PUBLIC ${QT_PACKAGE_NAME}::AndroidExtras)
+	endif()
+endif()
+
+if(ANDROID OR EMSCRIPTEN)
+	# Android doesn't allow images to be placed on the system clipboard.
+	# Emscripten can't freely access it. Emulate it via an internal buffer.
+	target_compile_definitions(dpclient PUBLIC HAVE_CLIPBOARD_EMULATION=1)
+endif()
+
+if(EMSCRIPTEN)
+	target_sources(dpclient PRIVATE
+		wasmsupport.cpp
+		wasmsupport.h
+		utils/wasmpersistence.cpp
+	)
+else()
+	target_sources(dpclient PRIVATE
+		project/projectrepair.cpp
+		project/projectrepair.h
+		utils/news.cpp
+		utils/news.h
+	)
+endif()
+
+if(TARGET LIBAV::LIBAV)
+	target_sources(dpclient PRIVATE
+		export/timelapsesaverrunnable.cpp
+		export/timelapsesaverrunnable.h
+	)
+endif()
+
+if(HAVE_TCPSOCKETS)
+	target_sources(dpclient PRIVATE
+		net/tcpserver.cpp
+		net/tcpserver.h
+	)
+	if(BUILTINSERVER)
+		target_compile_definitions(dpclient PUBLIC DP_HAVE_BUILTIN_SERVER=1)
+		target_link_libraries(dpclient PUBLIC dpserver)
+		target_sources(dpclient PRIVATE
+			server/builtinclient.cpp
+			server/builtinclient.h
+			server/builtinreset.cpp
+			server/builtinreset.h
+			server/builtinsession.cpp
+			server/builtinsession.h
+			server/builtinserver.cpp
+			server/builtinserver.h
+		)
+	endif()
+endif()
+
+if(HAVE_UDPSOCKETS)
+	target_compile_definitions(dpclient PUBLIC DP_HAVE_ACTIVITYBROADCAST=1)
+	target_sources(dpclient PRIVATE
+		io/activitybroadcast.cpp
+		io/activitybroadcast.h
+	)
+endif()
+
+# https://gitlab.kitware.com/cmake/cmake/-/issues/19813
+# IKriate: Windows parental controls (COM) are not used; IKriate's session
+# list leaves out sessions marked not suitable for minors on its own.
+target_sources(dpclient PRIVATE
+	parentalcontrols/parentalcontrols_dummy.cpp
+)
+
+target_link_libraries(dpclient
+	PRIVATE
+		cmake-config
+	PUBLIC
+		dpshared
+		drawdance_client
+		${QT_PACKAGE_NAME}::Core
+		${QT_PACKAGE_NAME}::Network
+		${QT_PACKAGE_NAME}::Gui
+)
+
+if(TARGET ${QT_PACKAGE_NAME}::WebSockets)
+	target_sources(dpclient PRIVATE
+		net/websocketserver.cpp
+		net/websocketserver.h
+	)
+	target_link_libraries(dpclient PUBLIC ${QT_PACKAGE_NAME}::WebSockets)
+endif()
+
+
+
+
+
+

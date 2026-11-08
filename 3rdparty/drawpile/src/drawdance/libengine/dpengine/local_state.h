@@ -1,0 +1,146 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+#ifndef DPENGINE_LOCAL_STATE_H
+#define DPENGINE_LOCAL_STATE_H
+#include "view_mode.h"
+#include <dpcommon/common.h>
+
+DP_TYPEDEF_PERSISTENT(CanvasState);
+DP_TYPEDEF_PERSISTENT(Timeline);
+typedef struct DP_DrawContext DP_DrawContext;
+typedef struct DP_LocalStateAction DP_LocalStateAction;
+typedef struct DP_Message DP_Message;
+typedef struct DP_MsgLocalChange DP_MsgLocalChange;
+typedef struct DP_Tile DP_Tile;
+
+
+typedef struct DP_LocalState DP_LocalState;
+
+typedef struct DP_LocalLayerState {
+    int layer_id;
+    bool hidden;
+    bool alpha_lock;
+    bool censored;
+    uint16_t sketch_opacity;
+    uint32_t sketch_tint;
+} DP_LocalLayerState;
+
+typedef struct DP_LocalTrackState {
+    int track_id;
+    bool hidden;
+    bool onion_skin;
+    bool move_lock;
+} DP_LocalTrackState;
+
+typedef void (*DP_LocalStateViewInvalidatedFn)(void *user, bool check_all,
+                                               int layer_id);
+typedef bool (*DP_LocalStateAcceptResetMessageFn)(void *user, DP_Message *msg);
+typedef void (*DP_LocalStateActionSaveFn)(void *user,
+                                          const DP_LocalStateAction *action);
+typedef void (*DP_LocalStateCensoredLayerRevealedFn)(void *user, int layer_id);
+
+DP_LocalState *
+DP_local_state_new(DP_CanvasState *cs_or_null,
+                   DP_LocalStateViewInvalidatedFn view_invalidated, void *user);
+
+void DP_local_state_free(DP_LocalState *ls);
+
+void DP_local_state_reset(DP_LocalState *ls);
+
+// Calls the given function with actions to restore the local state, then calls
+// it with a null action last.
+void DP_local_state_save(DP_LocalState *ls, bool reveal_censored,
+                         DP_LocalStateActionSaveFn save_fn, void *user);
+
+const DP_LocalLayerState *DP_local_state_layer_states(DP_LocalState *ls,
+                                                      int *out_count);
+
+int DP_local_state_layer_state_count(DP_LocalState *ls);
+
+DP_Tile *DP_local_state_background_tile_noinc(DP_LocalState *ls);
+
+bool DP_local_state_background_opaque(DP_LocalState *ls);
+
+DP_ViewMode DP_local_state_view_mode(DP_LocalState *ls);
+
+DP_OnionSkins *DP_local_state_onion_skins(DP_LocalState *ls);
+
+int DP_local_state_active_layer_id(DP_LocalState *ls);
+
+int DP_local_state_active_frame_index(DP_LocalState *ls);
+
+const DP_LocalTrackState *DP_local_state_track_states(DP_LocalState *ls,
+                                                      int *out_count);
+
+int DP_local_state_track_state_count(DP_LocalState *ls);
+
+bool DP_local_state_track_visible(DP_LocalState *ls, int track_id);
+
+bool DP_local_state_handle(DP_LocalState *ls, DP_DrawContext *dc,
+                           DP_Message *msg, bool local);
+
+bool DP_local_state_reset_image_build(DP_LocalState *ls, DP_DrawContext *dc,
+                                      DP_LocalStateAcceptResetMessageFn fn,
+                                      void *user);
+
+bool DP_local_state_playback_image_build(DP_LocalState *ls, DP_DrawContext *dc,
+                                         DP_LocalStateAcceptResetMessageFn fn,
+                                         void *user);
+
+bool DP_local_state_project_snapshot_build(DP_LocalState *ls,
+                                           DP_DrawContext *dc,
+                                           DP_LocalStateAcceptResetMessageFn fn,
+                                           void *user);
+
+bool DP_local_state_project_player_snapshot_build(
+    DP_LocalState *ls, DP_LocalStateAcceptResetMessageFn fn, void *user);
+
+
+void DP_local_state_layer_states_apply(
+    DP_LocalState *ls, DP_TransientCanvasState *tcs, DP_DrawContext *dc,
+    bool reveal_censored,
+    DP_LocalStateCensoredLayerRevealedFn censored_layer_revealed, void *user);
+
+void DP_local_state_track_states_apply(
+    DP_LocalState *ls, DP_Timeline *tl,
+    DP_TransientTimeline *(*get_transient_timeline_fn)(void *), void *user);
+
+DP_CanvasState *DP_local_state_apply_nodec(DP_LocalState *ls,
+                                           DP_CanvasState *cs_or_null,
+                                           DP_DrawContext *dc);
+
+DP_CanvasState *DP_local_state_apply_dec(DP_LocalState *ls,
+                                         DP_CanvasState *cs_or_null,
+                                         DP_DrawContext *dc);
+
+
+DP_Message *DP_local_state_msg_layer_visibility_new(int layer_id, bool hidden);
+
+// May return NULL if compressing the tile fails.
+DP_Message *DP_local_state_msg_background_tile_new(DP_DrawContext *dc,
+                                                   DP_Tile *tile_or_null);
+
+DP_Message *DP_local_state_msg_view_mode_new(DP_ViewMode view_mode);
+
+DP_Message *DP_local_state_msg_active_layer_new(int layer_id);
+
+DP_Message *DP_local_state_msg_active_frame_new(int frame_index);
+
+DP_Message *DP_local_state_msg_onion_skins_new(const DP_OnionSkins *oss);
+
+DP_Message *DP_local_state_msg_track_visibility_new(int track_id, bool hidden);
+
+DP_Message *DP_local_state_msg_track_onion_skin_new(int track_id,
+                                                    bool onion_skin);
+
+DP_Message *DP_local_state_msg_layer_sketch_new(int layer_id, uint16_t opacity,
+                                                uint32_t tint);
+
+DP_Message *DP_local_state_msg_layer_alpha_lock_new(int layer_id,
+                                                    bool alpha_lock);
+
+DP_Message *DP_local_state_msg_layer_censored_new(int layer_id, bool censored);
+
+DP_Message *DP_local_state_msg_track_move_lock_new(int track_id,
+                                                   bool move_lock);
+
+#endif

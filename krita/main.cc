@@ -859,6 +859,9 @@ if (!qEnvironmentVariableIsEmpty("KRITA_OPENGL_DEBUG")) {
 #endif
 #endif
     KisApplication::setAttribute(Qt::AA_CompressHighFrequencyEvents, false);
+    // IKriate (from Drawpile): Qt 6 merges tablet events by default, which
+    // drops pen samples and makes quick strokes jaggy on slower devices.
+    KisApplication::setAttribute(Qt::AA_CompressTabletEvents, false);
 
     // Set up remote arguments.
     QObject::connect(&app, &KisApplication::messageReceived,

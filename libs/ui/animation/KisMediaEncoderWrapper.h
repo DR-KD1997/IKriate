@@ -25,6 +25,7 @@ public:
     enum class Type {
         AndroidMediaEncoder,
         LibavMediaEncoder,
+        GifMediaEncoder,
     };
 
     virtual ~KisMediaEncoderFormat() = default;

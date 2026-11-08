@@ -106,6 +106,10 @@ tasks.register('copyAssets', Copy) {
     into 'assets/'
     include '**'
     exclude 'locale/**'   // copied by copyLocaleFiles, limited to ikriateLanguages
+    // IKriate: build files and documentation of the dependency packages
+    // (they stay in the prefix: the packaging step runs CMake against it).
+    exclude 'ECM/**', 'aclocal/**', 'cmake/**', 'pkgconfig/**', 'eigen3/**', 'WebP/**',
+            'gettext/**', 'gettext-*/**', 'theora/**', 'ndk-modules/**', 'doc/**', 'man/**'
 }
 
 /*
@@ -123,6 +127,8 @@ tasks.register('copyLocaleFiles', Copy) {
         if (!ikriateLanguages.contains('all')) {
             ikriateLanguages.each { lang -> include "${lang}/**" }
         }
+        // Messages of the gettext tools and of SeExpr, which IKriate does not use.
+        exclude '**/gettext-tools.mo', '**/gettext-runtime.mo', '**/seexpr2_qt.qm'
     }
     from("$installPrefix/translations") {
         if (!ikriateLanguages.contains('all')) {

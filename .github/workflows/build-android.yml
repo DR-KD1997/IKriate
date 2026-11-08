@@ -118,9 +118,12 @@ jobs:
             --platform "Android/$KDECI_ANDROID_ABI/Qt5/Shared" --only-build --skip-publishing 2>&1 | tee build-ikriate.log
 
       - name: Remove unused dependency libraries
-        # KDE's dependency packages are installed whole; drop the libraries of
-        # features the tablet package does not build (only if nothing links them).
-        run: python3 packaging/android/prune-tablet-libs.py /tmp/wd/krita/_install 2>&1 | tee prune.log
+        # KDE's dependency packages are installed whole: replace ICU with a stub
+        # (built with the NDK), drop unused Qt plugins/QML modules and every
+        # library nothing links any more (FFmpeg, MLT, ...).
+        run: |
+          python3 packaging/android/prune-tablet-libs.py /tmp/wd/krita/_install \
+            --ndk "$ANDROID_HOME/ndk/$ANDROID_NDK_VERSION" 2>&1 | tee prune.log
 
       - name: Package APK
         run: |

@@ -1604,7 +1604,10 @@ set_package_properties(Poppler PROPERTIES
 ##
 ## Test for libav on Android
 ##
-if(ANDROID)
+# IKriate: optional, and left out of the tablet package. Android's own
+# encoders (MediaCodec) render MP4; FFmpeg only added more formats, at about
+# 25 MB with its codec libraries.
+if(ANDROID AND NOT IKRIATE_TABLET_PACKAGE)
     find_package(PkgConfig REQUIRED)
     set_package_properties(PkgConfig PROPERTIES
         DESCRIPTION "pkg-config"
@@ -1613,7 +1616,7 @@ if(ANDROID)
         PURPOSE "Needed to find ffmpeg libraries on Android."
     )
 
-    pkg_check_modules(LibAV REQUIRED IMPORTED_TARGET GLOBAL
+    pkg_check_modules(LibAV IMPORTED_TARGET GLOBAL
         libavcodec
         libavfilter
         libavformat
@@ -1635,8 +1638,8 @@ if(ANDROID)
     set_package_properties(LibAV PROPERTIES
         DESCRIPTION "FFmpeg libraries"
         URL "https://ffmpeg.org/"
-        TYPE REQUIRED
-        PURPOSE "Needed to render animations and timelapses on Android."
+        TYPE OPTIONAL
+        PURPOSE "More animation and timelapse formats on Android."
     )
 endif()
 

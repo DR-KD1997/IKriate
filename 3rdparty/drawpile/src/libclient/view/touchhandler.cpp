@@ -1,0 +1,978 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+extern "C" {
+#include <dpcommon/event_log.h>
+}
+#include "libclient/utils/qtguicompat.h"
+#include "libclient/view/enums.h"
+#include "libclient/view/touchhandler.h"
+#include "libshared/util/qtcompat.h"
+#include <QDateTime>
+#include <QLineF>
+#include <QLoggingCategory>
+#include <QTimer>
+#include <QtMath>
+#include <cmath>
+
+Q_LOGGING_CATEGORY(
+	lcDpTouchHandler, "net.drawpile.view.touchhandler", QtDebugMsg)
+
+namespace view {
+
+TouchHandler::TouchHandler(QObject *parent)
+	: QObject(parent)
+	, m_oneFingerTouchAction(int(ONE_FINGER_TOUCH_DEFAULT))
+	, m_twoFingerPinchAction(int(view::TwoFingerPinchAction::Zoom))
+	, m_twoFingerTwistAction(int(view::TwoFingerTwistAction::Rotate))
+	, m_oneFingerTapAction(int(view::TouchTapAction::Nothing))
+	, m_twoFingerTapAction(int(view::TouchTapAction::Undo))
+	, m_threeFingerTapAction(int(view::TouchTapAction::Redo))
+	, m_fourFingerTapAction(int(view::TouchTapAction::HideDocks))
+	, m_oneFingerTapAndHoldAction(
+		  int(view::TouchTapAndHoldAction::ColorPickMode))
+	, m_oneFingerDoubleTapAction(int(view::TouchTapAction::Nothing))
+	, m_tapTimer(Qt::CoarseTimer)
+{
+}
+
+bool TouchHandler::isTouchDrawEnabled() const
+{
+	switch(m_oneFingerTouchAction) {
+	case int(view::OneFingerTouchAction::Draw):
+		return true;
+	case int(view::OneFingerTouchAction::Guess):
+		return !m_anyTabletEventsReceived;
+	default:
+		return false;
+	}
+}
+
+bool TouchHandler::isTouchDrawPressureEnabled() const
+{
+	return m_touchDrawPressureEnabled;
+}
+
+bool TouchHandler::isTouchPanEnabled() const
+{
+	switch(m_oneFingerTouchAction) {
+	case int(view::OneFingerTouchAction::Pan):
+		return false;
+	case int(view::OneFingerTouchAction::Guess):
+		return m_anyTabletEventsReceived;
+	default:
+		return false;
+	}
+}
+
+bool TouchHandler::isTouchDrawOrPanEnabled() const
+{
+	switch(m_oneFingerTouchAction) {
+	case int(view::OneFingerTouchAction::Pan):
+	case int(view::OneFingerTouchAction::Draw):
+	case int(view::OneFingerTouchAction::Guess):
+		return true;
+	default:
+		return false;
+	}
+}
+
+bool TouchHandler::isTouchPinchEnabled() const
+{
+	return m_twoFingerPinchAction != int(view::TwoFingerPinchAction::Nothing);
+}
+
+bool TouchHandler::isTouchTwistEnabled() const
+{
+	return m_twoFingerTwistAction != int(view::TwoFingerTwistAction::Nothing);
+}
+
+bool TouchHandler::isTouchPinchOrTwistEnabled() const
+{
+	return isTouchPinchEnabled() || isTouchTwistEnabled();
+}
+
+void TouchHandler::handleTouchBegin(QTouchEvent *event)
+{
+	qCDebug(lcDpTouchHandler, "Touch begin");
+	m_touchState.begin(event);
+	// Can apparently happen on Android when putting your palm on the screen.
+	if(m_touchState.isEmpty()) {
+		return;
+	}
+
+	m_touchDrawBuffer.clear();
+	m_touchDragging = false;
+	m_touchRotating = false;
+	m_touchHeld = false;
+	m_tapTimer.setRemainingTime(TAP_MAX_DELAY_MS);
+	bool isTouchPad = compat::isTouchPad(event);
+	if(!isTouchPad && isTouchDrawEnabled() && m_touchState.isSingleTouch()) {
+		QPointF posf = m_touchState.currentCenter();
+		qreal pressure = touchPressure(event);
+		m_touchGlobalPos =
+			compat::touchGlobalPos(compat::touchPoints(*event).constFirst());
+		DP_EVENT_LOG(
+			"touch_draw_begin x=%f y=%f pressure=%f touching=%d type=%d "
+			"device=%s points=%s timestamp=%llu",
+			posf.x(), posf.y(), pressure, int(m_touching),
+			compat::touchDeviceType(event),
+			qUtf8Printable(compat::touchDeviceName(event)),
+			qUtf8Printable(compat::debug(compat::touchPoints(*event))),
+			qulonglong(event->timestamp()));
+		if(isTouchPanEnabled() || isTouchPinchOrTwistEnabled() ||
+		   haveOneFingerTapAction() || haveOneFingerDoubleTapAction() ||
+		   haveOneFingerTapAndHoldAction()) {
+			// Buffer the touch first, since it might end up being the
+			// beginning of an action that involves multiple fingers.
+			m_touchDrawBuffer.append(
+				{QDateTime::currentMSecsSinceEpoch(), posf, pressure});
+			m_touchMode = TouchMode::Unknown;
+		} else {
+			// There's no other actions other than drawing enabled, so we
+			// can just start drawing without awaiting what happens next.
+			m_touchMode = TouchMode::Drawing;
+			emit touchPressed(
+				event, QDateTime::currentMSecsSinceEpoch(), posf,
+				m_touchGlobalPos, pressure);
+		}
+	} else {
+		DP_EVENT_LOG(
+			"touch_begin touching=%d type=%d device=%s points=%s "
+			"timestamp=%llu",
+			int(m_touching), compat::touchDeviceType(event),
+			qUtf8Printable(compat::touchDeviceName(event)),
+			qUtf8Printable(compat::debug(compat::touchPoints(*event))),
+			qulonglong(event->timestamp()));
+		m_touchMode = TouchMode::Moving;
+		if(m_touchState.isMultiTouch()) {
+			flushBufferedOneFingerSingleTap();
+		}
+	}
+
+	if(!isTouchPad && m_touchState.isSingleTouch() &&
+	   m_touchMode != TouchMode::Drawing && haveOneFingerTapAndHoldAction()) {
+		startTapAndHoldTimer();
+	} else {
+		stopTapAndHoldTimer();
+	}
+}
+
+void TouchHandler::handleTouchUpdate(
+	QTouchEvent *event, qreal zoom, qreal rotation, qreal dpr)
+{
+	qCDebug(lcDpTouchHandler, "Touch update");
+	m_touchState.update(event);
+
+	bool spotsChanged = m_touchState.isSpotsChanged();
+	if(spotsChanged) {
+		m_touchStartsValid = false;
+	}
+
+	// Can apparently happen on Android when putting your palm on the screen.
+	if(m_touchState.isEmpty()) {
+		return;
+	}
+
+	bool singleTouch = m_touchState.isSingleTouch();
+	if(!singleTouch) {
+		stopTapAndHoldTimer();
+		flushBufferedOneFingerSingleTap();
+		if(m_touchHeld) {
+			m_touchHeld = false;
+			emit touchColorPickFinished();
+		}
+	}
+
+	if(m_touchHeld) {
+		emit touchColorPicked(m_touchState.currentCenter());
+	} else if(
+		isTouchDrawEnabled() &&
+		((singleTouch && m_touchMode == TouchMode::Unknown) ||
+		 m_touchMode == TouchMode::Drawing) &&
+		!compat::isTouchPad(event)) {
+		QPointF posf = compat::touchPos(compat::touchPoints(*event).first());
+		qreal pressure = touchPressure(event);
+		DP_EVENT_LOG(
+			"touch_draw_update x=%f y=%f pressure=%f touching=%d type=%d "
+			"device=%s points=%s timestamp=%llu",
+			posf.x(), posf.y(), pressure, int(m_touching),
+			compat::touchDeviceType(event),
+			qUtf8Printable(compat::touchDeviceName(event)),
+			qUtf8Printable(compat::debug(compat::touchPoints(*event))),
+			qulonglong(event->timestamp()));
+		int bufferCount = m_touchDrawBuffer.size();
+		if(bufferCount == 0) {
+			if(m_touchMode == TouchMode::Drawing) {
+				emit touchMoved(
+					QDateTime::currentMSecsSinceEpoch(), posf, pressure);
+			} else { // Shouldn't happen, but we'll deal with it anyway.
+				stopTapAndHoldTimer();
+				flushBufferedOneFingerSingleTap();
+				m_touchMode = TouchMode::Drawing;
+				emit touchPressed(
+					event, QDateTime::currentMSecsSinceEpoch(), posf,
+					m_touchGlobalPos, pressure);
+			}
+		} else {
+			// This still might be the beginning of a multitouch operation.
+			// If the finger didn't move enough of a distance and we didn't
+			// buffer an excessive amount of touches yet. Buffer the touched
+			// point and wait a bit more as to what's going to happen.
+			bool shouldAppend =
+				bufferCount < DRAW_BUFFER_COUNT &&
+				squareDist(m_touchDrawBuffer.first().posf - posf) <
+					TAP_SLOP_SQUARED;
+			if(shouldAppend) {
+				m_touchDrawBuffer.append(
+					{QDateTime::currentMSecsSinceEpoch(), posf, pressure});
+			} else {
+				stopTapAndHoldTimer();
+				flushBufferedOneFingerSingleTap();
+				m_touchMode = TouchMode::Drawing;
+				flushTouchDrawBuffer();
+				emit touchMoved(
+					QDateTime::currentMSecsSinceEpoch(), posf, pressure);
+			}
+		}
+	} else {
+		m_touchMode = TouchMode::Moving;
+		const QList<TouchSpot> &spots = m_touchState.spots();
+
+		if(!m_touchDragging) {
+			if(m_tapTimer.hasExpired()) {
+				// The user has had their fingers down for at least a second,
+				// this is clearly no longer a tap, but some longer gesture.
+				m_touchDragging = true;
+			} else {
+				// This might be a tap gesture. Don't start a drag until there's
+				// been sufficient movement on any of the fingers.
+				for(const TouchSpot &spot : spots) {
+					if(squareDist(spot.first - spot.current) >
+					   TAP_SLOP_SQUARED) {
+						qCDebug(
+							lcDpTouchHandler, "Enough movement, starting drag");
+						m_touchDragging = true;
+						break;
+					}
+				}
+				if(!m_touchDragging) {
+					qCDebug(
+						lcDpTouchHandler,
+						"Maybe still a tap gesture, wait for more movement.");
+					return;
+				}
+			}
+		}
+
+		stopTapAndHoldTimer();
+		flushBufferedOneFingerSingleTap();
+
+		QPointF center = m_touchState.currentCenter();
+		DP_EVENT_LOG(
+			"touch_update x=%f y=%f touching=%d type=%d device=%s points=%s "
+			"timestamp=%llu",
+			center.x(), center.y(), int(m_touching),
+			compat::touchDeviceType(event),
+			qUtf8Printable(compat::touchDeviceName(event)),
+			qUtf8Printable(compat::debug(compat::touchPoints(*event))),
+			qulonglong(event->timestamp()));
+
+		if(!m_touchStartsValid) {
+			m_touchStartZoom = zoom;
+			m_touchStartRotate = rotation;
+			m_touchStartsValid = true;
+			m_touchRotating = false;
+			startZoomRotate(zoom, rotation);
+		}
+
+		// We want to pan with one finger if one-finger pan is enabled and
+		// also when pinching to zoom. Slightly non-obviously, we also want
+		// to pan with one finger when finger drawing is enabled, because if
+		// we got here with one finger, we've come out of a multitouch
+		// operation and aren't going to be drawing until all fingers leave
+		// the surface anyway, so panning is the only sensible option.
+		bool haveMultiTouch = m_touchState.isMultiTouch();
+		bool havePinchOrTwist = haveMultiTouch && isTouchPinchOrTwistEnabled();
+		bool havePan = havePinchOrTwist ||
+					   (isTouchDrawOrPanEnabled() &&
+						(haveMultiTouch || !compat::isTouchPad(event)));
+		if(QPointF delta;
+		   havePan && !spotsChanged &&
+		   !(delta = m_touchState.previousCenter() - center).isNull()) {
+			m_touching = true;
+			scrollBy(delta.x(), delta.y());
+		}
+
+		// Scaling and rotation with two fingers
+		if(havePinchOrTwist) {
+			m_touching = true;
+			qreal anchorAvgDist = 0.0;
+			qreal avgDist = 0.0;
+			QPointF anchorCenter = m_touchState.anchorCenter();
+			for(const TouchSpot &spot : spots) {
+				anchorAvgDist += squareDist(spot.anchor - anchorCenter);
+				avgDist += squareDist(spot.current - center);
+			}
+			anchorAvgDist = std::sqrt(anchorAvgDist);
+
+			qreal touchZoom = zoom;
+			if(isTouchPinchEnabled()) {
+				avgDist = std::sqrt(avgDist);
+				qreal dZoom = avgDist / anchorAvgDist;
+				touchZoom = m_touchStartZoom * dZoom;
+			}
+
+			qreal touchRotation = rotation;
+			if(isTouchTwistEnabled()) {
+				const TouchSpot &spot1 = spots.first();
+				const TouchSpot &spot2 = spots.last();
+				QLineF l1(spot1.anchor, spot2.anchor);
+				QLineF l2(spot1.current, spot2.current);
+				qreal dAngle = l1.angle() - l2.angle();
+
+				// Require a small nudge to activate rotation to avoid
+				// rotating when the user just wanted to zoom. Also only
+				// rotate when touch points start out far enough from each
+				// other. Initial angle measurement is inaccurate when
+				// touchpoints are close together.
+				if(anchorAvgDist * dpr > 80.0 &&
+				   (qAbs(dAngle) > 3.0 || m_touchRotating)) {
+					m_touchRotating = true;
+					touchRotation =
+						adjustTwistRotation(m_touchStartRotate + dAngle);
+				}
+			}
+
+			zoomRotate(touchZoom, touchRotation);
+		}
+	}
+}
+
+void TouchHandler::handleTouchEnd(QTouchEvent *event, bool cancel)
+{
+	qCDebug(lcDpTouchHandler, "Touch %s", cancel ? "cancel" : "end");
+	event->accept();
+	const QList<compat::TouchPoint> &points = compat::touchPoints(*event);
+	stopTapAndHoldTimer();
+	if(m_touchHeld) {
+		emit touchColorPickFinished();
+	} else if(
+		isTouchDrawEnabled() &&
+		((m_touchMode == TouchMode::Unknown && !m_touchDrawBuffer.isEmpty() &&
+		  (m_touchDragging ||
+		   (!haveOneFingerTapAction() && !haveOneFingerDoubleTapAction()))) ||
+		 m_touchMode == TouchMode::Drawing)) {
+		DP_EVENT_LOG(
+			"touch_draw_%s touching=%d type=%d device=%s points=%s "
+			"timestamp=%llu",
+			cancel ? "cancel" : "end", int(m_touching),
+			compat::touchDeviceType(event),
+			qUtf8Printable(compat::touchDeviceName(event)),
+			qUtf8Printable(compat::debug(points)),
+			qulonglong(event->timestamp()));
+		flushTouchDrawBuffer();
+		// No points can happen on Android when putting your palm on the screen.
+		QPointF posf = points.isEmpty() ? m_touchState.currentCenter()
+										: compat::touchPos(points.first());
+		emit touchReleased(QDateTime::currentMSecsSinceEpoch(), posf);
+	} else if(m_touchDragging) {
+		DP_EVENT_LOG(
+			"touch_%s touching=%d type=%d device=%s points=%s timestamp=%llu",
+			cancel ? "cancel" : "end", int(m_touching),
+			compat::touchDeviceType(event),
+			qUtf8Printable(compat::touchDeviceName(event)),
+			qUtf8Printable(compat::debug(points)),
+			qulonglong(event->timestamp()));
+	} else {
+		int lastTouchPoints = m_touchState.lastTouchPoints();
+		int maxTouchPoints = m_touchState.maxTouchPoints();
+		DP_EVENT_LOG(
+			"touch_tap_%s lastTouchPoints=%d maxTouchPoints=%d touching=%d "
+			"type=%d device=%s points=%s timestamp=%llu",
+			cancel ? "cancel" : "end", lastTouchPoints, maxTouchPoints,
+			int(m_touching), compat::touchDeviceType(event),
+			qUtf8Printable(compat::touchDeviceName(event)),
+			qUtf8Printable(compat::debug(points)),
+			qulonglong(event->timestamp()));
+		if(shouldExecuteTap(cancel, lastTouchPoints)) {
+			qCDebug(
+				lcDpTouchHandler, "Executing %s tap with %d touch points",
+				cancel ? "cancelled" : "ended", maxTouchPoints);
+			if(maxTouchPoints == 1) {
+				QPointF posf = points.isEmpty()
+								   ? m_touchState.currentCenter()
+								   : compat::touchPos(points.first());
+				TouchDrawPoint releasePoint = {
+					QDateTime::currentMSecsSinceEpoch(), posf, 0.0};
+				handleOneFingerTapWith(&releasePoint);
+			} else {
+				flushBufferedOneFingerSingleTap();
+				if(maxTouchPoints == 2) {
+					qCDebug(
+						lcDpTouchHandler, "Executing two-finger single tap");
+					emitTwoFingerTapAction();
+				} else if(maxTouchPoints == 3) {
+					qCDebug(
+						lcDpTouchHandler, "Executing three-finger single tap");
+					emitThreeFingerTapAction();
+				} else if(maxTouchPoints >= 4) {
+					qCDebug(
+						lcDpTouchHandler, "Executing four-finger single tap");
+					emitFourFingerTapAction();
+				}
+			}
+		} else {
+			qCDebug(
+				lcDpTouchHandler, "Not executing %s tap with %d touch points",
+				cancel ? "cancelled" : "ended", maxTouchPoints);
+			flushBufferedOneFingerSingleTap();
+		}
+	}
+	m_touching = false;
+}
+
+void TouchHandler::setTouchDrawPressureEnabled(bool touchDrawPressureEnabled)
+{
+	m_touchDrawPressureEnabled = touchDrawPressureEnabled;
+}
+
+void TouchHandler::setOneFingerTouchAction(int oneFingerTouchAction)
+{
+	m_oneFingerTouchAction = oneFingerTouchAction;
+}
+
+void TouchHandler::setTwoFingerPinchAction(int twoFingerPinchAction)
+{
+	m_twoFingerPinchAction = twoFingerPinchAction;
+}
+
+void TouchHandler::setTwoFingerTwistAction(int twoFingerTwistAction)
+{
+	m_twoFingerTwistAction = twoFingerTwistAction;
+}
+
+void TouchHandler::setOneFingerTapAction(int oneFingerTapAction)
+{
+	m_oneFingerTapAction = oneFingerTapAction;
+}
+
+void TouchHandler::setOneFingerTapTrigger(const QString &oneFingerTapTrigger)
+{
+	m_oneFingerTapTrigger = oneFingerTapTrigger;
+}
+
+void TouchHandler::setTwoFingerTapAction(int twoFingerTapAction)
+{
+	m_twoFingerTapAction = twoFingerTapAction;
+}
+
+void TouchHandler::setTwoFingerTapTrigger(const QString &twoFingerTapTrigger)
+{
+	m_twoFingerTapTrigger = twoFingerTapTrigger;
+}
+
+void TouchHandler::setThreeFingerTapAction(int threeFingerTapAction)
+{
+	m_threeFingerTapAction = threeFingerTapAction;
+}
+
+void TouchHandler::setThreeFingerTapTrigger(
+	const QString &threeFingerTapTrigger)
+{
+	m_threeFingerTapTrigger = threeFingerTapTrigger;
+}
+
+void TouchHandler::setFourFingerTapAction(int fourFingerTapAction)
+{
+	m_fourFingerTapAction = fourFingerTapAction;
+}
+
+void TouchHandler::setFourFingerTapTrigger(const QString &fourFingerTapTrigger)
+{
+	m_fourFingerTapTrigger = fourFingerTapTrigger;
+}
+
+void TouchHandler::setOneFingerTapAndHoldAction(int oneFingerTapAndHoldAction)
+{
+	m_oneFingerTapAndHoldAction = oneFingerTapAndHoldAction;
+	if(haveOneFingerTapAndHoldAction()) {
+		if(!m_tapAndHoldTimer) {
+			m_tapAndHoldTimer = new QTimer(this);
+			m_tapAndHoldTimer->setTimerType(Qt::CoarseTimer);
+			m_tapAndHoldTimer->setSingleShot(true);
+			m_tapAndHoldTimer->setInterval(TAP_AND_HOLD_DELAY_MS);
+			connect(
+				m_tapAndHoldTimer, &QTimer::timeout, this,
+				&TouchHandler::triggerTapAndHold);
+		}
+	} else {
+		delete m_tapAndHoldTimer;
+		m_tapAndHoldTimer = nullptr;
+	}
+}
+
+void TouchHandler::setOneFingerDoubleTapAction(int oneFingerDoubleTapAction)
+{
+	m_oneFingerDoubleTapAction = oneFingerDoubleTapAction;
+	setUpMultiTapTimer();
+}
+
+void TouchHandler::setOneFingerDoubleTapTrigger(
+	const QString &oneFingerDoubleTapTrigger)
+{
+	m_oneFingerDoubleTapTrigger = oneFingerDoubleTapTrigger;
+	setUpMultiTapTimer();
+}
+
+void TouchHandler::setSmoothing(int smoothing)
+{
+	if(smoothing > 0) {
+		m_smoothMultiplier = 1.0 - qMin(smoothing, 100) / 100.0 * 0.9;
+		if(!m_smoothTimer) {
+			m_smoothTimer = new QTimer(this);
+			m_smoothTimer->setInterval(1000 / 60);
+			connect(
+				m_smoothTimer, &QTimer::timeout, this,
+				&TouchHandler::updateSmoothedMotion);
+		}
+	} else if(smoothing <= 0 && m_smoothTimer) {
+		delete m_smoothTimer;
+		m_smoothTimer = nullptr;
+		m_smoothDx = 0.0;
+		m_smoothDy = 0.0;
+	}
+}
+
+void TouchHandler::scrollBy(qreal dx, qreal dy)
+{
+	if(m_smoothTimer) {
+		m_smoothDx += dx;
+		m_smoothDy += dy;
+		if(!m_smoothTimer->isActive()) {
+			m_smoothTimer->start();
+		}
+	} else {
+		emit touchScrolledBy(dx, dy);
+	}
+}
+
+void TouchHandler::startZoomRotate(qreal zoom, qreal rotation)
+{
+	m_smoothZoomCurrent = zoom;
+	m_smoothZoomTarget = zoom;
+	m_smoothRotationCurrent = std::fmod(rotation, 360.0);
+	m_smoothRotationTarget = m_smoothRotationCurrent;
+}
+
+void TouchHandler::zoomRotate(qreal zoom, qreal rotation)
+{
+	if(m_smoothTimer) {
+		m_smoothZoomTarget = zoom;
+		m_smoothRotationTarget = rotation;
+		if(!m_smoothTimer->isActive()) {
+			m_smoothTimer->start();
+		}
+	} else {
+		emit touchZoomedRotated(zoom, rotation);
+	}
+}
+
+qreal TouchHandler::adjustTwistRotation(qreal degrees) const
+{
+	if(m_twoFingerTwistAction == int(view::TwoFingerTwistAction::Rotate)) {
+		return qAbs(std::fmod(degrees, 360.0)) < 5.0 ? 0.0 : degrees;
+	} else if(
+		m_twoFingerTwistAction ==
+		int(view::TwoFingerTwistAction::RotateDiscrete)) {
+		qreal step = 15.0;
+		qreal offset = std::fmod(degrees, step);
+		if(offset <= step / 2.0) {
+			return qFloor(degrees / step) * step;
+		} else {
+			return qCeil(degrees / step) * step;
+		}
+	} else {
+		return degrees;
+	}
+}
+
+void TouchHandler::flushBufferedOneFingerSingleTap()
+{
+	qCDebug(lcDpTouchHandler, "Flush buffered one-finger single tap");
+	if(m_awaitingOneFingerDoubleTap) {
+		m_awaitingOneFingerDoubleTap = false;
+		stopMultiTapTimer();
+		if(m_delayedTouchDrawBuffer.isEmpty()) {
+			qCDebug(lcDpTouchHandler, "Executing buffered tap");
+			emitOneFingerTapAction();
+		} else {
+			qCDebug(lcDpTouchHandler, "Executing buffered stroke");
+			flushDelayedTouchDrawBuffer();
+		}
+	} else {
+		qCDebug(lcDpTouchHandler, "Not executing buffered tap");
+	}
+}
+
+void TouchHandler::TouchState::clear()
+{
+	m_spotsById.clear();
+	m_currentCenter = QPointF(0.0, 0.0);
+	m_previousCenter = QPointF(0.0, 0.0);
+	m_anchorCenter = QPointF(0.0, 0.0);
+	m_maxTouchPoints = 0;
+	m_anchorCenterValid = true;
+	m_previousCenterValid = true;
+	m_spotsChanged = true;
+}
+
+void TouchHandler::TouchState::begin(QTouchEvent *event)
+{
+	clear();
+	update(event);
+}
+
+void TouchHandler::TouchState::update(QTouchEvent *event)
+{
+	const QList<compat::TouchPoint> &points = compat::touchPoints(*event);
+	compat::sizetype pointsCount = points.size();
+	m_spotsChanged = pointsCount != m_spots.size();
+	// Can apparently happen on Android when putting your palm on the screen.
+	if(pointsCount == 0) {
+		m_spotsById.clear();
+		m_currentCenter = QPointF(0.0, 0.0);
+		m_previousCenter = QPointF(0.0, 0.0);
+		m_anchorCenter = QPointF(0.0, 0.0);
+		m_previousCenterValid = true;
+		m_anchorCenterValid = true;
+	} else {
+		m_lastTouchPoints = pointsCount;
+		if(pointsCount > m_maxTouchPoints) {
+			m_maxTouchPoints = pointsCount;
+		}
+
+		for(TouchSpot &spot : m_spotsById) {
+			spot.state = TouchSpot::Gone;
+		}
+
+		m_currentCenter = QPointF(0.0, 0.0);
+		for(const compat::TouchPoint &tp : points) {
+			QPointF pos = compat::touchPos(tp);
+			QPointF start = compat::touchStartPos(tp);
+			m_currentCenter += pos;
+
+			int id = compat::touchId(tp);
+			TouchSpot &spot = m_spotsById[id];
+			if(spot.state == TouchSpot::Initial) {
+				spot.previous = pos;
+				spot.first = start;
+				m_spotsChanged = true;
+			} else {
+				spot.previous = spot.current;
+				if(QLineF(spot.first, start).length() > TOUCH_START_SLOP) {
+					spot.first = start;
+					m_spotsChanged = true;
+				}
+			}
+			spot.current = pos;
+			spot.state = TouchSpot::Active;
+		}
+		m_currentCenter /= qreal(pointsCount);
+
+		QHash<int, TouchSpot>::iterator it = m_spotsById.begin();
+		QHash<int, TouchSpot>::iterator end = m_spotsById.end();
+		while(it != end) {
+			if(it->state == TouchSpot::Gone) {
+				it = m_spotsById.erase(it);
+				m_spotsChanged = true;
+			} else {
+				++it;
+			}
+		}
+
+		m_spots.clear();
+		m_spots.reserve(pointsCount);
+		for(const compat::TouchPoint &tp : points) {
+			TouchSpot &spot = m_spotsById[tp.id()];
+			if(m_spotsChanged) {
+				spot.anchor = spot.current;
+			}
+			m_spots.append(spot);
+		}
+
+		if(m_spotsChanged) {
+			m_anchorCenterValid = false;
+		}
+		m_previousCenterValid = false;
+	}
+}
+
+const QPointF &TouchHandler::TouchState::previousCenter()
+{
+	if(!m_previousCenterValid) {
+		m_previousCenterValid = true;
+		m_previousCenter = QPointF(0.0, 0.0);
+		for(const TouchSpot &spot : m_spotsById) {
+			m_previousCenter += spot.previous;
+		}
+		m_previousCenter /= qreal(m_spotsById.size());
+	}
+	return m_previousCenter;
+}
+
+const QPointF &TouchHandler::TouchState::anchorCenter()
+{
+	if(!m_anchorCenterValid) {
+		m_anchorCenterValid = true;
+		m_anchorCenter = QPointF(0.0, 0.0);
+		for(const TouchSpot &spot : m_spotsById) {
+			m_anchorCenter += spot.anchor;
+		}
+		m_anchorCenter /= qreal(m_spotsById.size());
+	}
+	return m_anchorCenter;
+}
+
+qreal TouchHandler::touchPressure(const QTouchEvent *event) const
+{
+	if(m_touchDrawPressureEnabled) {
+		const QList<compat::TouchPoint> &points = compat::touchPoints(*event);
+		return points.isEmpty() ? 0.0 : points.constFirst().pressure();
+	} else {
+		return 1.0;
+	}
+}
+
+void TouchHandler::updateSmoothedMotion()
+{
+	qreal eps = 0.001;
+
+	if(m_smoothDx != 0.0 || m_smoothDy != 0.0) {
+		qreal dx;
+		if(qAbs(m_smoothDx) > eps) {
+			dx = m_smoothDx * m_smoothMultiplier;
+			m_smoothDx -= dx;
+		} else {
+			dx = m_smoothDx;
+			m_smoothDx = 0.0;
+		}
+
+		qreal dy;
+		if(qAbs(m_smoothDy) > eps) {
+			dy = m_smoothDy * m_smoothMultiplier;
+			m_smoothDy -= dy;
+		} else {
+			dy = m_smoothDy;
+			m_smoothDy = 0.0;
+		}
+
+		emit touchScrolledBy(dx, dy);
+	}
+
+	if(m_smoothZoomCurrent != m_smoothZoomTarget ||
+	   m_smoothRotationCurrent != m_smoothRotationTarget) {
+		qreal zoomDelta = m_smoothZoomTarget - m_smoothZoomCurrent;
+		if(qAbs(zoomDelta) > eps) {
+			m_smoothZoomCurrent += zoomDelta * m_smoothMultiplier;
+		} else {
+			m_smoothZoomCurrent = m_smoothZoomTarget;
+		}
+
+		// XXX: Smoothing rotation causes weird issues with the canvas not
+		// ratcheting properly or spinning forever. Hard to reproduce, so I'm
+		// just turning off that part for now, presumably it's still okay.
+		m_smoothRotationCurrent = m_smoothRotationTarget;
+
+		emit touchZoomedRotated(m_smoothZoomCurrent, m_smoothRotationCurrent);
+	}
+
+	if(m_smoothTimer && m_smoothDx == 0.0 && m_smoothDy == 0.0 &&
+	   m_smoothZoomCurrent == m_smoothZoomTarget &&
+	   m_smoothRotationCurrent == m_smoothRotationTarget) {
+		m_smoothTimer->stop();
+	}
+}
+
+void TouchHandler::triggerTapAndHold()
+{
+	qCDebug(lcDpTouchHandler, "Trigger tap and hold");
+	flushBufferedOneFingerSingleTap();
+	stopTapAndHoldTimer();
+	if(m_touchState.maxTouchPoints() == 1 &&
+	   m_touchMode != TouchMode::Drawing) {
+		qCDebug(
+			lcDpTouchHandler, "Executing tap and hold action %d",
+			int(m_oneFingerTapAndHoldAction));
+		switch(m_oneFingerTapAndHoldAction) {
+		case int(view::TouchTapAndHoldAction::ColorPickMode):
+			if(m_allowColorPick) {
+				m_touchHeld = true;
+				emit touchColorPicked(m_touchState.currentCenter());
+			}
+			break;
+		default:
+			qCWarning(
+				lcDpTouchHandler, "Unknown one finger tap and hold action %d",
+				m_oneFingerTapAndHoldAction);
+			break;
+		}
+	} else {
+		qCDebug(lcDpTouchHandler, "Not executing tap and hold");
+	}
+}
+
+void TouchHandler::flushTouchDrawBuffer()
+{
+	flushTouchDrawPoints(m_touchDrawBuffer, m_touchGlobalPos, false);
+}
+
+void TouchHandler::flushDelayedTouchDrawBuffer()
+{
+	flushTouchDrawPoints(
+		m_delayedTouchDrawBuffer, m_delayedTouchGlobalPos, true);
+}
+
+void TouchHandler::flushTouchDrawPoints(
+	QVector<TouchDrawPoint> &buffer, const QPoint &globalPos, bool releaseLast)
+{
+	int bufferCount = buffer.size();
+	qCDebug(
+		lcDpTouchHandler, "Flush touch draw buffer with %d point(s)",
+		bufferCount);
+
+	// For flushing delayed touch points after waiting for a double-tap, we take
+	// off the last point that gets handles specially.
+	if(releaseLast) {
+		--bufferCount;
+	}
+
+	if(bufferCount > 0) {
+		const TouchDrawPoint &press = buffer.first();
+		Q_EMIT touchPressed(
+			nullptr, press.timeMsec, press.posf, globalPos, press.pressure);
+
+		for(int i = 0; i < bufferCount; ++i) {
+			const TouchDrawPoint &move = buffer[i];
+			Q_EMIT touchMoved(move.timeMsec, move.posf, move.pressure);
+		}
+
+		if(releaseLast) {
+			const TouchDrawPoint &release = buffer[bufferCount];
+			Q_EMIT touchReleased(release.timeMsec, release.posf);
+		}
+
+		buffer.clear();
+	}
+}
+
+void TouchHandler::handleOneFingerTapWith(TouchDrawPoint *releasePointOrNull)
+{
+	if(haveOneFingerDoubleTapAction()) {
+		m_delayedTouchDrawBuffer.clear();
+		if(m_awaitingOneFingerDoubleTap) {
+			qCDebug(lcDpTouchHandler, "Executing one-finger double tap");
+			m_awaitingOneFingerDoubleTap = false;
+			stopMultiTapTimer();
+			emitOneFingerDoubleTapAction();
+		} else {
+			qCDebug(lcDpTouchHandler, "Awaiting one-finger double tap");
+			m_awaitingOneFingerDoubleTap = true;
+			if(releasePointOrNull && !haveOneFingerTapAction()) {
+				m_delayedTouchGlobalPos = m_touchGlobalPos;
+				m_delayedTouchDrawBuffer.swap(m_touchDrawBuffer);
+				m_delayedTouchDrawBuffer.append(*releasePointOrNull);
+			}
+			startMultiTapTimer();
+		}
+	} else {
+		qCDebug(lcDpTouchHandler, "Executing one-finger single tap");
+		emitOneFingerTapAction();
+	}
+}
+
+void TouchHandler::emitTapAction(int action, const QString &trigger)
+{
+	switch(action) {
+	case int(view::TouchTapAction::Nothing):
+		break;
+	case int(view::TouchTapAction::TriggerAction):
+		if(!trigger.isEmpty()) {
+			Q_EMIT touchTapTriggerActivated(trigger);
+		}
+		break;
+	default:
+		Q_EMIT touchTapActionActivated(action);
+		break;
+	}
+}
+
+void TouchHandler::safeStartTimer(const char *title, QTimer *timer)
+{
+	if(timer) {
+		qCDebug(lcDpTouchHandler, "Start %s timer", title);
+		timer->start();
+	} else {
+		qCWarning(lcDpTouchHandler, "Can't start null %s timer", title);
+	}
+}
+
+void TouchHandler::safeStopTimer(const char *title, QTimer *timer)
+{
+	if(timer) {
+		qCDebug(lcDpTouchHandler, "Stop %s timer", title);
+		timer->stop();
+	} else {
+		// No warning, stopping a null timer is expected.
+	}
+}
+
+void TouchHandler::setUpMultiTapTimer()
+{
+	if(haveOneFingerDoubleTapAction()) {
+		if(!m_multiTapTimer) {
+			m_multiTapTimer = new QTimer(this);
+			m_multiTapTimer->setTimerType(Qt::CoarseTimer);
+			m_multiTapTimer->setSingleShot(true);
+			m_multiTapTimer->setInterval(MULTI_TAP_DELAY_MS);
+			connect(
+				m_multiTapTimer, &QTimer::timeout, this,
+				&TouchHandler::flushBufferedOneFingerSingleTap);
+		}
+	} else {
+		delete m_multiTapTimer;
+		m_multiTapTimer = nullptr;
+	}
+}
+
+bool TouchHandler::haveOneFingerTapAndHoldAction() const
+{
+	return m_oneFingerTapAndHoldAction !=
+		   int(view::TouchTapAndHoldAction::Nothing);
+}
+
+bool TouchHandler::haveTapAction(int action, const QString &trigger)
+{
+	switch(action) {
+	case int(view::TouchTapAction::Nothing):
+		return false;
+	case int(view::TouchTapAction::TriggerAction):
+		return !trigger.isEmpty();
+	default:
+		return true;
+	}
+}
+
+bool TouchHandler::shouldExecuteTap(bool cancel, int lastTouchPoints)
+{
+	// Some Android devices eat gestures with more than two fingers
+	// unconditionally, even if the user disables them on the system level.
+#if defined(Q_OS_ANDROID) || defined(__EMSCRIPTEN__)
+	if(lastTouchPoints > 2) {
+		return true;
+	}
+#else
+	Q_UNUSED(lastTouchPoints);
+#endif
+	return !cancel;
+}
+
+}

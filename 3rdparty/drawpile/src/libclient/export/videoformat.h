@@ -1,0 +1,68 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+#ifndef LIBCLIENT_EXPORT_VIDEOFORMAT_H
+#define LIBCLIENT_EXPORT_VIDEOFORMAT_H
+#include <QString>
+#include <QVector>
+
+enum class VideoFormat {
+	Frames,
+	Zip,
+	Gif,
+	Webp,
+	Mp4Vp9,
+	WebmVp8,
+	Mp4H264,
+	Mp4Av1,
+	Apng,
+	SpriteSheet,
+	Last = SpriteSheet,
+};
+
+enum class VideoFormatApplication {
+	Animation,
+	Timelapse,
+};
+
+struct VideoFormatOption {
+	VideoFormat format;
+	QString title;
+	bool ffmpegSupported;
+	bool nonFfmpegSupported;
+
+	bool isOnlyFfmpegSupported() const
+	{
+		return !nonFfmpegSupported && ffmpegSupported;
+	}
+};
+
+struct VideoEncoderOption {
+	QString key;
+	QString title;
+	int internalType;
+};
+
+struct SpritesheetDimensions {
+	long long cols;
+	long long rows;
+	long long spriteWidth;
+	long long spriteHeight;
+	long long sheetWidth;
+	long long sheetHeight;
+};
+
+bool isVideoFormatSupportedFfmpeg(VideoFormat format);
+
+bool isVideoFormatSupportedNonFfmpeg(VideoFormat format);
+
+QVector<VideoFormatOption> getVideoFormatOptions(
+	VideoFormatApplication application, bool *outAnyFfmpegSupported);
+
+QVector<VideoEncoderOption> getVideoEncoderOptions(VideoFormat format);
+
+int getAutomaticVideoEncoderOptionIndex(
+	const QVector<VideoEncoderOption> &options, bool haveFfmpeg);
+
+SpritesheetDimensions
+getSpritesheetDimensions(int width, int height, int frameCount);
+
+#endif

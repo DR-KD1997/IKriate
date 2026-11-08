@@ -1,0 +1,189 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+extern "C" {
+#include <dpimpex/save.h>
+}
+#include "libclient/canvas/paintengine.h"
+#include "libclient/drawdance/annotation.h"
+#include "libclient/drawdance/global.h"
+#include "libclient/export/canvassaverrunnable.h"
+#include "libclient/io/files.h"
+#include "libclient/utils/annotations.h"
+#include <QElapsedTimer>
+#include <QPainter>
+#include <QRandomGenerator>
+#ifdef Q_OS_ANDROID
+#	include <QDateTime>
+#	include <QDir>
+#	include <QFile>
+#endif
+
+CanvasSaverRunnable::CanvasSaverRunnable(
+	const drawdance::CanvasState &canvasState, DP_SaveImageType type,
+	const QString &path, const canvas::PaintEngine *paintEngine,
+	QObject *parent)
+	: QObject(parent)
+	, m_canvasState(canvasState)
+	, m_type(type)
+	, m_path(path)
+{
+	if(paintEngine && DP_save_image_type_is_flat_image(type)) {
+		m_vmb = new drawdance::ViewModeBuffer;
+		m_vmf = paintEngine->viewModeFilter(*m_vmb, m_canvasState);
+	}
+}
+
+CanvasSaverRunnable::~CanvasSaverRunnable()
+{
+	delete m_vmb;
+}
+
+void CanvasSaverRunnable::run()
+{
+	QElapsedTimer timer;
+	timer.start();
+
+#ifdef Q_OS_ANDROID
+	// Android doesn't support QSaveFile and KArchive doesn't support the
+	// Truncate mode required on Android to not leave potential garbage at the
+	// end of the file written to, so we have to jigger this stuff ourselves.
+	QString tempPath =
+		QDir::temp().filePath(QStringLiteral("save_%1_%2")
+								  .arg(QDateTime::currentMSecsSinceEpoch())
+								  .arg(QRandomGenerator::global()->generate()));
+	QByteArray pathBytes = tempPath.toUtf8();
+#else
+	QByteArray pathBytes = m_path.toUtf8();
+#endif
+
+	const char *path = pathBytes.constData();
+	drawdance::DrawContext dc = drawdance::DrawContextPool::acquire();
+	DP_SaveResult result = DP_save(
+		m_canvasState.get(), dc.get(), m_type, path, m_vmb ? &m_vmf : nullptr,
+		bakeAnnotation, this);
+
+#ifdef Q_OS_ANDROID
+	QFile tempFile(tempPath);
+	if(result == DP_SAVE_RESULT_SUCCESS) {
+		result = copyToTargetFile(tempFile);
+	}
+	if(!tempFile.remove()) {
+		qWarning(
+			"Error removing temporary file '%s': %s", path,
+			qUtf8Printable(tempFile.errorString()));
+	}
+#endif
+
+	switch(result) {
+	case DP_SAVE_RESULT_SUCCESS:
+		Q_EMIT saveSucceeded(timer.elapsed());
+		break;
+	case DP_SAVE_RESULT_CANCEL:
+		Q_EMIT saveCancelled();
+		break;
+	default:
+		Q_EMIT saveFailed(saveResultToErrorString(result, m_type));
+		break;
+	}
+}
+
+QString CanvasSaverRunnable::saveResultToErrorString(
+	DP_SaveResult result, DP_SaveImageType type)
+{
+	switch(result) {
+	case DP_SAVE_RESULT_SUCCESS:
+	case DP_SAVE_RESULT_CANCEL:
+		return QString{};
+	case DP_SAVE_RESULT_BAD_ARGUMENTS:
+		return tr("Bad arguments, this is probably a bug in Drawpile.");
+	case DP_SAVE_RESULT_BAD_DIMENSIONS:
+		return badDimensionsErrorString(
+			DP_save_image_type_max_dimension(type),
+			QString::fromUtf8(DP_save_image_type_name(type)));
+	case DP_SAVE_RESULT_UNKNOWN_FORMAT:
+		return tr("Unsupported format.");
+	case DP_SAVE_RESULT_FLATTEN_ERROR:
+		return tr("Couldn't merge the canvas into a flat image.");
+	case DP_SAVE_RESULT_OPEN_ERROR:
+		return tr("Couldn't open file for writing.");
+	case DP_SAVE_RESULT_WRITE_ERROR:
+		return tr(
+			"Save operation failed, but the file might have been "
+			"partially written.");
+	case DP_SAVE_RESULT_INTERNAL_ERROR:
+		return tr("Internal error during saving.");
+	}
+	return tr("Unknown error.");
+}
+
+QString CanvasSaverRunnable::badDimensionsErrorString(
+	int maxDimension, const QString &format)
+{
+	//: %1 is a number and %2 is a file format. For example, the message
+	//: will say "…must be between 1 and 65535 for JPEG."
+	return tr("Canvas size out of bounds, width and height must be between 1 "
+			  "and %1 for %2.")
+		.arg(QString::number(maxDimension), format);
+}
+
+
+bool CanvasSaverRunnable::copyFileContents(
+	QFileDevice &sourceFile, QFileDevice &targetFile)
+{
+	QString error;
+	if(io::copyFileContents(sourceFile, targetFile, error)) {
+		return true;
+	} else {
+		QByteArray errorBytes = error.toUtf8();
+		DP_error_set_string(
+			errorBytes.constData(), size_t(errorBytes.length()));
+		return false;
+	}
+}
+
+bool CanvasSaverRunnable::bakeAnnotation(
+	void *user, DP_Annotation *a, unsigned char *out)
+{
+	Q_UNUSED(user);
+	drawdance::Annotation annotation = drawdance::Annotation::inc(a);
+	QImage img(
+		out, annotation.width(), annotation.height(),
+		QImage::Format_ARGB32_Premultiplied);
+	img.fill(0);
+	QPainter painter(&img);
+	utils::paintAnnotation(
+		&painter, annotation.size(), annotation.backgroundColor(),
+		annotation.text(), annotation.alias(), annotation.valign());
+	return true;
+}
+
+#ifdef Q_OS_ANDROID
+DP_SaveResult CanvasSaverRunnable::copyToTargetFile(QFile &tempFile) const
+{
+	if(!tempFile.open(QIODevice::ReadOnly)) {
+		DP_error_set(
+			"Error opening temp file '%s': %s",
+			qUtf8Printable(tempFile.fileName()),
+			qUtf8Printable(tempFile.errorString()));
+		return DP_SAVE_RESULT_OPEN_ERROR;
+	}
+
+	QFile targetFile(m_path);
+	if(!targetFile.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
+		DP_error_set(
+			"Error opening target file '%s': %s",
+			qUtf8Printable(targetFile.fileName()),
+			qUtf8Printable(targetFile.errorString()));
+		tempFile.close();
+		return DP_SAVE_RESULT_OPEN_ERROR;
+	}
+
+	bool copyOk = copyFileContents(tempFile, targetFile);
+	tempFile.close();
+	targetFile.close();
+	if(copyOk) {
+		return DP_SAVE_RESULT_SUCCESS;
+	} else {
+		return DP_SAVE_RESULT_WRITE_ERROR;
+	}
+}
+#endif

@@ -1,0 +1,77 @@
+#[[
+This module defines versions and other similar constants that are used
+throughout the project.
+#]]
+
+set(DRAWPILE_PROTO_DEFAULT_PORT 27750)
+set(DRAWPILE_WEBADMIN_DEFAULT_PORT 27780)
+set(DRAWPILE_WEBSOCKET_DEFAULT_PORT 27751)
+
+set(semver_regexp "([0-9]+\\.[0-9]+\\.[0-9]+)((-[A-Za-z0-9.-]*)?(\\+[A-Za-z0-9.-]*)?)")
+
+include(GitVersion)
+git_version_describe(dp_version)
+if(dp_version MATCHES "^v?${semver_regexp}")
+	set(PROJECT_VERSION ${CMAKE_MATCH_1})
+	set(PROJECT_VERSION_LABEL ${CMAKE_MATCH_2})
+else()
+	file(STRINGS Cargo.toml dp_version LIMIT_COUNT 1 REGEX "^version[ \t]*=[ \t]*\"[^\"]*\"$")
+	if(dp_version MATCHES "^version[ \t]*=[ \t]*\"${semver_regexp}\"")
+		set(PROJECT_VERSION ${CMAKE_MATCH_1})
+		set(PROJECT_VERSION_LABEL ${CMAKE_MATCH_2})
+	else()
+		message(FATAL_ERROR "Invalid version in Cargo.toml")
+	endif()
+endif()
+unset(dp_version)
+
+set(dp_proto_regex "^[ \t]*version:[ \t]*\"?dp:([0-9]+)\\.([0-9]+)\\.([0-9]+)\"?$")
+file(STRINGS src/drawdance/generators/protogen/protocol.yaml dp_proto_version LIMIT_COUNT 1 REGEX ${dp_proto_regex})
+if(dp_proto_version MATCHES ${dp_proto_regex})
+	set(DRAWPILE_PROTO_SERVER_VERSION ${CMAKE_MATCH_1})
+	set(DRAWPILE_PROTO_MAJOR_VERSION ${CMAKE_MATCH_2})
+	set(DRAWPILE_PROTO_MINOR_VERSION ${CMAKE_MATCH_3})
+else()
+	message(FATAL_ERROR "Invalid protocol.yaml")
+endif()
+
+unset(semver_regexp)
+
+function(calculate_android_version_code out_var version abi_name)
+	if(version MATCHES "^([0-9]+)\\.([0-9]+)\\.([0-9]+)")
+		set(server "${CMAKE_MATCH_1}")
+		set(major "${CMAKE_MATCH_2}")
+		set(minor "${CMAKE_MATCH_3}")
+
+		if(version MATCHES "-beta\\.([0-9]+)")
+			set(beta "${CMAKE_MATCH_1}")
+		else()
+			set(beta 99)
+		endif()
+
+		if(version MATCHES "-fix\\.([0-9]+)")
+			set(fix "${CMAKE_MATCH_1}")
+		else()
+			set(fix 0)
+		endif()
+
+		if(abi_name STREQUAL "armeabi-v7a")
+			set(abi 1)
+		elseif(abi_name STREQUAL "arm64-v8a")
+			set(abi 2)
+		elseif(abi_name STREQUAL "x86")
+			set(abi 3)
+		elseif(abi_name STREQUAL "x86_64")
+			set(abi 4)
+		else()
+			message(WARNING "Unknown version code for ABI '${abi_name}'")
+			set(abi 0)
+		endif()
+
+		math(EXPR vercode "${server} * 1000000000 + ${major} * 10000000 + ${minor} * 100000 + ${beta} * 1000 + ${fix} * 10 + ${abi}")
+	else()
+		message(WARNING "Unable to determine version code from '${version}'")
+		set(vercode 0)
+	endif()
+	set("${out_var}" "${vercode}" PARENT_SCOPE)
+endfunction()

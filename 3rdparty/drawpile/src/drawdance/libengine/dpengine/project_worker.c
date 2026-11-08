@@ -1,0 +1,1449 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "project_worker.h"
+#include "canvas_state.h"
+#include "image.h"
+#include "project.h"
+#include "save_enums.h"
+#include "view_state.h"
+#include <dpcommon/common.h>
+#include <dpcommon/conversions.h>
+#include <dpcommon/queue.h>
+#include <dpcommon/threading.h>
+#include <dpcommon/timing.h>
+#include <dpmsg/message.h>
+
+#ifdef DP_PROJECT_WORKER_DEBUG_ENABLED
+#    define DP_PROJECT_WORKER_DEBUG(...)               \
+        do {                                           \
+            DP_debug("[project worker] " __VA_ARGS__); \
+        } while (0)
+
+static const char *debug_str(const char *s)
+{
+    if (s) {
+        return s;
+    }
+    else {
+        return "";
+    }
+}
+#else
+#    define DP_PROJECT_WORKER_DEBUG(...) \
+        do {                             \
+            /* nothing */                \
+        } while (0)
+#endif
+
+
+struct DP_ProjectWorker {
+    DP_ProjectWorkerHandleEventFn handle_event_fn;
+    DP_ProjectWorkerThumbWriteFn thumb_write_fn;
+    void *user;
+    DP_Mutex *mutex;
+    DP_Semaphore *sem;
+    DP_Thread *thread;
+    DP_Project *prj;
+    DP_ProjectPlayer *pp;
+    DP_ProjectSessionTimes pst;
+    unsigned int last_file_id;
+    unsigned int open_file_id;
+    char *continue_source_param;
+    long long continue_sequence_id;
+    long long open_snapshot_id;
+    size_t accumulated_size;
+    DP_Queue queue;
+};
+
+typedef enum DP_ProjectWorkerCommandType {
+    DP_PROJECT_WORKER_COMMAND_SYNC,
+    DP_PROJECT_WORKER_COMMAND_OPEN,
+    DP_PROJECT_WORKER_COMMAND_CLOSE,
+    DP_PROJECT_WORKER_COMMAND_SESSION_OPEN,
+    DP_PROJECT_WORKER_COMMAND_SESSION_RESUME,
+    DP_PROJECT_WORKER_COMMAND_SESSION_CLOSE,
+    DP_PROJECT_WORKER_COMMAND_MESSAGE_RECORD,
+    DP_PROJECT_WORKER_COMMAND_MESSAGE_INTERNAL_RECORD,
+    DP_PROJECT_WORKER_COMMAND_MESSAGE_VIEW_STATE_RECORD,
+    DP_PROJECT_WORKER_COMMAND_SNAPSHOT_OPEN,
+    DP_PROJECT_WORKER_COMMAND_SNAPSHOT_MESSAGE_RECORD,
+    DP_PROJECT_WORKER_COMMAND_SNAPSHOT_VIEW_STATE_RECORD,
+    DP_PROJECT_WORKER_COMMAND_SNAPSHOT_FINISH,
+    DP_PROJECT_WORKER_COMMAND_THUMBNAIL_MAKE,
+    DP_PROJECT_WORKER_COMMAND_SESSION_TIMES_UPDATE,
+    DP_PROJECT_WORKER_COMMAND_SAVE,
+    DP_PROJECT_WORKER_COMMAND_INFO,
+    DP_PROJECT_WORKER_COMMAND_PLAYER_PREPARE,
+    DP_PROJECT_WORKER_COMMAND_PLAYER_CONTROL,
+} DP_ProjectWorkerCommandType;
+
+typedef struct DP_ProjectWorkerCommand {
+    DP_ProjectWorkerCommandType type;
+    union {
+        struct {
+            DP_ProjectWorkerSyncFn fn;
+            void *user;
+        } sync;
+        struct {
+            char *path;
+            char *continue_source_param;
+            long long continue_sequence_id;
+            unsigned int flags;
+            unsigned int file_id;
+        } open;
+        struct {
+            unsigned int file_id;
+        } close;
+        struct {
+            char *source_param;
+            char *protocol;
+            int source_type;
+            unsigned int flags;
+            unsigned int file_id;
+        } session_open;
+        struct {
+            char *protocol;
+            long long session_id;
+            unsigned int file_id;
+        } session_resume;
+        struct {
+            unsigned int flags_to_set;
+            unsigned int file_id;
+        } session_close;
+        struct {
+            DP_Message *msg;
+            long long recorded_at_msec;
+            unsigned int flags;
+            unsigned int file_id;
+        } message_record;
+        struct {
+            void *body_or_null;
+            size_t size;
+            long long recorded_at_msec;
+            int type;
+            unsigned int context_id;
+            unsigned int flags;
+            unsigned int file_id;
+        } message_internal_record;
+        struct {
+            DP_ViewState vs;
+            long long recorded_at_msec;
+            unsigned int context_id;
+            unsigned int flags;
+            unsigned int file_id;
+        } message_view_state_record;
+        struct {
+            DP_CanvasState *cs;
+            unsigned int flags;
+            unsigned int file_id;
+        } snapshot_open;
+        struct {
+            DP_Message *msg;
+            long long recorded_at_msec;
+            unsigned int flags;
+            unsigned int file_id;
+        } snapshot_message_record;
+        struct {
+            DP_ViewState vs;
+            long long recorded_at_msec;
+            unsigned int context_id;
+            unsigned int flags;
+            unsigned int file_id;
+        } snapshot_view_state_record;
+        struct {
+            unsigned int file_id;
+            bool discard_other_snapshots;
+        } snapshot_finish;
+        struct {
+            DP_CanvasState *cs;
+            unsigned int file_id;
+        } thumbnail_make;
+        struct {
+            unsigned int file_id;
+        } session_times_update;
+        struct {
+            DP_ProjectWorkerSaveStartFn start_fn;
+            DP_ProjectWorkerSaveFinishFn finish_fn;
+            void *user;
+            DP_CanvasState *cs;
+            unsigned int file_id;
+        } save;
+        struct {
+            void (*callback)(void *, const DP_ProjectInfo *);
+            void *user;
+            unsigned int flags;
+            unsigned int file_id;
+        } info;
+        struct {
+            DP_DrawContext *dc;
+            double max_delta_seconds;
+            long long snapshot_interval;
+            unsigned int file_id;
+        } player_prepare;
+        struct {
+            DP_ProjectPlayerControlParams params;
+            unsigned int file_id;
+        } player_control;
+    };
+} DP_ProjectWorkerCommand;
+
+
+static bool shift_command(DP_Mutex *mutex, DP_Queue *queue,
+                          DP_ProjectWorkerCommand *out_command)
+{
+    DP_MUTEX_MUST_LOCK(mutex);
+    DP_ProjectWorkerCommand *command = DP_queue_peek(queue, sizeof(*command));
+    bool have_command = command != NULL;
+    if (have_command) {
+        *out_command = *command;
+        DP_queue_shift(queue);
+    }
+    DP_MUTEX_MUST_UNLOCK(mutex);
+    return have_command;
+}
+
+static void emit_event(DP_ProjectWorker *pw, DP_ProjectWorkerEvent event)
+{
+    DP_PROJECT_WORKER_DEBUG("emit event %d", (int)event.type);
+    pw->handle_event_fn(pw->user, &event);
+}
+
+static void handle_close(DP_ProjectWorker *pw, unsigned int file_id)
+{
+    unsigned int open_file_id = pw->open_file_id;
+    if (file_id != open_file_id) {
+        DP_warn("Not closing file id %u, currently open is %u", file_id,
+                open_file_id);
+        return;
+    }
+
+    DP_Mutex *mutex = pw->mutex;
+    if (!pw->prj) {
+        DP_warn("No project open for file id %u", file_id);
+        DP_MUTEX_MUST_LOCK(mutex);
+        pw->open_file_id = 0u;
+        DP_free(pw->continue_source_param);
+        pw->continue_source_param = NULL;
+        pw->continue_sequence_id = 0LL;
+        pw->accumulated_size = (size_t)0;
+        DP_MUTEX_MUST_UNLOCK(mutex);
+        return;
+    }
+
+    DP_MUTEX_MUST_LOCK(mutex);
+    DP_Project *prj = pw->prj;
+    pw->prj = NULL;
+    DP_project_player_free(pw->pp);
+    pw->pp = NULL;
+    pw->open_file_id = 0u;
+    DP_free(pw->continue_source_param);
+    pw->continue_source_param = NULL;
+    pw->continue_sequence_id = 0LL;
+    pw->accumulated_size = (size_t)0;
+    DP_MUTEX_MUST_UNLOCK(mutex);
+
+    bool ok = DP_project_close(prj);
+    emit_event(pw, (DP_ProjectWorkerEvent){DP_PROJECT_WORKER_EVENT_CLOSE,
+                                           {.file_id = file_id}});
+    if (!ok) {
+        emit_event(
+            pw, (DP_ProjectWorkerEvent){DP_PROJECT_WORKER_EVENT_CLOSE_ERROR,
+                                        {.error = {file_id, 0, DP_error()}}});
+    }
+}
+
+static void handle_open(DP_ProjectWorker *pw, unsigned int file_id, char *path,
+                        unsigned int flags, char *continue_source_param,
+                        long long continue_sequence_id)
+{
+    if (pw->prj) {
+        unsigned int open_file_id = pw->open_file_id;
+        DP_warn("Project %u already open, closing to open %u '%s'",
+                open_file_id, file_id, path);
+        handle_close(pw, open_file_id);
+    }
+
+    DP_ProjectOpenResult result = DP_project_open(path, flags);
+    free(path);
+
+    if (result.project) {
+        DP_Mutex *mutex = pw->mutex;
+        DP_MUTEX_MUST_LOCK(mutex);
+        pw->prj = result.project;
+        pw->open_file_id = file_id;
+        pw->continue_source_param = continue_source_param;
+        pw->continue_sequence_id = continue_sequence_id;
+        pw->accumulated_size = (size_t)0;
+        DP_MUTEX_MUST_UNLOCK(mutex);
+        emit_event(pw, (DP_ProjectWorkerEvent){DP_PROJECT_WORKER_EVENT_OPEN,
+                                               .file_id = file_id});
+    }
+    else {
+        DP_ASSERT(!pw->prj);
+        DP_ASSERT(pw->open_file_id == 0u);
+        DP_free(continue_source_param);
+        emit_event(pw, (DP_ProjectWorkerEvent){
+                           DP_PROJECT_WORKER_EVENT_OPEN_ERROR,
+                           .error = {file_id, result.error, DP_error()}});
+    }
+}
+
+static void handle_session_open(DP_ProjectWorker *pw, unsigned int file_id,
+                                int source_type, char *source_param,
+                                char *protocol, unsigned int flags)
+{
+    unsigned int open_file_id = pw->open_file_id;
+    if (file_id != open_file_id) {
+        DP_free(source_param);
+        DP_free(protocol);
+        DP_warn("Not opening session on file id %u, currently open is %u",
+                file_id, open_file_id);
+        return;
+    }
+
+    DP_Project *prj = pw->prj;
+    int result = DP_project_session_open(prj, source_type, source_param,
+                                         protocol, flags);
+    DP_free(source_param);
+    DP_free(protocol);
+    if (result == 0) {
+        DP_PROJECT_WORKER_DEBUG("opened session %lld",
+                                DP_project_session_id(prj));
+        pw->pst = DP_project_session_times_null();
+    }
+    else {
+        emit_event(pw, (DP_ProjectWorkerEvent){
+                           DP_PROJECT_WORKER_EVENT_SESSION_OPEN_ERROR,
+                           .error = {file_id, result, DP_error()}});
+    }
+}
+
+static void handle_session_resume(DP_ProjectWorker *pw, unsigned int file_id,
+                                  long long session_id, char *protocol)
+{
+    unsigned int open_file_id = pw->open_file_id;
+    if (file_id != open_file_id) {
+        DP_free(protocol);
+        DP_warn("Not resuming session on file id %u, currently open is %u",
+                file_id, open_file_id);
+        return;
+    }
+
+    DP_Project *prj = pw->prj;
+    int result = DP_project_session_resume(prj, session_id, protocol);
+    DP_free(protocol);
+    if (result == 0) {
+        DP_PROJECT_WORKER_DEBUG("resumed session %lld",
+                                DP_project_session_id(prj));
+        pw->pst = DP_project_session_times_null();
+    }
+    else {
+        emit_event(pw, (DP_ProjectWorkerEvent){
+                           DP_PROJECT_WORKER_EVENT_SESSION_RESUME_ERROR,
+                           .error = {file_id, result, DP_error()}});
+    }
+}
+
+static void handle_session_close(DP_ProjectWorker *pw, unsigned int file_id,
+                                 unsigned int flags_to_set)
+{
+    unsigned int open_file_id = pw->open_file_id;
+    if (file_id != open_file_id) {
+        DP_warn("Not closing session on file id %u, currently open is %u",
+                file_id, open_file_id);
+        return;
+    }
+
+    DP_Project *prj = pw->prj;
+    DP_PROJECT_WORKER_DEBUG("closing session %lld", DP_project_session_id(prj));
+    int result = DP_project_session_close(prj, flags_to_set);
+    if (result != 0) {
+        emit_event(pw, (DP_ProjectWorkerEvent){
+                           DP_PROJECT_WORKER_EVENT_SESSION_CLOSE_ERROR,
+                           .error = {file_id, result, DP_error()}});
+    }
+}
+
+static void report_size_reset(DP_ProjectWorker *pw)
+{
+    pw->accumulated_size = (size_t)0;
+
+    long long page_count;
+    long long page_size;
+    long long free_count;
+    int result = DP_project_size(pw->prj, &page_count, &page_size, &free_count);
+    if (result == 0) {
+        size_t size_in_bytes;
+        if (page_count > 0LL && page_size > 0LL && free_count >= 0LL
+            && free_count <= page_count) {
+            size_in_bytes = DP_llong_to_size(page_count - free_count)
+                          * DP_llong_to_size(page_size);
+        }
+        else {
+            size_in_bytes = (size_t)0;
+        }
+        DP_PROJECT_WORKER_DEBUG(
+            "reporting %zu bytes (%lld pages at %lld bytes)", size_in_bytes,
+            page_count, page_size);
+        emit_event(pw,
+                   (DP_ProjectWorkerEvent){DP_PROJECT_WORKER_EVENT_SIZE_REPORT,
+                                           .size_in_bytes = size_in_bytes});
+    }
+    else {
+        emit_event(pw, (DP_ProjectWorkerEvent){
+                           DP_PROJECT_WORKER_EVENT_SIZE_REPORT_ERROR,
+                           .error = {pw->open_file_id, result, DP_error()}});
+    }
+}
+
+static void check_message_size_limit(DP_ProjectWorker *pw, size_t body_length)
+{
+    // We'll use a kind of arbitrary fixed constant for the fixed fields:
+    // session id, sequence id, recorded at, flags, type, context id. This is
+    // just for guessing the frequency of size checks, so this'll do.
+    size_t message_size = (size_t)32 + body_length;
+    size_t total_size = pw->accumulated_size + message_size;
+    size_t limit_size = (size_t)(1024 * 128);
+    if (total_size < limit_size) {
+        pw->accumulated_size = total_size;
+    }
+    else {
+        report_size_reset(pw);
+    }
+}
+
+static void handle_message_record(DP_ProjectWorker *pw, unsigned int file_id,
+                                  DP_Message *msg, long long recorded_at_msec,
+                                  unsigned int flags)
+{
+    unsigned int open_file_id = pw->open_file_id;
+    if (file_id != open_file_id) {
+        DP_message_decref(msg);
+        DP_warn("Not recording message on file id %u, currently open is %u",
+                file_id, open_file_id);
+        return;
+    }
+
+    size_t body_length;
+    int result = DP_project_message_record(
+        pw->prj, DP_llong_to_double(recorded_at_msec) / 1000.0, msg, flags,
+        &body_length);
+    DP_message_decref(msg);
+    if (result == 0) {
+        check_message_size_limit(pw, body_length);
+    }
+    else {
+        emit_event(pw, (DP_ProjectWorkerEvent){
+                           DP_PROJECT_WORKER_EVENT_MESSAGE_RECORD_ERROR,
+                           .error = {file_id, result, DP_error()}});
+    }
+}
+
+
+static void handle_message_internal_record(DP_ProjectWorker *pw,
+                                           unsigned int file_id, int type,
+                                           unsigned int context_id,
+                                           void *body_or_null, size_t size,
+                                           long long recorded_at_msec,
+                                           unsigned int flags)
+{
+    unsigned int open_file_id = pw->open_file_id;
+    if (file_id != open_file_id) {
+        DP_free(body_or_null);
+        DP_warn("Not recording internal message on file id %u, currently open "
+                "is %u",
+                file_id, open_file_id);
+        return;
+    }
+
+    int result = DP_project_message_internal_record(
+        pw->prj, DP_llong_to_double(recorded_at_msec) / 1000.0, type,
+        context_id, body_or_null, size, flags);
+    DP_free(body_or_null);
+    if (result == 0) {
+        check_message_size_limit(pw, size);
+    }
+    else {
+        emit_event(pw, (DP_ProjectWorkerEvent){
+                           DP_PROJECT_WORKER_EVENT_MESSAGE_RECORD_ERROR,
+                           .error = {file_id, result, DP_error()}});
+    }
+}
+
+static void handle_message_view_state_record(
+    DP_ProjectWorker *pw, unsigned int file_id, unsigned int context_id,
+    const DP_ViewState *vs, long long recorded_at_msec, unsigned int flags)
+{
+    unsigned int open_file_id = pw->open_file_id;
+    if (file_id != open_file_id) {
+        DP_warn("Not recording view state message on file id %u, currently "
+                "open is %u",
+                file_id, open_file_id);
+        return;
+    }
+
+    int result = DP_project_message_view_state_record(
+        pw->prj, DP_llong_to_double(recorded_at_msec) / 1000.0, context_id, vs,
+        flags);
+    if (result == 0) {
+        check_message_size_limit(
+            pw, DP_PROJECT_MESSAGE_INTERNAL_VIEW_STATE_BODY_LENGTH);
+    }
+    else {
+        emit_event(pw, (DP_ProjectWorkerEvent){
+                           DP_PROJECT_WORKER_EVENT_MESSAGE_RECORD_ERROR,
+                           .error = {file_id, result, DP_error()}});
+    }
+}
+
+static void try_discard_snapshot(DP_Project *prj, long long snapshot_id)
+{
+    DP_PROJECT_WORKER_DEBUG("discarding failed snapshot %lld", snapshot_id);
+    int result = DP_project_snapshot_discard(prj, snapshot_id);
+    if (result != 0) {
+        DP_warn("Error %d discarding failed snapshot: %s", result, DP_error());
+    }
+}
+
+static void handle_snapshot_open(DP_ProjectWorker *pw, unsigned int file_id,
+                                 DP_CanvasState *cs, unsigned int flags)
+{
+    unsigned int open_file_id = pw->open_file_id;
+    if (file_id != open_file_id) {
+        DP_canvas_state_decref(cs);
+        DP_warn("Not creating snapshot on file id %u, currently open is %u",
+                file_id, open_file_id);
+        return;
+    }
+
+    DP_Project *prj = pw->prj;
+    long long prev_snapshot_id = pw->open_snapshot_id;
+    if (prev_snapshot_id != 0LL) {
+        DP_warn("Snapshot %lld already open on file id %u, discarding it",
+                prev_snapshot_id, open_file_id);
+        try_discard_snapshot(prj, prev_snapshot_id);
+        pw->open_snapshot_id = 0LL;
+    }
+
+    long long snapshot_id = DP_project_snapshot_open(prj, flags);
+    if (snapshot_id < 0LL) {
+        DP_canvas_state_decref(cs);
+        emit_event(pw, (DP_ProjectWorkerEvent){
+                           DP_PROJECT_WORKER_EVENT_SNAPSHOT_ERROR,
+                           .error = {file_id, DP_llong_to_int(snapshot_id),
+                                     DP_error()}});
+        return;
+    }
+
+    DP_PROJECT_WORKER_DEBUG("creating snapshot %lld", snapshot_id);
+    int result = DP_project_snapshot_canvas(prj, snapshot_id, cs, NULL, NULL);
+    DP_canvas_state_decref(cs);
+
+    if (result == 0) {
+        pw->open_snapshot_id = snapshot_id;
+    }
+    else {
+        try_discard_snapshot(prj, snapshot_id);
+        emit_event(pw, (DP_ProjectWorkerEvent){
+                           DP_PROJECT_WORKER_EVENT_SNAPSHOT_ERROR,
+                           .error = {file_id, result, DP_error()}});
+    }
+}
+
+static void handle_snapshot_message_record(DP_ProjectWorker *pw,
+                                           unsigned int file_id,
+                                           DP_Message *msg,
+                                           long long recorded_at_msec,
+                                           unsigned int flags)
+{
+    unsigned int open_file_id = pw->open_file_id;
+    if (file_id != open_file_id) {
+        DP_message_decref(msg);
+        DP_warn("Not recording snapshot message on file id %u, currently open "
+                "is %u",
+                file_id, open_file_id);
+        return;
+    }
+
+    long long snapshot_id = pw->open_snapshot_id;
+    if (snapshot_id == 0LL) {
+        DP_message_decref(msg);
+        DP_PROJECT_WORKER_DEBUG(
+            "not recording snapshot message file id %u because none is open",
+            file_id);
+        return;
+    }
+
+    int result = DP_project_snapshot_message_record(
+        pw->prj, snapshot_id, DP_llong_to_double(recorded_at_msec) / 1000.0,
+        msg, flags);
+    DP_message_decref(msg);
+    if (result != 0) {
+        emit_event(pw, (DP_ProjectWorkerEvent){
+                           DP_PROJECT_WORKER_EVENT_SNAPSHOT_ERROR,
+                           .error = {file_id, result, DP_error()}});
+    }
+}
+
+static void handle_snapshot_view_state_record(
+    DP_ProjectWorker *pw, unsigned int file_id, unsigned int context_id,
+    const DP_ViewState *vs, long long recorded_at_msec, unsigned int flags)
+{
+    unsigned int open_file_id = pw->open_file_id;
+    if (file_id != open_file_id) {
+        DP_warn("Not recording snapshot view state on file id %u, currently "
+                "open is %u",
+                file_id, open_file_id);
+        return;
+    }
+
+    long long snapshot_id = pw->open_snapshot_id;
+    if (snapshot_id == 0LL) {
+        DP_PROJECT_WORKER_DEBUG(
+            "not recording snapshot view state file id %u because none is open",
+            file_id);
+        return;
+    }
+
+    int result = DP_project_snapshot_view_state_record(
+        pw->prj, snapshot_id, DP_llong_to_double(recorded_at_msec) / 1000.0,
+        context_id, vs, flags);
+    if (result != 0) {
+        emit_event(pw, (DP_ProjectWorkerEvent){
+                           DP_PROJECT_WORKER_EVENT_SNAPSHOT_ERROR,
+                           .error = {file_id, result, DP_error()}});
+    }
+}
+
+static void handle_snapshot_finish(DP_ProjectWorker *pw, unsigned int file_id,
+                                   bool discard_other_snapshots)
+{
+    unsigned int open_file_id = pw->open_file_id;
+    if (file_id != open_file_id) {
+        DP_warn("Not finishing snapshot on file id %u, currently open is %u",
+                file_id, open_file_id);
+        return;
+    }
+
+    long long snapshot_id = pw->open_snapshot_id;
+    if (snapshot_id == 0LL) {
+        DP_PROJECT_WORKER_DEBUG(
+            "not finishing snapshot on file id %u because none is open",
+            file_id);
+        return;
+    }
+
+    DP_PROJECT_WORKER_DEBUG("finishing snapshot %lld", snapshot_id);
+    DP_Project *prj = pw->prj;
+    int finish_result = DP_project_snapshot_finish(pw->prj, snapshot_id);
+    pw->open_snapshot_id = 0LL;
+
+    if (finish_result != 0) {
+        try_discard_snapshot(prj, snapshot_id);
+        emit_event(pw, (DP_ProjectWorkerEvent){
+                           DP_PROJECT_WORKER_EVENT_SNAPSHOT_ERROR,
+                           .error = {file_id, finish_result, DP_error()}});
+        return;
+    }
+
+    if (discard_other_snapshots) {
+        DP_PROJECT_WORKER_DEBUG("discarding all snapshots except %lld",
+                                snapshot_id);
+        int discard_result =
+            DP_project_snapshot_discard_all_except(prj, snapshot_id);
+        if (discard_result < 0) {
+            DP_warn("Failed to discard all snapshots except %lld: %s",
+                    snapshot_id, DP_error());
+        }
+        else {
+            DP_PROJECT_WORKER_DEBUG("discarded %d snapshot(s)", discard_result);
+        }
+    }
+}
+
+static void handle_thumbnail_make(DP_ProjectWorker *pw, unsigned int file_id,
+                                  DP_CanvasState *cs)
+{
+    unsigned int open_file_id = pw->open_file_id;
+    if (file_id != open_file_id) {
+        DP_canvas_state_decref(cs);
+        DP_warn("Not creating snapshot on file id %u, currently open is %u",
+                file_id, open_file_id);
+        return;
+    }
+
+    DP_Image *thumb = DP_image_thumbnail_from_canvas(
+        cs, NULL, DP_PROJECT_THUMBNAIL_SIZE, DP_PROJECT_THUMBNAIL_SIZE);
+    DP_canvas_state_decref(cs);
+
+    bool ok = thumb && pw->thumb_write_fn(pw->user, thumb, NULL);
+    DP_image_free(thumb);
+    if (!ok) {
+        emit_event(pw, (DP_ProjectWorkerEvent){
+                           DP_PROJECT_WORKER_EVENT_THUMBNAIL_MAKE_ERROR,
+                           .error = {file_id, -1, DP_error()}});
+    }
+}
+
+static void handle_session_times_update(DP_ProjectWorker *pw,
+                                        unsigned int file_id)
+{
+    unsigned int open_file_id = pw->open_file_id;
+    if (file_id != open_file_id) {
+        DP_warn(
+            "Not updating session times on file id %u, currently open is %u",
+            file_id, open_file_id);
+        return;
+    }
+
+    int result = DP_project_session_times_update(pw->prj, &pw->pst);
+    if (result == 0) {
+        emit_event(pw, (DP_ProjectWorkerEvent){
+                           DP_PROJECT_WORKER_EVENT_SESSION_TIMES_UPDATE,
+                           .own_work_minutes = pw->pst.own_work_minutes});
+    }
+    else {
+        emit_event(pw, (DP_ProjectWorkerEvent){
+                           DP_PROJECT_WORKER_EVENT_SESSION_TIMES_UPDATE_ERROR,
+                           .error = {file_id, result, DP_error()}});
+    }
+}
+
+int DP_project_save_error_to_save_result(int result)
+{
+    switch (result) {
+    case 0:
+        return (int)DP_SAVE_RESULT_SUCCESS;
+    case DP_PROJECT_SAVE_ERROR_MISUSE:
+        return (int)DP_SAVE_RESULT_BAD_ARGUMENTS;
+    case DP_PROJECT_SAVE_ERROR_NO_SESSION:
+    case DP_PROJECT_SAVE_ERROR_OPEN:
+    case DP_PROJECT_SAVE_ERROR_READ_ONLY:
+    case DP_PROJECT_SAVE_ERROR_SETUP:
+    case DP_PROJECT_SAVE_ERROR_READ_EMPTY:
+    case DP_PROJECT_SAVE_ERROR_HEADER_WRITE:
+    case DP_PROJECT_SAVE_ERROR_HEADER_READ:
+    case DP_PROJECT_SAVE_ERROR_HEADER_MISMATCH:
+    case DP_PROJECT_SAVE_ERROR_MIGRATION:
+        return (int)DP_SAVE_RESULT_OPEN_ERROR;
+    case DP_PROJECT_SAVE_ERROR_LOCKED:
+    case DP_PROJECT_SAVE_ERROR_WRITE:
+        return (int)DP_SAVE_RESULT_WRITE_ERROR;
+    default:
+        return (int)DP_SAVE_RESULT_INTERNAL_ERROR;
+    }
+}
+
+static void handle_save(DP_ProjectWorker *pw, unsigned int file_id,
+                        DP_CanvasState *cs,
+                        DP_ProjectWorkerSaveStartFn start_fn,
+                        DP_ProjectWorkerSaveFinishFn finish_fn, void *user)
+{
+    const char *path = NULL;
+    int start_result = start_fn(user, &path);
+    if (start_result != (int)DP_SAVE_RESULT_SUCCESS) {
+        finish_fn(user, start_result);
+        emit_event(pw, (DP_ProjectWorkerEvent){
+                           DP_PROJECT_WORKER_EVENT_SAVE_ERROR,
+                           .error = {file_id, start_result, DP_error()}});
+        return;
+    }
+
+    DP_PROJECT_WORKER_DEBUG("saving to %s", path ? path : "NULL");
+
+    unsigned int open_file_id = pw->open_file_id;
+    if (file_id != open_file_id) {
+        DP_canvas_state_decref(cs);
+        DP_warn("Not saving file id %u, currently open is %u", file_id,
+                open_file_id);
+        finish_fn(user, (int)DP_SAVE_RESULT_CANCEL);
+        return;
+    }
+
+    int result =
+        DP_project_save(pw->prj, cs, path, 0u, pw->continue_source_param,
+                        pw->continue_sequence_id, pw->thumb_write_fn, pw->user);
+    DP_canvas_state_decref(cs);
+
+    if (finish_fn) {
+        finish_fn(user, DP_project_save_error_to_save_result(result));
+    }
+
+    if (result == 0) {
+        report_size_reset(pw);
+    }
+    else {
+        emit_event(pw, (DP_ProjectWorkerEvent){
+                           DP_PROJECT_WORKER_EVENT_SAVE_ERROR,
+                           .error = {file_id, result, DP_error()}});
+    }
+}
+
+static void handle_info(DP_ProjectWorker *pw, unsigned int file_id,
+                        unsigned int flags,
+                        void (*callback)(void *, const DP_ProjectInfo *),
+                        void *user)
+{
+    unsigned int open_file_id = pw->open_file_id;
+    if (file_id != open_file_id) {
+        DP_warn("Not getting info on file id %u, currently open is %u", file_id,
+                open_file_id);
+        return;
+    }
+
+    int result = DP_project_info(pw->prj, flags, callback, user);
+    if (result == 0) {
+        emit_event(pw,
+                   (DP_ProjectWorkerEvent){DP_PROJECT_WORKER_EVENT_INFO_DONE,
+                                           .file_id = file_id});
+    }
+    else {
+        emit_event(pw, (DP_ProjectWorkerEvent){
+                           DP_PROJECT_WORKER_EVENT_INFO_ERROR,
+                           .error = {file_id, result, DP_error()}});
+    }
+}
+
+static void handle_player_prepare(DP_ProjectWorker *pw, unsigned int file_id,
+                                  DP_DrawContext *dc, double max_delta_seconds,
+                                  long long snapshot_interval)
+{
+    unsigned int open_file_id = pw->open_file_id;
+    if (file_id != open_file_id) {
+        DP_warn("Not preparing player on file id %u, currently open is %u",
+                file_id, open_file_id);
+        return;
+    }
+
+    if (pw->pp) {
+        emit_event(pw, (DP_ProjectWorkerEvent){
+                           DP_PROJECT_WORKER_EVENT_PLAYER_PREPARE_ERROR,
+                           .error = {file_id, DP_PROJECT_PLAYBACK_ERROR_MISUSE,
+                                     "Project player already prepared"}});
+        return;
+    }
+
+    DP_ProjectPlayer *pp = DP_project_player_new(pw->prj, dc);
+    if (!pp) {
+        emit_event(pw, (DP_ProjectWorkerEvent){
+                           DP_PROJECT_WORKER_EVENT_PLAYER_PREPARE_ERROR,
+                           .error = {file_id, DP_PROJECT_PLAYBACK_ERROR_MISUSE,
+                                     DP_error()}});
+        return;
+    }
+
+    int result =
+        DP_project_player_prepare(pp, max_delta_seconds, snapshot_interval);
+    if (result == 0) {
+        pw->pp = pp;
+        emit_event(pw, (DP_ProjectWorkerEvent){
+                           DP_PROJECT_WORKER_EVENT_PLAYER_PREPARE_DONE,
+                           .total_playback_seconds =
+                               DP_project_player_total_playback_seconds(pp)});
+    }
+    else {
+        DP_project_player_free(pp);
+        emit_event(pw, (DP_ProjectWorkerEvent){
+                           DP_PROJECT_WORKER_EVENT_PLAYER_PREPARE_ERROR,
+                           .error = {file_id, result, DP_error()}});
+    }
+}
+
+static void handle_player_control(DP_ProjectWorker *pw, unsigned int file_id,
+                                  const DP_ProjectPlayerControlParams *params)
+{
+    unsigned int open_file_id = pw->open_file_id;
+    if (file_id != open_file_id) {
+        DP_warn("Not controlling player on file id %u, currently open is %u",
+                file_id, open_file_id);
+        return;
+    }
+
+    DP_ProjectPlayer *pp = pw->pp;
+    if (!pp) {
+        emit_event(pw, (DP_ProjectWorkerEvent){
+                           DP_PROJECT_WORKER_EVENT_PLAYER_CONTROL_ERROR,
+                           .error = {file_id, DP_PROJECT_PLAYBACK_ERROR_MISUSE,
+                                     "Project player not prepared"}});
+        return;
+    }
+
+    int result = DP_project_player_control(pp, params);
+    if (result != 0) {
+        emit_event(pw, (DP_ProjectWorkerEvent){
+                           DP_PROJECT_WORKER_EVENT_PLAYER_CONTROL_ERROR,
+                           .error = {file_id, result, DP_error()}});
+    }
+
+    emit_event(
+        pw, (DP_ProjectWorkerEvent){DP_PROJECT_WORKER_EVENT_PLAYER_CONTROL_DONE,
+                                    .control_id = params->control_id});
+}
+
+static void handle_command(DP_ProjectWorker *pw,
+                           const DP_ProjectWorkerCommand *command)
+{
+    switch (command->type) {
+    case DP_PROJECT_WORKER_COMMAND_SYNC:
+        DP_PROJECT_WORKER_DEBUG("handle sync %p", command->sync.user);
+        command->sync.fn(command->sync.user);
+        return;
+    case DP_PROJECT_WORKER_COMMAND_OPEN:
+        DP_PROJECT_WORKER_DEBUG("handle open %u '%s' flags %x",
+                                command->open.file_id, command->open.path,
+                                command->open.flags);
+        handle_open(pw, command->open.file_id, command->open.path,
+                    command->open.flags, command->open.continue_source_param,
+                    command->open.continue_sequence_id);
+        return;
+    case DP_PROJECT_WORKER_COMMAND_CLOSE:
+        DP_PROJECT_WORKER_DEBUG("handle close %u", command->close.file_id);
+        handle_close(pw, command->close.file_id);
+        return;
+    case DP_PROJECT_WORKER_COMMAND_SESSION_OPEN:
+        DP_PROJECT_WORKER_DEBUG("handle session open %u source_type %d "
+                                "source_param '%s' protocol '%s' flags %x",
+                                command->session_open.file_id,
+                                command->session_open.source_type,
+                                debug_str(command->session_open.source_param),
+                                debug_str(command->session_open.protocol),
+                                command->session_open.flags);
+        handle_session_open(pw, command->session_open.file_id,
+                            command->session_open.source_type,
+                            command->session_open.source_param,
+                            command->session_open.protocol,
+                            command->session_open.flags);
+        return;
+    case DP_PROJECT_WORKER_COMMAND_SESSION_RESUME:
+        DP_PROJECT_WORKER_DEBUG(
+            "handle session resume %u protocol '%s' session_id %lld",
+            command->session_resume.file_id,
+            debug_str(command->session_resume.protocol),
+            command->session_resume.session_id);
+        handle_session_resume(pw, command->session_resume.file_id,
+                              command->session_resume.session_id,
+                              command->session_resume.protocol);
+        return;
+    case DP_PROJECT_WORKER_COMMAND_SESSION_CLOSE:
+        DP_PROJECT_WORKER_DEBUG("handle session close %u flags_to_set %x",
+                                command->session_close.file_id,
+                                command->session_close.flags_to_set);
+        handle_session_close(pw, command->session_close.file_id,
+                             command->session_close.flags_to_set);
+        return;
+    case DP_PROJECT_WORKER_COMMAND_MESSAGE_RECORD:
+        DP_PROJECT_WORKER_DEBUG(
+            "handle message record %u type %s context_id %u flags 0x%x",
+            command->message_record.file_id,
+            DP_message_type_enum_name_unprefixed(
+                DP_message_type(command->message_record.msg)),
+            DP_message_context_id(command->message_record.msg),
+            command->message_record.flags);
+        handle_message_record(pw, command->message_record.file_id,
+                              command->message_record.msg,
+                              command->message_record.recorded_at_msec,
+                              command->message_record.flags);
+        return;
+    case DP_PROJECT_WORKER_COMMAND_MESSAGE_INTERNAL_RECORD:
+        DP_PROJECT_WORKER_DEBUG("handle message internal record %u type %d "
+                                "context_id %u flags 0x%x",
+                                command->message_internal_record.file_id,
+                                command->message_internal_record.type,
+                                command->message_internal_record.context_id,
+                                command->message_internal_record.flags);
+        handle_message_internal_record(
+            pw, command->message_internal_record.file_id,
+            command->message_internal_record.type,
+            command->message_internal_record.context_id,
+            command->message_internal_record.body_or_null,
+            command->message_internal_record.size,
+            command->message_internal_record.recorded_at_msec,
+            command->message_internal_record.flags);
+        return;
+    case DP_PROJECT_WORKER_COMMAND_MESSAGE_VIEW_STATE_RECORD:
+        DP_PROJECT_WORKER_DEBUG(
+            "handle message view state record %u context_id %u flags 0x%x",
+            command->message_view_state_record.file_id,
+            command->message_view_state_record.context_id,
+            command->message_view_state_record.flags);
+        handle_message_view_state_record(
+            pw, command->message_view_state_record.file_id,
+            command->message_view_state_record.context_id,
+            &command->message_view_state_record.vs,
+            command->message_view_state_record.recorded_at_msec,
+            command->message_view_state_record.flags);
+        return;
+    case DP_PROJECT_WORKER_COMMAND_SNAPSHOT_OPEN:
+        DP_PROJECT_WORKER_DEBUG("handle snapshot open %u flags 0x%x",
+                                command->snapshot_open.file_id,
+                                command->snapshot_open.flags);
+        handle_snapshot_open(pw, command->snapshot_open.file_id,
+                             command->snapshot_open.cs,
+                             command->snapshot_open.flags);
+        return;
+    case DP_PROJECT_WORKER_COMMAND_SNAPSHOT_MESSAGE_RECORD:
+        DP_PROJECT_WORKER_DEBUG(
+            "handle snapshot message record %u type %s context_id %u flags "
+            "0x%x",
+            command->snapshot_message_record.file_id,
+            DP_message_type_enum_name_unprefixed(
+                DP_message_type(command->snapshot_message_record.msg)),
+            DP_message_context_id(command->snapshot_message_record.msg),
+            command->snapshot_message_record.flags);
+        handle_snapshot_message_record(
+            pw, command->snapshot_message_record.file_id,
+            command->snapshot_message_record.msg,
+            command->snapshot_message_record.recorded_at_msec,
+            command->snapshot_message_record.flags);
+        return;
+    case DP_PROJECT_WORKER_COMMAND_SNAPSHOT_VIEW_STATE_RECORD:
+        DP_PROJECT_WORKER_DEBUG(
+            "handle snapshot view_tate record %u context_id %u flags 0x%x",
+            command->snapshot_view_state_record.file_id,
+            command->snapshot_view_state_record.context_id,
+            command->snapshot_view_state_record.flags);
+        handle_snapshot_view_state_record(
+            pw, command->snapshot_view_state_record.file_id,
+            command->snapshot_view_state_record.context_id,
+            &command->snapshot_view_state_record.vs,
+            command->snapshot_view_state_record.recorded_at_msec,
+            command->snapshot_view_state_record.flags);
+        return;
+    case DP_PROJECT_WORKER_COMMAND_SNAPSHOT_FINISH:
+        DP_PROJECT_WORKER_DEBUG("handle snapshot finish %u",
+                                command->snapshot_finish.file_id);
+        handle_snapshot_finish(
+            pw, command->snapshot_finish.file_id,
+            command->snapshot_finish.discard_other_snapshots);
+        return;
+    case DP_PROJECT_WORKER_COMMAND_THUMBNAIL_MAKE:
+        DP_PROJECT_WORKER_DEBUG("handle thumbnail make %u",
+                                command->thumbnail_make.file_id);
+        handle_thumbnail_make(pw, command->thumbnail_make.file_id,
+                              command->thumbnail_make.cs);
+        return;
+    case DP_PROJECT_WORKER_COMMAND_SESSION_TIMES_UPDATE:
+        DP_PROJECT_WORKER_DEBUG("handle session times update %u",
+                                command->session_times_update.file_id);
+        handle_session_times_update(pw, command->session_times_update.file_id);
+        return;
+    case DP_PROJECT_WORKER_COMMAND_SAVE:
+        DP_PROJECT_WORKER_DEBUG("handle save %u", command->save.file_id);
+        handle_save(pw, command->save.file_id, command->save.cs,
+                    command->save.start_fn, command->save.finish_fn,
+                    command->save.user);
+        return;
+    case DP_PROJECT_WORKER_COMMAND_INFO:
+        DP_PROJECT_WORKER_DEBUG("handle info %u flags 0x%x",
+                                command->info.file_id, command->info.flags);
+        handle_info(pw, command->info.file_id, command->info.flags,
+                    command->info.callback, command->info.user);
+        return;
+    case DP_PROJECT_WORKER_COMMAND_PLAYER_PREPARE:
+        DP_PROJECT_WORKER_DEBUG("handle project player prepare %u max delta "
+                                "seconds %f snapshot interval %lld",
+                                command->player_prepare.file_id,
+                                command->player_prepare.max_delta_seconds,
+                                command->player_prepare.snapshot_interval);
+        handle_player_prepare(pw, command->player_prepare.file_id,
+                              command->player_prepare.dc,
+                              command->player_prepare.max_delta_seconds,
+                              command->player_prepare.snapshot_interval);
+        return;
+    case DP_PROJECT_WORKER_COMMAND_PLAYER_CONTROL:
+        DP_PROJECT_WORKER_DEBUG("handle project player control %u type %d ",
+                                command->player_control.file_id,
+                                (int)command->player_control.params.type);
+        handle_player_control(pw, command->player_control.file_id,
+                              &command->player_control.params);
+        return;
+    }
+    DP_warn("Unhandled project worker command %d", (int)command->type);
+}
+
+static void run_worker(void *user)
+{
+    DP_PROJECT_WORKER_DEBUG("starting");
+    DP_ProjectWorker *pw = user;
+    DP_Mutex *mutex = pw->mutex;
+    DP_Semaphore *sem = pw->sem;
+    DP_Queue *queue = &pw->queue;
+    while (true) {
+        DP_SEMAPHORE_MUST_WAIT(sem);
+        DP_ProjectWorkerCommand command;
+        if (shift_command(mutex, queue, &command)) {
+            handle_command(pw, &command);
+        }
+        else {
+            break;
+        }
+    }
+    DP_PROJECT_WORKER_DEBUG("exiting");
+}
+
+
+static void push_command(DP_ProjectWorker *pw, DP_ProjectWorkerCommand command)
+{
+    DP_Mutex *mutex = pw->mutex;
+    DP_MUTEX_MUST_LOCK(mutex);
+    *(DP_ProjectWorkerCommand *)DP_queue_push(&pw->queue, sizeof(command)) =
+        command;
+    DP_MUTEX_MUST_UNLOCK(mutex);
+    DP_SEMAPHORE_MUST_POST(pw->sem);
+}
+
+
+DP_ProjectWorker *
+DP_project_worker_new(DP_ProjectWorkerHandleEventFn handle_event_fn,
+                      DP_ProjectWorkerThumbWriteFn thumb_write_fn, void *user)
+{
+    DP_ASSERT(handle_event_fn);
+
+    DP_Mutex *mutex = DP_mutex_new();
+    if (!mutex) {
+        return NULL;
+    }
+
+    DP_Semaphore *sem = DP_semaphore_new(0);
+    if (!sem) {
+        DP_mutex_free(mutex);
+        return NULL;
+    }
+
+    DP_ProjectWorker *pw = DP_malloc(sizeof(*pw));
+    *pw = (DP_ProjectWorker){
+        handle_event_fn,
+        thumb_write_fn,
+        user,
+        mutex,
+        sem,
+        NULL,
+        NULL,
+        NULL,
+        DP_project_session_times_null(),
+        0u,
+        0u,
+        NULL,
+        0LL,
+        0LL,
+        (size_t)0,
+        DP_QUEUE_NULL,
+    };
+    DP_queue_init(&pw->queue, 1024, sizeof(DP_ProjectWorkerCommand));
+
+    DP_PROJECT_WORKER_DEBUG("spawn");
+    pw->thread = DP_thread_new(run_worker, pw);
+    if (!pw->thread) {
+        DP_queue_dispose(&pw->queue);
+        DP_free(pw);
+        DP_semaphore_free(sem);
+        DP_mutex_free(mutex);
+        return NULL;
+    }
+
+    return pw;
+}
+
+void DP_project_worker_free_join(DP_ProjectWorker *pw)
+{
+    if (pw) {
+        DP_PROJECT_WORKER_DEBUG("join");
+        DP_SEMAPHORE_MUST_POST(pw->sem);
+        DP_thread_free_join(pw->thread);
+        DP_PROJECT_WORKER_DEBUG("free");
+        DP_queue_dispose(&pw->queue);
+        DP_semaphore_free(pw->sem);
+        DP_mutex_free(pw->mutex);
+        DP_project_player_free(pw->pp);
+
+        DP_Project *prj = pw->prj;
+        if (prj) {
+            if (!DP_project_close(prj)) {
+                DP_warn("Failed to close project on free: %s", DP_error());
+            }
+            emit_event(pw,
+                       (DP_ProjectWorkerEvent){DP_PROJECT_WORKER_EVENT_CLOSE,
+                                               {.file_id = pw->last_file_id}});
+        }
+
+        DP_free(pw->continue_source_param);
+        DP_free(pw);
+    }
+}
+
+void DP_project_worker_sync(DP_ProjectWorker *pw, DP_ProjectWorkerSyncFn fn,
+                            void *user)
+{
+    DP_ASSERT(pw);
+    DP_PROJECT_WORKER_DEBUG("push sync %u", sync_id);
+    push_command(pw, (DP_ProjectWorkerCommand){DP_PROJECT_WORKER_COMMAND_SYNC,
+                                               {.sync = {fn, user}}});
+}
+
+unsigned int DP_project_worker_open(DP_ProjectWorker *pw, const char *path,
+                                    unsigned int flags,
+                                    const char *continue_source_param,
+                                    long long continue_sequence_id)
+{
+    DP_ASSERT(pw);
+    DP_ASSERT(path);
+    unsigned int file_id = ++pw->last_file_id;
+    if (file_id == 0) { // In case someone manages to open UINT_MAX files.
+        file_id = ++pw->last_file_id;
+    }
+    DP_PROJECT_WORKER_DEBUG("push open %u %s %s %lld", file_id, path,
+                            continue_source_param ? continue_source_param : "",
+                            continue_sequence_id);
+    push_command(
+        pw, (DP_ProjectWorkerCommand){
+                DP_PROJECT_WORKER_COMMAND_OPEN,
+                {.open = {DP_strdup(path), DP_strdup(continue_source_param),
+                          continue_sequence_id, flags, file_id}}});
+    return file_id;
+}
+
+void DP_project_worker_close(DP_ProjectWorker *pw, unsigned int file_id)
+{
+    DP_PROJECT_WORKER_DEBUG("push close %u", file_id);
+    push_command(pw, (DP_ProjectWorkerCommand){DP_PROJECT_WORKER_COMMAND_CLOSE,
+                                               .close = {file_id}});
+}
+
+void DP_project_worker_session_open(DP_ProjectWorker *pw, unsigned int file_id,
+                                    int source_type, const char *source_param,
+                                    const char *protocol, unsigned int flags)
+{
+    DP_ASSERT(pw);
+    push_command(
+        pw, (DP_ProjectWorkerCommand){
+                DP_PROJECT_WORKER_COMMAND_SESSION_OPEN,
+                .session_open = {DP_strdup(source_param), DP_strdup(protocol),
+                                 source_type, flags, file_id}});
+}
+
+void DP_project_worker_session_resume(DP_ProjectWorker *pw,
+                                      unsigned int file_id,
+                                      long long session_id,
+                                      const char *protocol)
+{
+    DP_ASSERT(pw);
+    push_command(
+        pw, (DP_ProjectWorkerCommand){
+                DP_PROJECT_WORKER_COMMAND_SESSION_RESUME,
+                .session_resume = {DP_strdup(protocol), session_id, file_id}});
+}
+
+void DP_project_worker_session_close(DP_ProjectWorker *pw, unsigned int file_id,
+                                     unsigned int flags_to_set)
+{
+    DP_ASSERT(pw);
+    push_command(pw, (DP_ProjectWorkerCommand){
+                         DP_PROJECT_WORKER_COMMAND_SESSION_CLOSE,
+                         .session_close = {flags_to_set, file_id}});
+}
+
+long long DP_project_worker_time_msec(void)
+{
+    return DP_time_unix_msec();
+}
+
+void DP_project_worker_message_record_noinc(DP_ProjectWorker *pw,
+                                            unsigned int file_id,
+                                            DP_Message *msg, unsigned int flags,
+                                            long long recorded_at_msec)
+{
+    DP_ASSERT(pw);
+    DP_ASSERT(msg);
+    push_command(
+        pw, (DP_ProjectWorkerCommand){
+                DP_PROJECT_WORKER_COMMAND_MESSAGE_RECORD,
+                .message_record = {msg, recorded_at_msec, flags, file_id}});
+}
+
+void DP_project_worker_message_record_inc(DP_ProjectWorker *pw,
+                                          unsigned int file_id, DP_Message *msg,
+                                          unsigned int flags,
+                                          long long recorded_at_msec)
+{
+    DP_ASSERT(pw);
+    DP_ASSERT(msg);
+    DP_project_worker_message_record_noinc(pw, file_id, DP_message_incref(msg),
+                                           flags, recorded_at_msec);
+}
+
+void DP_project_worker_message_internal_record(DP_ProjectWorker *pw,
+                                               unsigned int file_id, int type,
+                                               unsigned int context_id,
+                                               void *body_or_null, size_t size,
+                                               unsigned int flags,
+                                               long long recorded_at_msec)
+{
+    DP_ASSERT(pw);
+    push_command(pw, (DP_ProjectWorkerCommand){
+                         DP_PROJECT_WORKER_COMMAND_MESSAGE_INTERNAL_RECORD,
+                         .message_internal_record = {
+                             body_or_null, size, recorded_at_msec, type,
+                             context_id, flags, file_id}});
+}
+
+void DP_project_worker_message_view_state_record(
+    DP_ProjectWorker *pw, unsigned int file_id, unsigned int context_id,
+    const DP_ViewState *vs, unsigned int flags, long long recorded_at_msec)
+{
+    DP_ASSERT(pw);
+    DP_ASSERT(vs);
+    push_command(
+        pw, (DP_ProjectWorkerCommand){
+                DP_PROJECT_WORKER_COMMAND_MESSAGE_VIEW_STATE_RECORD,
+                .message_view_state_record = {*vs, recorded_at_msec, context_id,
+                                              flags, file_id}});
+}
+
+void DP_project_worker_snapshot_open_noinc(DP_ProjectWorker *pw,
+                                           unsigned int file_id,
+                                           DP_CanvasState *cs,
+                                           unsigned int flags)
+{
+    DP_ASSERT(pw);
+    DP_ASSERT(cs);
+    push_command(
+        pw, (DP_ProjectWorkerCommand){DP_PROJECT_WORKER_COMMAND_SNAPSHOT_OPEN,
+                                      .snapshot_open = {cs, flags, file_id}});
+}
+
+void DP_project_worker_snapshot_open_inc(DP_ProjectWorker *pw,
+                                         unsigned int file_id,
+                                         DP_CanvasState *cs, unsigned int flags)
+{
+    DP_ASSERT(pw);
+    DP_ASSERT(cs);
+    DP_project_worker_snapshot_open_noinc(pw, file_id,
+                                          DP_canvas_state_incref(cs), flags);
+}
+
+void DP_project_worker_snapshot_message_record_noinc(DP_ProjectWorker *pw,
+                                                     unsigned int file_id,
+                                                     DP_Message *msg,
+                                                     unsigned int flags)
+{
+    DP_ASSERT(pw);
+    DP_ASSERT(msg);
+    push_command(pw, (DP_ProjectWorkerCommand){
+                         DP_PROJECT_WORKER_COMMAND_SNAPSHOT_MESSAGE_RECORD,
+                         .snapshot_message_record = {msg, DP_time_unix_msec(),
+                                                     flags, file_id}});
+}
+
+void DP_project_worker_snapshot_view_state_record(DP_ProjectWorker *pw,
+                                                  unsigned int file_id,
+                                                  unsigned int context_id,
+                                                  const DP_ViewState *vs,
+                                                  unsigned int flags)
+{
+    DP_ASSERT(pw);
+    DP_ASSERT(vs);
+    push_command(
+        pw, (DP_ProjectWorkerCommand){
+                DP_PROJECT_WORKER_COMMAND_SNAPSHOT_VIEW_STATE_RECORD,
+                .snapshot_view_state_record = {*vs, DP_time_unix_msec(),
+                                               context_id, flags, file_id}});
+}
+
+void DP_project_worker_snapshot_finish(DP_ProjectWorker *pw,
+                                       unsigned int file_id,
+                                       bool discard_other_snapshots)
+{
+    DP_ASSERT(pw);
+    push_command(pw,
+                 (DP_ProjectWorkerCommand){
+                     DP_PROJECT_WORKER_COMMAND_SNAPSHOT_FINISH,
+                     .snapshot_finish = {file_id, discard_other_snapshots}});
+}
+
+void DP_project_worker_thumbnail_make_noinc(DP_ProjectWorker *pw,
+                                            unsigned int file_id,
+                                            DP_CanvasState *cs)
+{
+    DP_ASSERT(pw);
+    DP_ASSERT(cs);
+    if (pw->thumb_write_fn) {
+        push_command(pw, (DP_ProjectWorkerCommand){
+                             DP_PROJECT_WORKER_COMMAND_THUMBNAIL_MAKE,
+                             .thumbnail_make = {cs, file_id}});
+    }
+    else {
+        DP_PROJECT_WORKER_DEBUG("no thumb_write_fn for thumbnail_make %u",
+                                file_id);
+    }
+}
+
+void DP_project_worker_session_times_update(DP_ProjectWorker *pw,
+                                            unsigned int file_id)
+{
+    DP_ASSERT(pw);
+    push_command(pw, (DP_ProjectWorkerCommand){
+                         DP_PROJECT_WORKER_COMMAND_SESSION_TIMES_UPDATE,
+                         .session_times_update = {file_id}});
+}
+
+void DP_project_worker_save_noinc(DP_ProjectWorker *pw, unsigned int file_id,
+                                  DP_CanvasState *cs,
+                                  DP_ProjectWorkerSaveStartFn start_fn,
+                                  DP_ProjectWorkerSaveFinishFn finish_fn,
+                                  void *user)
+{
+    DP_ASSERT(pw);
+    DP_ASSERT(start_fn);
+    DP_ASSERT(finish_fn);
+    push_command(pw, (DP_ProjectWorkerCommand){
+                         DP_PROJECT_WORKER_COMMAND_SAVE,
+                         .save = {start_fn, finish_fn, user, cs, file_id}});
+}
+
+void DP_project_worker_info(DP_ProjectWorker *pw, unsigned int file_id,
+                            unsigned int flags,
+                            void (*callback)(void *, const DP_ProjectInfo *),
+                            void *user)
+{
+    DP_ASSERT(pw);
+    DP_ASSERT(callback);
+    push_command(pw, (DP_ProjectWorkerCommand){
+                         DP_PROJECT_WORKER_COMMAND_INFO,
+                         .info = {callback, user, flags, file_id}});
+}
+
+void DP_project_worker_player_prepare(DP_ProjectWorker *pw,
+                                      unsigned int file_id, DP_DrawContext *dc,
+                                      double max_delta_seconds,
+                                      long long snapshot_interval)
+{
+    DP_ASSERT(pw);
+    DP_ASSERT(dc);
+    push_command(pw, (DP_ProjectWorkerCommand){
+                         DP_PROJECT_WORKER_COMMAND_PLAYER_PREPARE,
+                         .player_prepare = {dc, max_delta_seconds,
+                                            snapshot_interval, file_id}});
+}
+
+void DP_project_worker_player_control(
+    DP_ProjectWorker *pw, unsigned int file_id,
+    const DP_ProjectPlayerControlParams *params)
+{
+    DP_ASSERT(pw);
+    DP_ASSERT(params);
+    push_command(
+        pw, (DP_ProjectWorkerCommand){DP_PROJECT_WORKER_COMMAND_PLAYER_CONTROL,
+                                      .player_control = {*params, file_id}});
+}
+
+bool DP_project_worker_cancel(DP_ProjectWorker *pw, unsigned int file_id)
+{
+    DP_ASSERT(pw);
+    DP_Mutex *mutex = pw->mutex;
+    DP_MUTEX_MUST_LOCK(mutex);
+    bool ok = pw->open_file_id == file_id;
+    if (ok) {
+        DP_project_cancel(pw->prj);
+    }
+    DP_MUTEX_MUST_UNLOCK(mutex);
+    return ok;
+}

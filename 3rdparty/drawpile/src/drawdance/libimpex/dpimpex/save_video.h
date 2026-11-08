@@ -1,0 +1,145 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+#ifndef DPIMPEX_SAVE_VIDEO_H
+#define DPIMPEX_SAVE_VIDEO_H
+#include "save.h"
+#include <dpcommon/common.h>
+
+typedef struct DP_CanvasState DP_CanvasState;
+typedef struct DP_DrawContext DP_DrawContext;
+typedef struct DP_Output DP_Output;
+typedef struct DP_Image DP_Image;
+typedef struct DP_Rect DP_Rect;
+
+#define DP_SAVE_VIDEO_FLAGS_NONE         0x0u
+#define DP_SAVE_VIDEO_FLAGS_SCALE_SMOOTH 0x1u
+
+// GIF palette sizes, always 16x16 images in BGRA format.
+#define DP_SAVE_VIDEO_GIF_PALETTE_DIMENSION 16
+#define DP_SAVE_VIDEO_GIF_PALETTE_BYTES     ((size_t)1024)
+
+// Keep this in sync with VideoEncoder.java!
+typedef enum DP_SaveVideoFormat {
+    DP_SAVE_VIDEO_FORMAT_MP4_VP9,
+    DP_SAVE_VIDEO_FORMAT_WEBM_VP8,
+    DP_SAVE_VIDEO_FORMAT_WEBP,
+    DP_SAVE_VIDEO_FORMAT_PALETTE,
+    DP_SAVE_VIDEO_FORMAT_GIF,
+    DP_SAVE_VIDEO_FORMAT_MP4_H264,
+    DP_SAVE_VIDEO_FORMAT_MP4_AV1,
+    DP_SAVE_VIDEO_FORMAT_APNG,
+    DP_SAVE_VIDEO_FORMAT_LAST = DP_SAVE_VIDEO_FORMAT_APNG,
+} DP_SaveVideoFormat;
+
+typedef enum DP_SaveVideoDestination {
+    DP_SAVE_VIDEO_DESTINATION_PATH,
+    DP_SAVE_VIDEO_DESTINATION_OUTPUT,
+    DP_SAVE_VIDEO_DESTINATION_FFMPEG,
+    DP_SAVE_VIDEO_DESTINATION_ANDROID,
+    DP_SAVE_VIDEO_DESTINATION_WINDOWS,
+} DP_SaveVideoDestination;
+
+typedef enum DP_SaveVideoEncoderType {
+    DP_SAVE_VIDEO_ENCODER_TYPE_LIBAV,
+    DP_SAVE_VIDEO_ENCODER_TYPE_FFMPEG,
+    DP_SAVE_VIDEO_ENCODER_TYPE_ANDROID_SOFTWARE,
+    DP_SAVE_VIDEO_ENCODER_TYPE_ANDROID_HARDWARE,
+    DP_SAVE_VIDEO_ENCODER_TYPE_WINDOWS,
+} DP_SaveVideoEncoderType;
+
+typedef struct DP_SaveVideoSupportEntry {
+    DP_SaveVideoEncoderType type;
+    const char *name;
+} DP_SaveVideoSupportEntry;
+
+typedef struct DP_SaveVideoSupport DP_SaveVideoSupport;
+
+typedef struct DP_SaveVideoNextFrame {
+    DP_SaveResult result;
+    int width;
+    int height;
+    const void *pixels;
+    double progress;
+    int instances;
+} DP_SaveVideoNextFrame;
+
+typedef bool (*DP_SaveVideoNextFrameFn)(void *user, DP_SaveVideoNextFrame *f);
+
+typedef struct DP_SaveVideoFfmpegParams {
+    const char *program;
+    const char **custom_args;
+    const char *output;
+} DP_SaveVideoFfmpegParams;
+
+typedef struct DP_SaveVideoAndroidParams {
+    const char *output;
+    const char *temp;
+    const char *encoder;
+} DP_SaveVideoAndroidParams;
+
+typedef struct DP_SaveVideoParams {
+    DP_SaveVideoDestination destination;
+    void *destination_param;
+    const unsigned char *palette_data;
+    size_t palette_size;
+    unsigned int flags;
+    int format;
+    int width;
+    int height;
+    double framerate;
+    DP_SaveVideoNextFrameFn next_frame_fn;
+    DP_SaveProgressFn progress_fn;
+    void *user;
+} DP_SaveVideoParams;
+
+typedef struct DP_SaveAnimationVideoParams {
+    DP_CanvasState *cs;
+    const DP_Rect *area;
+    DP_SaveVideoDestination destination;
+    void *destination_param;
+    const unsigned char *palette_data;
+    size_t palette_size;
+    unsigned int flags;
+    int format;
+    int width;
+    int height;
+    const int *frame_indexes;
+    int frame_index_count;
+    double framerate;
+    int loops;
+    DP_SaveProgressFn progress_fn;
+    void *user;
+} DP_SaveAnimationVideoParams;
+
+typedef struct DP_SaveAnimationGifParams {
+    DP_CanvasState *cs;
+    const DP_Rect *area;
+    DP_SaveVideoDestination destination;
+    void *path_or_output;
+    unsigned int flags;
+    int width;
+    int height;
+    const int *frame_indexes;
+    int frame_index_count;
+    double framerate;
+    DP_SaveProgressFn progress_fn;
+    void *user;
+} DP_SaveAnimationGifParams;
+
+DP_SaveVideoSupport *DP_save_video_format_support(int format);
+
+int DP_save_video_support_count(DP_SaveVideoSupport *support);
+
+const DP_SaveVideoSupportEntry *
+DP_save_video_support_entry(DP_SaveVideoSupport *support, int index);
+
+bool DP_save_video_format_supported_ffmpeg(int format);
+
+bool DP_save_video_format_supported_non_ffmpeg(int format);
+
+DP_SaveResult DP_save_video(DP_SaveVideoParams params);
+
+DP_SaveResult DP_save_animation_video(DP_SaveAnimationVideoParams params);
+
+DP_SaveResult DP_save_animation_gif(DP_SaveAnimationGifParams params);
+
+#endif

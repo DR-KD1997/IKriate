@@ -1,0 +1,1697 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "libclient/brushes/brush.h"
+#include "cmake-config/config.h"
+#include "libclient/canvas/blendmodes.h"
+#include "libclient/drawdance/brushengine.h"
+#include "libclient/drawdance/pixels.h"
+#include "libclient/drawdance/strokeworker.h"
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <mypaint-brush.h>
+
+namespace {
+
+static bool antiOverflowIsNull(const DP_AntiOverflow &antiOverflow)
+{
+	DP_AntiOverflow nullAntiOverflow = DP_anti_overflow_null();
+	return DP_anti_overflow_equal(&antiOverflow, &nullAntiOverflow);
+}
+
+QJsonObject antiOverflowToJson(const DP_AntiOverflow &antiOverflow)
+{
+	QJsonObject o;
+	if(antiOverflow.enabled) {
+		o.insert(QStringLiteral("enabled"), true);
+	}
+	if(antiOverflow.tolerance != 0) {
+		o.insert(QStringLiteral("tolerance"), antiOverflow.tolerance);
+	}
+	if(antiOverflow.expand != 0) {
+		o.insert(QStringLiteral("expand"), antiOverflow.expand);
+	}
+	return o;
+}
+
+DP_AntiOverflow antiOverflowFromJson(const QJsonObject &o)
+{
+	DP_AntiOverflow antiOverflow = {
+		o.value(QStringLiteral("enabled")).toBool(),
+		o.value(QStringLiteral("tolerance")).toInt(),
+		o.value(QStringLiteral("expand")).toInt(),
+	};
+	return antiOverflow;
+}
+
+void saveAntiOverflowSetting(
+	QJsonObject &settings, const DP_AntiOverflow &antiOverflow)
+{
+	if(!antiOverflowIsNull(antiOverflow)) {
+		settings.insert(
+			QStringLiteral("antioverflow"), antiOverflowToJson(antiOverflow));
+	}
+}
+
+DP_AntiOverflow loadAntiOverflowSetting(const QJsonObject &settings)
+{
+	QJsonValue value = settings.value(QStringLiteral("antioverflow"));
+	if(value.isObject()) {
+		return antiOverflowFromJson(value.toObject());
+	} else {
+		return DP_anti_overflow_null();
+	}
+}
+
+}
+
+namespace brushes {
+
+ClassicBrush::ClassicBrush()
+	: DP_ClassicBrush({
+		  {1.0f, 10.0f, {}},
+		  {0.0f, 1.0f, {}},
+		  {0.0f, 1.0f, {}},
+		  {0.0f, 0.0f, {}},
+		  {0.0f, 0.0f, {}},
+		  0.1f,
+		  0,
+		  {0.0f, 0.0f, 0.0f, 1.0f},
+		  DP_BRUSH_SHAPE_CLASSIC_PIXEL_ROUND,
+		  DP_PAINT_MODE_DIRECT,
+		  DP_BLEND_MODE_NORMAL,
+		  DP_BLEND_MODE_ERASE,
+		  false,
+		  true,
+		  true,
+		  false,
+		  false,
+		  {DP_CLASSIC_BRUSH_DYNAMIC_NONE, DEFAULT_VELOCITY, DEFAULT_DISTANCE},
+		  {DP_CLASSIC_BRUSH_DYNAMIC_NONE, DEFAULT_VELOCITY, DEFAULT_DISTANCE},
+		  {DP_CLASSIC_BRUSH_DYNAMIC_NONE, DEFAULT_VELOCITY, DEFAULT_DISTANCE},
+		  {DP_CLASSIC_BRUSH_DYNAMIC_NONE, DEFAULT_VELOCITY, DEFAULT_DISTANCE},
+		  {DP_CLASSIC_BRUSH_DYNAMIC_NONE, DEFAULT_VELOCITY, DEFAULT_DISTANCE},
+		  DP_anti_overflow_null(),
+	  })
+{
+	updateCurve(m_sizeCurve, size.curve);
+	updateCurve(m_opacityCurve, opacity.curve);
+	updateCurve(m_hardnessCurve, hardness.curve);
+	updateCurve(m_smudgeCurve, smudge.curve);
+	updateCurve(m_jitterCurve, jitter.curve);
+}
+
+bool ClassicBrush::equalPreset(
+	const ClassicBrush &other, bool inEraserSlot) const
+{
+	return DP_classic_brush_equal_preset(this, &other, inEraserSlot) &&
+		   stabilizationMode == other.stabilizationMode &&
+		   stabilizerSampleCount == other.stabilizerSampleCount &&
+		   smoothing == other.smoothing && syncSamples == other.syncSamples &&
+		   confidential == other.confidential;
+}
+
+void ClassicBrush::setPaintMode(int paintMode)
+{
+	if(canvas::paintmode::isValidPaintMode(paintMode)) {
+		paint_mode = DP_PaintMode(paintMode);
+	} else {
+		qWarning("Invalid paint mode %d", paintMode);
+	}
+}
+
+void ClassicBrush::setBlendMode(int blendMode, bool isErase)
+{
+	if(isErase) {
+		if(canvas::blendmode::isValidEraseMode(blendMode)) {
+			erase_mode = DP_BlendMode(blendMode);
+		} else {
+			qWarning("Invalid brush erase mode %d", blendMode);
+		}
+	} else {
+		if(canvas::blendmode::isValidBrushMode(blendMode)) {
+			brush_mode = DP_BlendMode(blendMode);
+		} else {
+			qWarning("Invalid brush blend mode %d", blendMode);
+		}
+	}
+}
+
+void ClassicBrush::setSizeCurve(const DpCubicCurve &sizeCurve)
+{
+	m_sizeCurve = sizeCurve;
+	updateCurve(m_sizeCurve, size.curve);
+}
+
+void ClassicBrush::setOpacityCurve(const DpCubicCurve &opacityCurve)
+{
+	m_opacityCurve = opacityCurve;
+	updateCurve(m_opacityCurve, opacity.curve);
+}
+
+void ClassicBrush::setHardnessCurve(const DpCubicCurve &hardnessCurve)
+{
+	m_hardnessCurve = hardnessCurve;
+	updateCurve(m_hardnessCurve, hardness.curve);
+}
+
+void ClassicBrush::setSmudgeCurve(const DpCubicCurve &smudgeCurve)
+{
+	m_smudgeCurve = smudgeCurve;
+	updateCurve(m_smudgeCurve, smudge.curve);
+}
+
+void ClassicBrush::setJitterCurve(const DpCubicCurve &jitterCurve)
+{
+	m_jitterCurve = jitterCurve;
+	updateCurve(m_jitterCurve, jitter.curve);
+}
+
+void ClassicBrush::setQColor(const QColor &c)
+{
+	drawdance::toUPixelFloat(color, c);
+}
+
+QColor ClassicBrush::qColor() const
+{
+	return drawdance::fromUPixelFloat(color);
+}
+
+bool ClassicBrush::shouldSyncSamples() const
+{
+	return syncSamples && smudge.max > 0.0f;
+}
+
+QJsonObject ClassicBrush::toJson() const
+{
+	return QJsonObject{
+		{"type", "dp-classic"},
+		{"version", 1},
+		{"settings", settingsToJson()},
+	};
+}
+
+void ClassicBrush::exportToJson(QJsonObject &json) const
+{
+	json["drawpile_classic_settings"] = settingsToJson();
+	json["settings"] = QJsonObject{};
+}
+
+ClassicBrush ClassicBrush::fromJson(const QJsonObject &json)
+{
+	ClassicBrush b;
+	if(json["type"] != "dp-classic") {
+		qWarning("ClassicBrush::fromJson: type is not dp-classic!");
+		return b;
+	}
+
+	const QJsonObject o = json["settings"].toObject();
+
+	if(o["shape"] == "round-pixel")
+		b.shape = DP_BRUSH_SHAPE_CLASSIC_PIXEL_ROUND;
+	else if(o["shape"] == "square-pixel")
+		b.shape = DP_BRUSH_SHAPE_CLASSIC_PIXEL_SQUARE;
+	else
+		b.shape = DP_BRUSH_SHAPE_CLASSIC_SOFT_ROUND;
+
+	b.size.max = o["size"].toDouble();
+	b.size.min = o["size2"].toDouble();
+	b.m_sizeCurve.fromString(o["sizecurve"].toString());
+	b.updateCurve(b.m_sizeCurve, b.size.curve);
+
+	b.opacity.max = o["opacity"].toDouble();
+	b.opacity.min = o["opacity2"].toDouble();
+	b.m_opacityCurve.fromString(o["opacitycurve"].toString());
+	b.updateCurve(b.m_opacityCurve, b.opacity.curve);
+
+	b.hardness.max = o["hard"].toDouble();
+	b.hardness.min = o["hard2"].toDouble();
+	b.m_hardnessCurve.fromString(o["hardcurve"].toString());
+	b.updateCurve(b.m_hardnessCurve, b.hardness.curve);
+
+	b.smudge.max = o["smudge"].toDouble();
+	b.smudge.min = o["smudge2"].toDouble();
+	b.m_smudgeCurve.fromString(o["smudgecurve"].toString());
+	b.updateCurve(b.m_smudgeCurve, b.smudge.curve);
+
+	b.jitter.max = o["jitter"].toDouble();
+	b.jitter.min = o["jitter2"].toDouble();
+	b.m_jitterCurve.fromString(o["jittercurve"].toString());
+	b.updateCurve(b.m_jitterCurve, b.jitter.curve);
+
+	b.spacing = o["spacing"].toDouble();
+	b.resmudge = o["resmudge"].toInt();
+	b.smudge_alpha =
+		o.value(QStringLiteral("smudgealpha")).toBool(b.smudge.max <= 0.0f);
+
+	b.paint_mode = canvas::paintmode::fromSettingName(
+		o.value(QStringLiteral("paintmode")).toString(),
+		o.value(QStringLiteral("indirect")).toBool()
+			? DP_PAINT_MODE_INDIRECT_WASH
+			: DP_PAINT_MODE_DIRECT);
+	b.colorpick = o["colorpick"].toBool();
+
+	b.size_dynamic = dynamicFromJson(o, QStringLiteral("size"));
+	b.m_lastSizeDynamicType =
+		lastDynamicTypeFromJson(o, QStringLiteral("size"));
+	b.hardness_dynamic = dynamicFromJson(o, QStringLiteral("hard"));
+	b.m_lastHardnessDynamicType =
+		lastDynamicTypeFromJson(o, QStringLiteral("hard"));
+	b.opacity_dynamic = dynamicFromJson(o, QStringLiteral("opacity"));
+	b.m_lastOpacityDynamicType =
+		lastDynamicTypeFromJson(o, QStringLiteral("opacity"));
+	b.smudge_dynamic = dynamicFromJson(o, QStringLiteral("smudge"));
+	b.m_lastSmudgeDynamicType =
+		lastDynamicTypeFromJson(o, QStringLiteral("smudge"));
+	b.jitter_dynamic = dynamicFromJson(o, QStringLiteral("jitter"));
+	b.m_lastJitterDynamicType =
+		lastDynamicTypeFromJson(o, QStringLiteral("jitter"));
+
+	int brushBlendMode = canvas::blendmode::fromOraName(
+		o.value(QStringLiteral("blend")).toString());
+	if(o.contains(QStringLiteral("blendalpha"))) {
+		canvas::blendmode::adjustAlphaBehavior(
+			brushBlendMode, o.value(QStringLiteral("blendalpha")).toBool());
+	}
+	b.brush_mode = DP_BlendMode(brushBlendMode);
+
+	int eraseBlendMode = canvas::blendmode::fromOraName(
+		o.value(QStringLiteral("blenderase")).toString());
+	if(o.contains(QStringLiteral("blenderasealpha"))) {
+		canvas::blendmode::adjustAlphaBehavior(
+			eraseBlendMode,
+			o.value(QStringLiteral("blenderasealpha")).toBool());
+	}
+	b.erase_mode = DP_BlendMode(eraseBlendMode);
+
+	b.erase = o["erase"].toBool();
+	b.pixel_perfect = o.value(QStringLiteral("pixelperfect")).toBool();
+	b.pixel_art_input = o.value(QStringLiteral("pixelartinput")).toBool();
+	b.anti_overflow = loadAntiOverflowSetting(o);
+
+	b.stabilizationMode =
+		o["stabilizationmode"].toInt() == Smoothing ? Smoothing : Stabilizer;
+	b.stabilizerSampleCount = o["stabilizer"].toInt();
+	b.smoothing = o["smoothing"].toInt();
+	b.syncSamples = o.value(QStringLiteral("syncsamples")).toBool();
+	b.confidential = o.value(QStringLiteral("confidential")).toBool();
+
+	return b;
+}
+
+bool ClassicBrush::fromExportJson(const QJsonObject &json)
+{
+	QJsonObject settings = json["drawpile_classic_settings"].toObject();
+	if(settings.isEmpty()) {
+		return false;
+	} else {
+		loadSettingsFromJson(settings);
+		return true;
+	}
+}
+
+QPixmap ClassicBrush::presetThumbnail() const
+{
+	QColor c =
+		smudge.max > 0.0f ? QColor::fromRgbF(0.1f, 0.6f, 0.9f) : Qt::gray;
+	return drawdance::BrushPreview::classicBrushPreviewDab(*this, 64, 64, c);
+}
+
+void ClassicBrush::updateCurve(
+	const DpCubicCurve &src, DP_ClassicBrushCurve &dst)
+{
+	src.transferIntoFloat(dst.values, DP_CLASSIC_BRUSH_CURVE_VALUE_COUNT);
+}
+
+void ClassicBrush::setDynamicType(
+	DP_ClassicBrushDynamicType type, DP_ClassicBrushDynamicType &outType,
+	DP_ClassicBrushDynamicType &outLastType)
+{
+	switch(type) {
+	case DP_CLASSIC_BRUSH_DYNAMIC_PRESSURE:
+	case DP_CLASSIC_BRUSH_DYNAMIC_VELOCITY:
+	case DP_CLASSIC_BRUSH_DYNAMIC_DISTANCE:
+		outLastType = type;
+		[[fallthrough]];
+	case DP_CLASSIC_BRUSH_DYNAMIC_NONE:
+		outType = type;
+		return;
+	}
+	qWarning("Unhandled dynamic type %d", int(type));
+}
+
+void ClassicBrush::loadSettingsFromJson(const QJsonObject &settings)
+{
+	if(settings["shape"] == "round-pixel") {
+		shape = DP_BRUSH_SHAPE_CLASSIC_PIXEL_ROUND;
+	} else if(settings["shape"] == "square-pixel") {
+		shape = DP_BRUSH_SHAPE_CLASSIC_PIXEL_SQUARE;
+	} else {
+		shape = DP_BRUSH_SHAPE_CLASSIC_SOFT_ROUND;
+	}
+
+	size.max = settings["size"].toDouble();
+	size.min = settings["size2"].toDouble();
+	m_sizeCurve.fromString(settings["sizecurve"].toString());
+	updateCurve(m_sizeCurve, size.curve);
+
+	opacity.max = settings["opacity"].toDouble();
+	opacity.min = settings["opacity2"].toDouble();
+	m_opacityCurve.fromString(settings["opacitycurve"].toString());
+	updateCurve(m_opacityCurve, opacity.curve);
+
+	hardness.max = settings["hard"].toDouble();
+	hardness.min = settings["hard2"].toDouble();
+	m_hardnessCurve.fromString(settings["hardcurve"].toString());
+	updateCurve(m_hardnessCurve, hardness.curve);
+
+	smudge.max = settings["smudge"].toDouble();
+	smudge.min = settings["smudge2"].toDouble();
+	m_smudgeCurve.fromString(settings["smudgecurve"].toString());
+	updateCurve(m_smudgeCurve, smudge.curve);
+
+	jitter.max = settings["jitter"].toDouble();
+	jitter.min = settings["jitter2"].toDouble();
+	m_jitterCurve.fromString(settings["jittercurve"].toString());
+	updateCurve(m_jitterCurve, jitter.curve);
+
+	spacing = settings["spacing"].toDouble();
+	resmudge = settings["resmudge"].toInt();
+	smudge_alpha = settings.value(QStringLiteral("smudgealpha"))
+					   .toBool(smudge.max <= 0.0f);
+
+	paint_mode = canvas::paintmode::fromSettingName(
+		settings.value(QStringLiteral("paintmode")).toString(),
+		settings.value(QStringLiteral("indirect")).toBool()
+			? DP_PAINT_MODE_INDIRECT_WASH
+			: DP_PAINT_MODE_DIRECT);
+	colorpick = settings["colorpick"].toBool();
+	size_dynamic = dynamicFromJson(settings, QStringLiteral("size"));
+	m_lastSizeDynamicType =
+		lastDynamicTypeFromJson(settings, QStringLiteral("size"));
+	hardness_dynamic = dynamicFromJson(settings, QStringLiteral("hard"));
+	m_lastHardnessDynamicType =
+		lastDynamicTypeFromJson(settings, QStringLiteral("hard"));
+	opacity_dynamic = dynamicFromJson(settings, QStringLiteral("opacity"));
+	m_lastOpacityDynamicType =
+		lastDynamicTypeFromJson(settings, QStringLiteral("opacity"));
+	smudge_dynamic = dynamicFromJson(settings, QStringLiteral("smudge"));
+	m_lastSmudgeDynamicType =
+		lastDynamicTypeFromJson(settings, QStringLiteral("smudge"));
+	jitter_dynamic = dynamicFromJson(settings, QStringLiteral("jitter"));
+	m_lastJitterDynamicType =
+		lastDynamicTypeFromJson(settings, QStringLiteral("jitter"));
+
+	int brushBlendMode = canvas::blendmode::fromOraName(
+		settings.value(QStringLiteral("blend")).toString());
+	if(settings.contains(QStringLiteral("blendalpha"))) {
+		canvas::blendmode::adjustAlphaBehavior(
+			brushBlendMode,
+			settings.value(QStringLiteral("blendalpha")).toBool());
+	}
+	brush_mode = DP_BlendMode(brushBlendMode);
+
+	int eraseBlendMode = canvas::blendmode::fromOraName(
+		settings.value(QStringLiteral("blenderase")).toString());
+	if(settings.contains(QStringLiteral("blenderasealpha"))) {
+		canvas::blendmode::adjustAlphaBehavior(
+			eraseBlendMode,
+			settings.value(QStringLiteral("blenderasealpha")).toBool());
+	}
+	erase_mode = DP_BlendMode(eraseBlendMode);
+
+	erase = settings["erase"].toBool();
+	pixel_perfect = settings.value(QStringLiteral("pixelperfect")).toBool();
+	pixel_art_input = settings.value(QStringLiteral("pixelartinput")).toBool();
+	anti_overflow = loadAntiOverflowSetting(settings);
+
+	stabilizationMode = settings["stabilizationmode"].toInt() == Smoothing
+							? Smoothing
+							: Stabilizer;
+	stabilizerSampleCount = settings["stabilizer"].toInt();
+	smoothing = settings["smoothing"].toInt();
+	syncSamples = settings.value(QStringLiteral("syncsamples")).toBool();
+	confidential = settings.value(QStringLiteral("confidential")).toBool();
+}
+
+QJsonObject ClassicBrush::settingsToJson() const
+{
+	QJsonObject o;
+	switch(shape) {
+	case DP_BRUSH_SHAPE_CLASSIC_PIXEL_ROUND:
+		o["shape"] = "round-pixel";
+		break;
+	case DP_BRUSH_SHAPE_CLASSIC_PIXEL_SQUARE:
+		o["shape"] = "square-pixel";
+		break;
+	default:
+		o["shape"] = "round-soft";
+		break;
+	}
+
+	o["size"] = size.max;
+	if(size.min > 0)
+		o["size2"] = size.min;
+	o["sizecurve"] = m_sizeCurve.toString();
+
+	o["opacity"] = opacity.max;
+	if(opacity.min > 0)
+		o["opacity2"] = opacity.min;
+	o["opacitycurve"] = m_opacityCurve.toString();
+
+	o["hard"] = hardness.max;
+	if(hardness.min > 0)
+		o["hard2"] = hardness.min;
+	o["hardcurve"] = m_hardnessCurve.toString();
+
+	if(smudge.max > 0)
+		o["smudge"] = smudge.max;
+	if(smudge.min > 0)
+		o["smudge2"] = smudge.min;
+	o["smudgecurve"] = m_smudgeCurve.toString();
+
+	if(jitter.max > 0)
+		o["jitter"] = jitter.max;
+	if(jitter.min > 0)
+		o["jitter2"] = jitter.min;
+	o["jittercurve"] = m_jitterCurve.toString();
+
+	o["spacing"] = spacing;
+	if(resmudge > 0)
+		o["resmudge"] = resmudge;
+	o[QStringLiteral("smudgealpha")] = smudge_alpha;
+
+	o[QStringLiteral("paintmode")] = canvas::paintmode::settingName(paint_mode);
+	o[QStringLiteral("indirect")] = paint_mode != DP_PAINT_MODE_DIRECT;
+
+	if(colorpick)
+		o["colorpick"] = true;
+	dynamicToJson(
+		size_dynamic, m_lastSizeDynamicType, QStringLiteral("size"), o);
+	dynamicToJson(
+		hardness_dynamic, m_lastHardnessDynamicType, QStringLiteral("hard"), o);
+	dynamicToJson(
+		opacity_dynamic, m_lastOpacityDynamicType, QStringLiteral("opacity"),
+		o);
+	dynamicToJson(
+		smudge_dynamic, m_lastSmudgeDynamicType, QStringLiteral("smudge"), o);
+	dynamicToJson(
+		jitter_dynamic, m_lastJitterDynamicType, QStringLiteral("jitter"), o);
+
+	o[QStringLiteral("blendalpha")] =
+		canvas::blendmode::presentsAsAlphaPreserving(brush_mode);
+	o[QStringLiteral("blenderasealpha")] =
+		canvas::blendmode::presentsAsAlphaPreserving(erase_mode);
+
+	o["blend"] = canvas::blendmode::oraName(brush_mode);
+	o["blenderase"] = canvas::blendmode::oraName(erase_mode);
+	o["erase"] = erase;
+
+	if(pixel_perfect) {
+		o.insert(QStringLiteral("pixelperfect"), true);
+	}
+
+	if(pixel_art_input) {
+		o.insert(QStringLiteral("pixelartinput"), true);
+	}
+
+	saveAntiOverflowSetting(o, anti_overflow);
+
+	o["stabilizationmode"] = stabilizationMode;
+	o["stabilizer"] = stabilizerSampleCount;
+	o["smoothing"] = smoothing;
+	o[QStringLiteral("syncsamples")] = syncSamples;
+	o[QStringLiteral("confidential")] = confidential;
+
+	// Note: color is intentionally omitted
+
+	return o;
+}
+
+DP_ClassicBrushDynamic
+ClassicBrush::dynamicFromJson(const QJsonObject &o, const QString &prefix)
+{
+	DP_ClassicBrushDynamicType type;
+	if(o[prefix + QStringLiteral("p")].toBool()) {
+		type = DP_CLASSIC_BRUSH_DYNAMIC_PRESSURE;
+	} else if(o[prefix + QStringLiteral("v")].toBool()) {
+		type = DP_CLASSIC_BRUSH_DYNAMIC_VELOCITY;
+	} else if(o[prefix + QStringLiteral("d")].toBool()) {
+		type = DP_CLASSIC_BRUSH_DYNAMIC_DISTANCE;
+	} else {
+		type = DP_CLASSIC_BRUSH_DYNAMIC_NONE;
+	}
+	float maxVelocity = qMax(
+		float(o[prefix + QStringLiteral("vmax")].toDouble(DEFAULT_VELOCITY)),
+		0.0f);
+	float maxDistance = qMax(
+		float(o[prefix + QStringLiteral("dmax")].toDouble(DEFAULT_DISTANCE)),
+		0.0f);
+	return {type, maxVelocity, maxDistance};
+}
+
+DP_ClassicBrushDynamicType ClassicBrush::lastDynamicTypeFromJson(
+	const QJsonObject &o, const QString &prefix)
+{
+	if(o[prefix + QStringLiteral("lastv")].toBool()) {
+		return DP_CLASSIC_BRUSH_DYNAMIC_VELOCITY;
+	} else if(o[prefix + QStringLiteral("lastd")].toBool()) {
+		return DP_CLASSIC_BRUSH_DYNAMIC_DISTANCE;
+	} else {
+		return DP_CLASSIC_BRUSH_DYNAMIC_PRESSURE;
+	}
+}
+
+void ClassicBrush::dynamicToJson(
+	const DP_ClassicBrushDynamic &dynamic, DP_ClassicBrushDynamicType lastType,
+	const QString &prefix, QJsonObject &o)
+{
+	switch(dynamic.type) {
+	case DP_CLASSIC_BRUSH_DYNAMIC_NONE:
+		break;
+	case DP_CLASSIC_BRUSH_DYNAMIC_PRESSURE:
+		o[prefix + QStringLiteral("p")] = true;
+		break;
+	case DP_CLASSIC_BRUSH_DYNAMIC_VELOCITY:
+		o[prefix + QStringLiteral("v")] = true;
+		break;
+	case DP_CLASSIC_BRUSH_DYNAMIC_DISTANCE:
+		o[prefix + QStringLiteral("d")] = true;
+		break;
+	}
+	switch(lastType) {
+	case DP_CLASSIC_BRUSH_DYNAMIC_NONE:
+	case DP_CLASSIC_BRUSH_DYNAMIC_PRESSURE:
+		break;
+	case DP_CLASSIC_BRUSH_DYNAMIC_VELOCITY:
+		o[prefix + QStringLiteral("lastv")] = true;
+		break;
+	case DP_CLASSIC_BRUSH_DYNAMIC_DISTANCE:
+		o[prefix + QStringLiteral("lastd")] = true;
+		break;
+	}
+	o[prefix + QStringLiteral("vmax")] = dynamic.max_velocity;
+	o[prefix + QStringLiteral("dmax")] = dynamic.max_distance;
+}
+
+
+MyPaintBrush::MyPaintBrush()
+	: m_brush({
+		  {0.0f, 0.0f, 0.0f, 1.0f},
+		  DP_PAINT_MODE_DIRECT,
+		  DP_BLEND_MODE_NORMAL,
+		  DP_BLEND_MODE_ERASE,
+		  false,
+		  false,
+		  DP_anti_overflow_null(),
+	  })
+	, m_settings(nullptr)
+	, m_stabilizationMode(Stabilizer)
+	, m_stabilizerSampleCount(0)
+	, m_smoothing(0)
+	, m_curves()
+{
+}
+
+MyPaintBrush::~MyPaintBrush()
+{
+	delete m_settings;
+}
+
+MyPaintBrush::MyPaintBrush(const MyPaintBrush &other)
+	: m_brush{other.m_brush}
+	, m_settings{nullptr}
+	, m_stabilizationMode{other.m_stabilizationMode}
+	, m_stabilizerSampleCount{other.m_stabilizerSampleCount}
+	, m_smoothing{other.m_smoothing}
+	, m_curves{other.m_curves}
+	, m_syncSamples(other.m_syncSamples)
+	, m_confidential(other.m_confidential)
+{
+	if(other.m_settings) {
+		m_settings = new DP_MyPaintSettings;
+		*m_settings = *other.m_settings;
+	}
+}
+
+MyPaintBrush::MyPaintBrush(MyPaintBrush &&other)
+	: m_brush{other.m_brush}
+	, m_settings{other.m_settings}
+	, m_stabilizationMode{other.m_stabilizationMode}
+	, m_stabilizerSampleCount{other.m_stabilizerSampleCount}
+	, m_smoothing{other.m_smoothing}
+	, m_curves{other.m_curves}
+	, m_syncSamples(other.m_syncSamples)
+	, m_confidential(other.m_confidential)
+{
+	other.m_settings = nullptr;
+}
+
+MyPaintBrush &MyPaintBrush::operator=(MyPaintBrush &&other)
+{
+	std::swap(m_brush, other.m_brush);
+	std::swap(m_settings, other.m_settings);
+	std::swap(m_stabilizationMode, other.m_stabilizationMode);
+	std::swap(m_stabilizerSampleCount, other.m_stabilizerSampleCount);
+	std::swap(m_smoothing, other.m_smoothing);
+	std::swap(m_curves, other.m_curves);
+	std::swap(m_syncSamples, other.m_syncSamples);
+	std::swap(m_confidential, other.m_confidential);
+	return *this;
+}
+
+MyPaintBrush &MyPaintBrush::operator=(const MyPaintBrush &other)
+{
+	m_brush = other.m_brush;
+	if(other.m_settings) {
+		if(!m_settings) {
+			m_settings = new DP_MyPaintSettings;
+		}
+		*m_settings = *other.m_settings;
+	} else {
+		delete m_settings;
+		m_settings = nullptr;
+	}
+	m_stabilizationMode = other.m_stabilizationMode;
+	m_stabilizerSampleCount = other.m_stabilizerSampleCount;
+	m_smoothing = other.m_smoothing;
+	m_curves = other.m_curves;
+	m_syncSamples = other.m_syncSamples;
+	m_confidential = other.m_confidential;
+	return *this;
+}
+
+bool MyPaintBrush::equalPreset(
+	const MyPaintBrush &other, bool inEraserSlot) const
+{
+	return DP_mypaint_brush_equal_preset(
+			   &m_brush, &other.m_brush, inEraserSlot) &&
+		   DP_mypaint_settings_equal_preset(
+			   &constSettings(), &other.constSettings()) &&
+		   m_stabilizationMode == other.m_stabilizationMode &&
+		   m_stabilizerSampleCount == other.m_stabilizerSampleCount &&
+		   m_smoothing == other.m_smoothing &&
+		   m_syncSamples == other.m_syncSamples &&
+		   m_confidential == other.m_confidential;
+}
+
+DP_MyPaintSettings &MyPaintBrush::settings()
+{
+	if(!m_settings) {
+		m_settings = new DP_MyPaintSettings(getDefaultSettings());
+	}
+	return *m_settings;
+}
+
+const DP_MyPaintSettings &MyPaintBrush::constSettings() const
+{
+	return m_settings ? *m_settings : getDefaultSettings();
+}
+
+void MyPaintBrush::setPaintMode(int paintMode)
+{
+	if(canvas::paintmode::isValidPaintMode(paintMode)) {
+		m_brush.paint_mode = DP_PaintMode(paintMode);
+	} else {
+		qWarning("Invalid paint mode %d", paintMode);
+	}
+}
+
+void MyPaintBrush::setBlendMode(int blendMode, bool isErase)
+{
+	if(isErase) {
+		if(canvas::blendmode::isValidEraseMode(blendMode)) {
+			m_brush.erase_mode = DP_BlendMode(blendMode);
+		} else {
+			qWarning("Invalid brush erase mode %d", blendMode);
+		}
+	} else {
+		if(canvas::blendmode::isValidBrushMode(blendMode)) {
+			m_brush.brush_mode = DP_BlendMode(blendMode);
+		} else {
+			qWarning("Invalid brush blend mode %d", blendMode);
+		}
+	}
+}
+
+bool MyPaintBrush::shouldSyncSamples() const
+{
+	if(m_syncSamples) {
+		const DP_MyPaintMapping *mapping =
+			&constSettings().mappings[MYPAINT_BRUSH_SETTING_SMUDGE];
+		if(mapping->base_value != 0) {
+			return true;
+		}
+
+		for(int i = 0; i < MYPAINT_BRUSH_INPUTS_COUNT; ++i) {
+			if(mapping->inputs[i].n != 0) {
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+void MyPaintBrush::setSyncSamples(bool syncSamples)
+{
+	m_syncSamples = syncSamples;
+}
+
+void MyPaintBrush::setConfidential(bool confidential)
+{
+	m_confidential = confidential;
+}
+
+float MyPaintBrush::maxSizeFor(float baseValue) const
+{
+	return DP_mypaint_settings_max_size_for(&constSettings(), baseValue);
+}
+
+float MyPaintBrush::baseValueForMaxSize(float maxSize) const
+{
+	return DP_mypaint_settings_base_value_for_max_size(
+		&constSettings(), maxSize);
+}
+
+MyPaintCurve MyPaintBrush::getCurve(int setting, int input) const
+{
+	return m_curves.value({setting, input});
+}
+
+void MyPaintBrush::setCurve(int setting, int input, const MyPaintCurve &curve)
+{
+	m_curves.insert({setting, input}, curve);
+}
+
+void MyPaintBrush::removeCurve(int setting, int input)
+{
+	m_curves.remove({setting, input});
+}
+
+void MyPaintBrush::setQColor(const QColor &c)
+{
+	drawdance::toUPixelFloat(m_brush.color, c);
+}
+
+QColor MyPaintBrush::qColor() const
+{
+	return drawdance::fromUPixelFloat(m_brush.color);
+}
+
+QPointF MyPaintBrush::getOffset() const
+{
+	double x, y;
+	if(DP_mypaint_settings_fixed_offset(&constSettings(), &x, &y)) {
+		return QPointF(x, y);
+	} else {
+		return QPointF(0.0, 0.0);
+	}
+}
+
+QJsonObject MyPaintBrush::toJson() const
+{
+	return QJsonObject{
+		{"type", "dp-mypaint"},
+		{"version", 1},
+		{"settings",
+		 QJsonObject{
+			 {"blend", canvas::blendmode::oraName(m_brush.brush_mode)},
+			 {"blenderase", canvas::blendmode::oraName(m_brush.erase_mode)},
+			 {"blendalpha",
+			  canvas::blendmode::presentsAsAlphaPreserving(m_brush.brush_mode)},
+			 {"blenderasealpha",
+			  canvas::blendmode::presentsAsAlphaPreserving(m_brush.erase_mode)},
+			 {"erase", m_brush.erase},
+			 {"stabilizationmode", m_stabilizationMode},
+			 {"stabilizer", m_stabilizerSampleCount},
+			 {"smoothing", m_smoothing},
+			 {QStringLiteral("syncsamples"), m_syncSamples},
+			 {QStringLiteral("confidential"), m_confidential},
+			 {QStringLiteral("pixelperfect"), m_brush.pixel_perfect},
+			 {QStringLiteral("antioverflow"),
+			  antiOverflowToJson(m_brush.anti_overflow)},
+			 {"mapping", mappingToJson()},
+			 // Backward-compatibility.
+			 {"lock_alpha", m_brush.brush_mode == DP_BLEND_MODE_RECOLOR},
+			 {"indirect", m_brush.paint_mode != DP_PAINT_MODE_DIRECT},
+		 }},
+	};
+}
+
+void MyPaintBrush::exportToJson(QJsonObject &json) const
+{
+	json["drawpile_settings"] = QJsonObject{
+		{"blend", canvas::blendmode::oraName(m_brush.brush_mode)},
+		{"blenderase", canvas::blendmode::oraName(m_brush.erase_mode)},
+		{"blendalpha",
+		 canvas::blendmode::presentsAsAlphaPreserving(m_brush.brush_mode)},
+		{"blenderasealpha",
+		 canvas::blendmode::presentsAsAlphaPreserving(m_brush.erase_mode)},
+		{"erase", m_brush.erase},
+		{"stabilizationmode", m_stabilizationMode},
+		{"stabilizer", m_stabilizerSampleCount},
+		{"smoothing", m_smoothing},
+		{QStringLiteral("syncsamples"), m_syncSamples},
+		{QStringLiteral("confidential"), m_confidential},
+		{QStringLiteral("pixelperfect"), m_brush.pixel_perfect},
+		{QStringLiteral("antioverflow"),
+		 antiOverflowToJson(m_brush.anti_overflow)},
+		// Backward-compatibility.
+		{"lock_alpha", m_brush.brush_mode == DP_BLEND_MODE_RECOLOR},
+		{"indirect", m_brush.paint_mode != DP_PAINT_MODE_DIRECT},
+	};
+	json["settings"] = mappingToJson();
+}
+
+MyPaintBrush MyPaintBrush::fromJson(const QJsonObject &json)
+{
+	MyPaintBrush b;
+	if(json["type"] != "dp-mypaint") {
+		qWarning("MyPaintBrush::fromJson: type is not dp-mypaint!");
+		return b;
+	}
+
+	const QJsonObject o = json["settings"].toObject();
+
+	if(o.contains(QStringLiteral("blend"))) {
+		int brushMode = canvas::blendmode::fromOraName(
+			o.value(QStringLiteral("blend")).toString());
+		canvas::blendmode::adjustAlphaBehavior(
+			brushMode, o.value(QStringLiteral("blendalpha")).toBool());
+		b.m_brush.brush_mode = DP_BlendMode(brushMode);
+	} else if(o.value(QStringLiteral("lock_alpha")).toBool()) {
+		b.m_brush.brush_mode = DP_BLEND_MODE_RECOLOR;
+	} else {
+		b.m_brush.brush_mode = DP_BLEND_MODE_NORMAL;
+	}
+
+	if(o.contains(QStringLiteral("blenderase"))) {
+		int eraseMode = canvas::blendmode::fromOraName(
+			o.value(QStringLiteral("blenderase")).toString(),
+			DP_BLEND_MODE_ERASE);
+		canvas::blendmode::adjustAlphaBehavior(
+			eraseMode, o.value(QStringLiteral("blenderasealpha")).toBool());
+		b.m_brush.erase_mode = DP_BlendMode(eraseMode);
+	} else {
+		b.m_brush.erase_mode = DP_BLEND_MODE_ERASE;
+	}
+
+	if(o.contains(QStringLiteral("paintmode"))) {
+		b.m_brush.paint_mode = canvas::paintmode::fromSettingName(
+			o.value(QStringLiteral("paintmode")).toString(),
+			DP_PAINT_MODE_DIRECT);
+	} else if(o.value(QStringLiteral("indirect")).toBool()) {
+		b.m_brush.paint_mode = DP_PAINT_MODE_INDIRECT_WASH;
+	} else {
+		b.m_brush.paint_mode = DP_PAINT_MODE_DIRECT;
+	}
+
+	b.m_brush.erase = o["erase"].toBool();
+	b.m_brush.pixel_perfect = o.value(QStringLiteral("pixelperfect")).toBool();
+	b.m_brush.anti_overflow = loadAntiOverflowSetting(o);
+	b.loadJsonSettings(o["mapping"].toObject());
+
+	// If there's no Drawpile stabilizer defined, we get a sensible default
+	// value from the slow tracking setting, which is also a kind of stabilizer.
+	int stabilizerSampleCount = o["stabilizer"].toInt(-1);
+	if(stabilizerSampleCount < 0) {
+		if(b.m_settings) {
+			const DP_MyPaintMapping &slowTrackingSetting =
+				b.m_settings->mappings[MYPAINT_BRUSH_SETTING_SLOW_TRACKING];
+			stabilizerSampleCount =
+				qRound(slowTrackingSetting.base_value * 10.0f);
+		} else {
+			stabilizerSampleCount = 0;
+		}
+	}
+	b.m_stabilizationMode =
+		o["stabilizationmode"].toInt() == Smoothing ? Smoothing : Stabilizer;
+	b.m_stabilizerSampleCount = stabilizerSampleCount;
+	b.m_smoothing = o["smoothing"].toInt();
+	b.m_confidential = o.value(QStringLiteral("confidential")).toBool();
+
+	QJsonValue syncSamplesValue = o.value(QStringLiteral("syncsamples"));
+	if(syncSamplesValue.isBool()) {
+		b.m_syncSamples = syncSamplesValue.toBool();
+	} else {
+		// A good number of MyPaint brushes have a really tiny amount of
+		// smudging that isn't worth the slowdown of synchronization. We guess
+		// whether we have such a case here if the sync isn't set explicitly.
+		b.m_syncSamples = DP_mypaint_settings_guess_sync_samples(b.m_settings);
+	}
+
+	return b;
+}
+
+bool MyPaintBrush::fromExportJson(const QJsonObject &json)
+{
+	if(json["version"].toInt() != 3) {
+		qWarning("MyPaintBrush::fromMyPaintJson: version not 3");
+		return false;
+	}
+
+	if(!loadJsonSettings(json["settings"].toObject())) {
+		return false;
+	}
+
+	QJsonObject drawpileSettings = json["drawpile_settings"].toObject();
+	if(drawpileSettings.isEmpty()) {
+		// Workaround for MyPaint exporting the current alpha lock state for
+		// this value. MyPaint doesn't import this either.
+		float &lockAlpha =
+			m_settings->mappings[MYPAINT_BRUSH_SETTING_LOCK_ALPHA].base_value;
+		if(lockAlpha == 1.0f) {
+			lockAlpha = 0.0f;
+		}
+	}
+
+	if(drawpileSettings.contains(QStringLiteral("blend"))) {
+		int brushMode = canvas::blendmode::fromOraName(
+			drawpileSettings.value(QStringLiteral("blend")).toString());
+		canvas::blendmode::adjustAlphaBehavior(
+			brushMode,
+			drawpileSettings.value(QStringLiteral("blendalpha")).toBool());
+		m_brush.brush_mode = DP_BlendMode(brushMode);
+	} else if(drawpileSettings.value(QStringLiteral("lock_alpha")).toBool()) {
+		m_brush.brush_mode = DP_BLEND_MODE_RECOLOR;
+	} else {
+		m_brush.brush_mode = DP_BLEND_MODE_NORMAL;
+	}
+
+	if(drawpileSettings.contains(QStringLiteral("blenderase"))) {
+		int eraseMode = canvas::blendmode::fromOraName(
+			drawpileSettings.value(QStringLiteral("blenderase")).toString(),
+			DP_BLEND_MODE_ERASE);
+		canvas::blendmode::adjustAlphaBehavior(
+			eraseMode,
+			drawpileSettings.value(QStringLiteral("blenderasealpha")).toBool());
+		m_brush.erase_mode = DP_BlendMode(eraseMode);
+	} else {
+		m_brush.erase_mode = DP_BLEND_MODE_ERASE;
+	}
+
+	if(drawpileSettings.contains(QStringLiteral("paintmode"))) {
+		m_brush.paint_mode = canvas::paintmode::fromSettingName(
+			drawpileSettings.value(QStringLiteral("paintmode")).toString(),
+			DP_PAINT_MODE_DIRECT);
+	} else if(drawpileSettings.value(QStringLiteral("indirect")).toBool()) {
+		m_brush.paint_mode = DP_PAINT_MODE_INDIRECT_WASH;
+	} else {
+		m_brush.paint_mode = DP_PAINT_MODE_DIRECT;
+	}
+
+	m_brush.erase = drawpileSettings["erase"].toBool(false);
+	m_brush.pixel_perfect =
+		drawpileSettings.value(QStringLiteral("pixelperfect")).toBool();
+	m_stabilizationMode =
+		drawpileSettings["stabilizationmode"].toInt() == Smoothing ? Smoothing
+																   : Stabilizer;
+	m_stabilizerSampleCount = drawpileSettings["stabilizer"].toInt(-1);
+	m_smoothing = drawpileSettings["smoothing"].toInt();
+	m_syncSamples =
+		drawpileSettings.value(QStringLiteral("syncsamples")).toBool();
+	m_confidential =
+		drawpileSettings.value(QStringLiteral("confidential")).toBool();
+
+	return true;
+}
+
+QPixmap MyPaintBrush::presetThumbnail() const
+{
+	// MyPaint brushes are too complicated to generate a single dab to represent
+	// them, so just make a blank image and have the user pick one themselves.
+	// At the time of writing, there's no MyPaint brush editor within Drawpile
+	// anyway, so most brushes will presumably be imported, not generated anew.
+	QPixmap pixmap(64, 64);
+	pixmap.fill(Qt::white);
+	return pixmap;
+}
+
+const DP_MyPaintSettings &MyPaintBrush::getDefaultSettings()
+{
+	static DP_MyPaintSettings settings;
+	static bool settingsInitialized;
+	if(!settingsInitialized) {
+		settingsInitialized = true;
+		// Same procedure as mypaint_brush_from_defaults.
+		for(int i = 0; i < MYPAINT_BRUSH_SETTINGS_COUNT; ++i) {
+			DP_MyPaintMapping &mapping = settings.mappings[i];
+			mapping.base_value =
+				mypaint_brush_setting_info(static_cast<MyPaintBrushSetting>(i))
+					->def;
+			for(int j = 0; j < MYPAINT_BRUSH_INPUTS_COUNT; ++j) {
+				mapping.inputs[j].n = 0;
+			}
+		}
+		DP_MyPaintMapping &opaqueMultiplyMapping =
+			settings.mappings[MYPAINT_BRUSH_SETTING_OPAQUE_MULTIPLY];
+		DP_MyPaintControlPoints &brushInputPressure =
+			opaqueMultiplyMapping.inputs[MYPAINT_BRUSH_INPUT_PRESSURE];
+		brushInputPressure.n = 2;
+		brushInputPressure.xvalues[0] = 0.0;
+		brushInputPressure.yvalues[0] = 0.0;
+		brushInputPressure.xvalues[1] = 1.0;
+		brushInputPressure.yvalues[1] = 1.0;
+	}
+	return settings;
+}
+
+QJsonObject MyPaintBrush::mappingToJson() const
+{
+	QJsonObject o;
+	if(m_settings) {
+		for(int i = 0; i < MYPAINT_BRUSH_SETTINGS_COUNT; ++i) {
+			const DP_MyPaintMapping &mapping = m_settings->mappings[i];
+
+			QJsonObject inputs;
+			QJsonObject ranges;
+			for(int j = 0; j < MYPAINT_BRUSH_INPUTS_COUNT; ++j) {
+				MyPaintBrushInput inputId = static_cast<MyPaintBrushInput>(j);
+				QString inputKey =
+					QString::fromUtf8(mypaint_brush_input_info(inputId)->cname);
+
+				const DP_MyPaintControlPoints &cps = mapping.inputs[j];
+				if(cps.n) {
+					QJsonArray points;
+					for(int k = 0; k < cps.n; ++k) {
+						points.append(
+							QJsonArray{
+								cps.xvalues[k],
+								cps.yvalues[k],
+							});
+					}
+					inputs[inputKey] = points;
+				}
+
+				QHash<QPair<int, int>, MyPaintCurve>::const_iterator it =
+					m_curves.find({i, j});
+				if(it != m_curves.constEnd() && it->visible) {
+					ranges[inputKey] = QJsonObject({
+						{QStringLiteral("xmax"), it->xMax},
+						{QStringLiteral("xmin"), it->xMin},
+						{QStringLiteral("ymax"), it->yMax},
+						{QStringLiteral("ymin"), it->yMin},
+					});
+				}
+			}
+
+			QJsonObject jsonSettings = QJsonObject{
+				{QStringLiteral("base_value"), mapping.base_value},
+				{QStringLiteral("inputs"), inputs},
+			};
+			if(!ranges.isEmpty()) {
+				jsonSettings[QStringLiteral("drawpile_ranges")] = ranges;
+			}
+
+			MyPaintBrushSetting settingId = static_cast<MyPaintBrushSetting>(i);
+			QString settingKey =
+				QString::fromUtf8(mypaint_brush_setting_info(settingId)->cname);
+			o[settingKey] = jsonSettings;
+		}
+	}
+	return o;
+}
+
+bool MyPaintBrush::loadJsonSettings(const QJsonObject &o)
+{
+	bool foundSetting = false;
+	for(int settingId = 0; settingId < MYPAINT_BRUSH_SETTINGS_COUNT;
+		++settingId) {
+		const MyPaintBrushSettingInfo *info =
+			mypaint_brush_setting_info(MyPaintBrushSetting(settingId));
+		QString mappingKey = QString::fromUtf8(info->cname);
+		bool loaded =
+			o.contains(mappingKey) && loadJsonMapping(
+										  mappingKey, settingId, info->min,
+										  info->max, o[mappingKey].toObject());
+		if(loaded) {
+			foundSetting = true;
+		}
+	}
+	return foundSetting;
+}
+
+bool MyPaintBrush::loadJsonMapping(
+	const QString &mappingKey, int settingId, float min, float max,
+	const QJsonObject &o)
+{
+	bool foundSetting = false;
+
+	QJsonValue baseValue = o[QStringLiteral("base_value")];
+	if(baseValue.isDouble()) {
+		settings().mappings[settingId].base_value =
+			qBound(min, float(baseValue.toDouble()), max);
+		foundSetting = true;
+	} else {
+		qWarning("Bad MyPaint 'base_value' in %s", qPrintable(mappingKey));
+	}
+
+	QJsonValue inputs = o[QStringLiteral("inputs")];
+	if(!inputs.isObject()) {
+		qWarning("Bad MyPaint 'inputs' in %s", qPrintable(mappingKey));
+	} else if(loadJsonInputs(
+				  settingId, inputs.toObject(),
+				  o[QStringLiteral("drawpile_ranges")].toObject())) {
+		foundSetting = true;
+	}
+
+	return foundSetting;
+}
+
+bool MyPaintBrush::loadJsonInputs(
+	int settingId, const QJsonObject &o, const QJsonObject &ranges)
+{
+	bool foundSetting = false;
+
+	for(int inputId = 0; inputId < MYPAINT_BRUSH_INPUTS_COUNT; ++inputId) {
+		const MyPaintBrushInputInfo *info =
+			mypaint_brush_input_info(MyPaintBrushInput(inputId));
+		QString inputKey = QString::fromUtf8(info->cname);
+		QJsonValue value = o[inputKey];
+		if(value.isArray()) {
+			foundSetting = true;
+			DP_MyPaintControlPoints &cps =
+				settings().mappings[settingId].inputs[inputId];
+			const QJsonArray points = o[inputKey].toArray();
+
+			static constexpr int MAX_POINTS =
+				sizeof(cps.xvalues) / sizeof(cps.xvalues[0]);
+			cps.n = qMin(MAX_POINTS, points.count());
+
+			for(int i = 0; i < cps.n; ++i) {
+				const QJsonArray point = points[i].toArray();
+				cps.xvalues[i] = point.at(0).toDouble();
+				cps.yvalues[i] = point.at(1).toDouble();
+			}
+
+			loadJsonRanges(settingId, inputId, inputKey, cps, ranges);
+		} else {
+			settings().mappings[settingId].inputs[inputId].n = 0;
+		}
+	}
+
+	return foundSetting;
+}
+
+void MyPaintBrush::loadJsonRanges(
+	int settingId, int inputId, const QString &inputKey,
+	const DP_MyPaintControlPoints &cps, const QJsonObject &ranges)
+{
+	if(MyPaintCurve::isNullControlPoints(cps)) {
+		return;
+	}
+
+	QJsonValue range = ranges[inputKey];
+	if(!range.isObject()) {
+		return;
+	}
+
+	QJsonValue xMax = range[QStringLiteral("xmax")];
+	QJsonValue xMin = range[QStringLiteral("xmin")];
+	QJsonValue yMax = range[QStringLiteral("ymax")];
+	QJsonValue yMin = range[QStringLiteral("ymin")];
+	if(xMax.isDouble() || xMin.isDouble() || yMax.isDouble() ||
+	   yMin.isDouble()) {
+		MyPaintCurve curve = MyPaintCurve::fromControlPoints(
+			cps, xMax.toDouble(std::numeric_limits<double>::lowest()),
+			xMin.toDouble(std::numeric_limits<double>::max()),
+			yMax.toDouble(std::numeric_limits<double>::lowest()),
+			yMin.toDouble(std::numeric_limits<double>::max()));
+		m_curves.insert({settingId, inputId}, curve);
+	}
+}
+
+MyPaintCurve MyPaintCurve::fromControlPoints(
+	const DP_MyPaintControlPoints &cps, double xMax, double xMin, double yMax,
+	double yMin)
+{
+	brushes::MyPaintCurve curve;
+	curve.visible = !isNullControlPoints(cps);
+	if(curve.visible) {
+		curve.xMax = curve.xMin = cps.xvalues[0];
+		curve.yMax = curve.yMin = cps.yvalues[0];
+		for(int i = 1; i < cps.n; ++i) {
+			double x = cps.xvalues[i];
+			if(x > curve.xMax) {
+				curve.xMax = x;
+			}
+			if(x < curve.xMin) {
+				curve.xMin = x;
+			}
+			double y = cps.yvalues[i];
+			if(y > curve.yMax) {
+				curve.yMax = y;
+			}
+			if(y < curve.yMin) {
+				curve.yMin = y;
+			}
+		}
+
+		if(xMax > curve.xMax) {
+			curve.xMax = xMax;
+		}
+		if(xMin < curve.xMin) {
+			curve.xMin = xMin;
+		}
+		if(yMax > curve.yMax) {
+			curve.yMax = yMax;
+		}
+		if(yMin < curve.yMin) {
+			curve.yMin = yMin;
+		}
+
+		double yAbs = qMax(qAbs(curve.yMin), qAbs(curve.yMax));
+		curve.yMin = -yAbs;
+		curve.yMax = yAbs;
+
+		QList<QPointF> points;
+		for(int i = 0; i < cps.n; ++i) {
+			points.append(curve.controlPointToCurve(
+				QPointF(cps.xvalues[i], cps.yvalues[i])));
+		}
+		curve.curve.setPoints(points);
+	}
+
+	return curve;
+}
+
+bool MyPaintCurve::isNullControlPoints(const DP_MyPaintControlPoints &cps)
+{
+	if(cps.n >= 2) {
+		for(int i = 0; i < cps.n; ++i) {
+			if(cps.yvalues[i] != 0.0) {
+				return false;
+			}
+		}
+	}
+	return true;
+}
+
+QPointF MyPaintCurve::controlPointToCurve(const QPointF &point)
+{
+	double x = translateCoordinate(point.x(), xMin, xMax, 0.0, 1.0);
+	double y = translateCoordinate(point.y(), yMin, yMax, 0.0, 1.0);
+	return QPointF{qBound(0.0, x, 1.0), qBound(0.0, y, 1.0)};
+}
+
+double MyPaintCurve::translateCoordinate(
+	double srcValue, double srcMin, double srcMax, double dstMin, double dstMax)
+{
+	return (dstMax - dstMin) / (srcMax - srcMin) * (srcValue - srcMin) + dstMin;
+}
+
+
+ActiveBrush::ActiveBrush(ActiveType activeType)
+	: m_activeType(activeType)
+	, m_classic()
+	, m_myPaint()
+{
+}
+
+bool ActiveBrush::equalPreset(const ActiveBrush &other, bool inEraserSlot) const
+{
+	return m_activeType == other.m_activeType &&
+		   (m_activeType == CLASSIC
+				? m_classic.equalPreset(other.m_classic, inEraserSlot)
+				: m_myPaint.equalPreset(other.m_myPaint, inEraserSlot));
+}
+
+DP_BrushShape ActiveBrush::shape() const
+{
+	return m_activeType == CLASSIC ? m_classic.shape : DP_BRUSH_SHAPE_MYPAINT;
+}
+
+bool ActiveBrush::hasHardness() const
+{
+	switch(shape()) {
+	case DP_BRUSH_SHAPE_CLASSIC_PIXEL_ROUND:
+	case DP_BRUSH_SHAPE_CLASSIC_PIXEL_SQUARE:
+		return false;
+	default:
+		return true;
+	}
+}
+
+DP_PaintMode ActiveBrush::paintMode() const
+{
+	return m_activeType == CLASSIC ? m_classic.paint_mode
+								   : m_myPaint.constBrush().paint_mode;
+}
+
+void ActiveBrush::setPaintMode(int paintMode)
+{
+	if(m_activeType == CLASSIC) {
+		m_classic.setPaintMode(paintMode);
+	} else {
+		m_myPaint.setPaintMode(paintMode);
+	}
+}
+
+DP_BlendMode ActiveBrush::blendMode() const
+{
+	return m_activeType == CLASSIC
+			   ? DP_classic_brush_blend_mode(&m_classic)
+			   : DP_mypaint_brush_blend_mode(&m_myPaint.constBrush());
+}
+
+void ActiveBrush::setBlendMode(int blendMode, bool isErase)
+{
+	if(m_activeType == CLASSIC) {
+		m_classic.setBlendMode(blendMode, isErase);
+	} else {
+		m_myPaint.setBlendMode(blendMode, isErase);
+	}
+}
+
+bool ActiveBrush::isEraser() const
+{
+	return m_activeType == CLASSIC ? m_classic.erase
+								   : m_myPaint.constBrush().erase;
+}
+
+void ActiveBrush::setEraser(bool erase)
+{
+	if(m_activeType == CLASSIC) {
+		m_classic.erase = erase;
+	} else {
+		m_myPaint.brush().erase = erase;
+	}
+}
+
+DP_UPixelFloat ActiveBrush::color() const
+{
+	return m_activeType == CLASSIC ? m_classic.color
+								   : m_myPaint.constBrush().color;
+}
+
+QColor ActiveBrush::qColor() const
+{
+	return m_activeType == CLASSIC ? m_classic.qColor() : m_myPaint.qColor();
+}
+
+void ActiveBrush::setQColor(const QColor &c)
+{
+	m_classic.setQColor(c);
+	m_myPaint.setQColor(c);
+}
+
+QPointF ActiveBrush::getOffset() const
+{
+	if(m_activeType == MYPAINT) {
+		return m_myPaint.getOffset();
+	} else {
+		return QPointF(0.0, 0.0);
+	}
+}
+
+bool ActiveBrush::isPixelPerfect() const
+{
+	if(m_activeType == MYPAINT) {
+		return m_myPaint.isPixelPerfect();
+	} else {
+		return m_classic.pixel_perfect;
+	}
+}
+
+void ActiveBrush::setPixelPerfect(bool pixelPerfect)
+{
+	if(m_activeType == MYPAINT) {
+		m_myPaint.setPixelPerfect(pixelPerfect);
+	} else {
+		m_classic.pixel_perfect = pixelPerfect;
+	}
+}
+
+bool ActiveBrush::isPixelArtInput() const
+{
+	if(m_activeType == MYPAINT) {
+		return false;
+	} else {
+		return m_classic.pixel_art_input;
+	}
+}
+
+void ActiveBrush::setPixelArtInput(bool pixelArtInput)
+{
+	if(m_activeType == MYPAINT) {
+		qWarning("Attempt to set pixel art input on MyPaint brush");
+	} else {
+		m_classic.pixel_art_input = pixelArtInput;
+	}
+}
+
+DP_AntiOverflow &ActiveBrush::antiOverflow()
+{
+	if(m_activeType == MYPAINT) {
+		return m_myPaint.antiOverflow();
+	} else {
+		return m_classic.anti_overflow;
+	}
+}
+
+const DP_AntiOverflow &ActiveBrush::constAntiOverflow() const
+{
+	if(m_activeType == MYPAINT) {
+		return m_myPaint.constAntiOverflow();
+	} else {
+		return m_classic.anti_overflow;
+	}
+}
+
+StabilizationMode ActiveBrush::stabilizationMode() const
+{
+	return m_activeType == CLASSIC ? m_classic.stabilizationMode
+								   : m_myPaint.stabilizationMode();
+}
+
+void ActiveBrush::setStabilizationMode(StabilizationMode stabilizationMode)
+{
+	if(m_activeType == CLASSIC) {
+		m_classic.stabilizationMode = stabilizationMode;
+	} else {
+		m_myPaint.setStabilizationMode(stabilizationMode);
+	}
+}
+
+int ActiveBrush::stabilizerSampleCount() const
+{
+	return m_activeType == CLASSIC ? m_classic.stabilizerSampleCount
+								   : m_myPaint.stabilizerSampleCount();
+}
+
+void ActiveBrush::setStabilizerSampleCount(int stabilizerSampleCount)
+{
+	if(m_activeType == CLASSIC) {
+		m_classic.stabilizerSampleCount = stabilizerSampleCount;
+	} else {
+		m_myPaint.setStabilizerSampleCount(stabilizerSampleCount);
+	}
+}
+
+int ActiveBrush::smoothing() const
+{
+	return m_activeType == CLASSIC ? m_classic.smoothing
+								   : m_myPaint.smoothing();
+}
+
+void ActiveBrush::setSmoothing(int smoothing)
+{
+	if(m_activeType == CLASSIC) {
+		m_classic.smoothing = smoothing;
+	} else {
+		m_myPaint.setSmoothing(smoothing);
+	}
+}
+
+bool ActiveBrush::shouldSyncSamples() const
+{
+	if(m_activeType == CLASSIC) {
+		return m_classic.shouldSyncSamples();
+	} else {
+		return m_myPaint.shouldSyncSamples();
+	}
+}
+
+bool ActiveBrush::isSyncSamples() const
+{
+	if(m_activeType == CLASSIC) {
+		return m_classic.syncSamples;
+	} else {
+		return m_myPaint.isSyncSamples();
+	}
+}
+
+void ActiveBrush::setSyncSamples(bool syncSamples)
+{
+	if(m_activeType == CLASSIC) {
+		m_classic.syncSamples = syncSamples;
+	} else {
+		m_myPaint.setSyncSamples(syncSamples);
+	}
+}
+
+bool ActiveBrush::isConfidential() const
+{
+	if(m_activeType == CLASSIC) {
+		return m_classic.confidential;
+	} else {
+		return m_myPaint.isConfidential();
+	}
+}
+
+void ActiveBrush::setConfidential(bool confidential)
+{
+	m_classic.confidential = confidential;
+	m_myPaint.setConfidential(confidential);
+}
+
+QByteArray ActiveBrush::toJson(bool includeSlotProperties) const
+{
+	QJsonObject json{
+		{"type", "dp-active"},
+		{"version", 1},
+		{"active_type", m_activeType == CLASSIC ? "classic" : "mypaint"},
+		{"settings",
+		 QJsonObject{
+			 {"classic", m_classic.toJson()},
+			 {"mypaint", m_myPaint.toJson()},
+		 }},
+	};
+	if(includeSlotProperties) {
+		json["_slot"] = QJsonObject{
+			{"color", qColor().name()},
+		};
+	}
+	return QJsonDocument{json}.toJson(QJsonDocument::Compact);
+}
+
+QByteArray ActiveBrush::toExportJson(const QString &description) const
+{
+	QJsonObject json{
+		{"comment", description},
+		{"drawpile_version", cmake_config::version()},
+		{"group", ""},
+		{"parent_brush_name", ""},
+		{"version", 3},
+	};
+	if(m_activeType == CLASSIC) {
+		m_classic.exportToJson(json);
+	} else {
+		m_myPaint.exportToJson(json);
+	}
+	return QJsonDocument{json}.toJson(QJsonDocument::Indented);
+}
+
+QJsonObject ActiveBrush::toShareJson() const
+{
+	if(isConfidential()) {
+		return QJsonObject();
+	} else {
+		if(m_activeType == CLASSIC) {
+			return m_classic.toJson();
+		} else {
+			return m_myPaint.toJson();
+		}
+	}
+}
+
+ActiveBrush
+ActiveBrush::fromJson(const QJsonObject &json, bool includeSlotProperties)
+{
+	ActiveBrush brush;
+	const QJsonValue type = json["type"];
+	if(type == "dp-active") {
+		brush.setActiveType(
+			json["active_type"] == "mypaint" ? MYPAINT : CLASSIC);
+		const QJsonObject o = json["settings"].toObject();
+		brush.setClassic(ClassicBrush::fromJson(o["classic"].toObject()));
+		brush.setMyPaint(MyPaintBrush::fromJson(o["mypaint"].toObject()));
+	} else if(type == "dp-classic") {
+		brush.setActiveType(CLASSIC);
+		brush.setClassic(ClassicBrush::fromJson(json));
+	} else if(type == "dp-mypaint") {
+		brush.setActiveType(MYPAINT);
+		brush.setMyPaint(MyPaintBrush::fromJson(json));
+	} else {
+		qWarning(
+			"ActiveBrush::fromJson: type is neither dp-active, dp-classic "
+			"nor dp-mypaint!");
+	}
+
+	if(includeSlotProperties) {
+		QJsonObject slot = json["_slot"].toObject();
+		if(!slot.isEmpty()) {
+			QColor color = QColor(slot["color"].toString());
+			brush.setQColor(color.isValid() ? color : Qt::black);
+		}
+	}
+
+	return brush;
+}
+
+bool ActiveBrush::fromExportJson(const QJsonObject &json)
+{
+	if(json["drawpile_classic_settings"].isObject()) {
+		setActiveType(CLASSIC);
+		return m_classic.fromExportJson(json);
+	} else {
+		setActiveType(MYPAINT);
+		return m_myPaint.fromExportJson(json);
+	}
+}
+
+QString ActiveBrush::presetType() const
+{
+	return m_activeType == MYPAINT ? QStringLiteral("mypaint")
+								   : QStringLiteral("classic");
+}
+
+QByteArray ActiveBrush::presetData() const
+{
+	QJsonObject json =
+		m_activeType == MYPAINT ? m_myPaint.toJson() : m_classic.toJson();
+	return QJsonDocument(json).toJson(QJsonDocument::Compact);
+}
+
+QPixmap ActiveBrush::presetThumbnail() const
+{
+	return m_activeType == MYPAINT ? m_myPaint.presetThumbnail()
+								   : m_classic.presetThumbnail();
+}
+
+void ActiveBrush::setInBrushEngine(
+	drawdance::BrushEngine &be, const DP_BrushEngineStrokeParams &besp) const
+{
+	if(m_activeType == CLASSIC) {
+		be.setClassicBrush(m_classic, besp, isEraserOverride());
+	} else {
+		be.setMyPaintBrush(
+			m_myPaint.constBrush(), m_myPaint.constSettings(), besp,
+			isEraserOverride());
+	}
+}
+
+void ActiveBrush::setInStrokeWorker(
+	drawdance::StrokeWorker &sw, const DP_BrushEngineStrokeParams &besp,
+	const QColor &colorOverride) const
+{
+	if(m_activeType == CLASSIC) {
+		sw.setClassicBrush(m_classic, besp, isEraserOverride(), colorOverride);
+	} else {
+		sw.setMyPaintBrush(
+			m_myPaint.constBrush(), m_myPaint.constSettings(), besp,
+			isEraserOverride(), colorOverride);
+	}
+}
+
+void ActiveBrush::renderPreview(
+	drawdance::BrushPreview &bp, DP_BrushPreviewStyle style,
+	DP_BrushPreviewShape shape) const
+{
+	if(m_activeType == CLASSIC) {
+		bp.renderClassic(m_classic, style, shape);
+	} else {
+		bp.renderMyPaint(
+			m_myPaint.constBrush(), m_myPaint.constSettings(), style, shape);
+	}
+}
+
+}

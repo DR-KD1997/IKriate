@@ -165,5 +165,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- IKriate: keeps an online session connected while the screen dims -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
 </manifest>

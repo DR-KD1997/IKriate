@@ -1,0 +1,480 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+extern "C" {
+#include <dpcommon/output.h>
+#include <dpengine/tile.h>
+#include <dpimpex/paint_engine_playback.h>
+}
+#include "libclient/drawdance/aclstate.h"
+#include "libclient/drawdance/image.h"
+#include "libclient/drawdance/paintengine.h"
+#include "libclient/drawdance/snapshotqueue.h"
+#include "libclient/drawdance/viewstate.h"
+#include "libshared/util/paths.h"
+#include <QColor>
+#include <QDateTime>
+
+namespace drawdance {
+
+PaintEngine::PaintEngine(
+	AclState &acls, SnapshotQueue &sq, bool wantCanvasHistoryDump,
+	bool rendererChecker, const QColor &checkerColor1,
+	const QColor &checkerColor2, const QColor &selectionColor,
+	DP_RendererTileFn rendererTileFn, DP_RendererUnlockFn rendererUnlockFn,
+	DP_RendererResizeFn rendererResizeFn, void *rendererUser,
+	DP_CanvasHistorySoftResetFn softResetFn, void *softResetUser,
+	DP_PaintEnginePlaybackFn playbackFn,
+	DP_PaintEngineDumpPlaybackFn dumpPlaybackFn, void *playbackUser,
+	DP_PaintEngineStreamResetStartFn streamResetStartFn, void *streamResetUser,
+	const CanvasState &canvasState)
+	: m_paintDc{DrawContextPool::acquire()}
+	, m_mainDc{DrawContextPool::acquire()}
+	, m_previewDc{DrawContextPool::acquire()}
+	, m_data(DP_paint_engine_new_inc(
+		  m_paintDc.get(), m_mainDc.get(), m_previewDc.get(), acls.get(),
+		  canvasState.get(), rendererChecker, checkerColor1.rgba(),
+		  checkerColor2.rgba(), selectionColor.rgba(), rendererTileFn,
+		  rendererUnlockFn, rendererResizeFn, rendererUser,
+		  DP_snapshot_queue_on_save_point, sq.get(), softResetFn, softResetUser,
+		  wantCanvasHistoryDump, getDumpDir().toUtf8().constData(),
+		  &PaintEngine::getTimeMs, nullptr, nullptr, playbackFn, dumpPlaybackFn,
+		  playbackUser, streamResetStartFn, streamResetUser))
+{
+}
+
+PaintEngine::~PaintEngine()
+{
+	DP_paint_engine_free_join(m_data);
+}
+
+DP_PaintEngine *PaintEngine::get() const
+{
+	return m_data;
+}
+
+net::MessageList PaintEngine::reset(
+	AclState &acls, SnapshotQueue &sq, uint8_t localUserId,
+	bool rendererChecker, DP_RendererTileFn rendererTileFn,
+	DP_RendererUnlockFn rendererUnlockFn, DP_RendererResizeFn rendererResizeFn,
+	void *rendererUser, DP_CanvasHistorySoftResetFn softResetFn,
+	void *softResetUser, DP_PaintEnginePlaybackFn playbackFn,
+	DP_PaintEngineDumpPlaybackFn dumpPlaybackFn, void *playbackUser,
+	DP_PaintEngineStreamResetStartFn streamResetStartFn, void *streamResetUser,
+	const CanvasState &canvasState, DP_Player *player)
+{
+	net::MessageList localResetImage;
+	DP_paint_engine_local_state_reset_image_build(
+		m_data, pushResetMessage, &localResetImage);
+	bool wantCanvasHistoryDump =
+		DP_paint_engine_want_canvas_history_dump(m_data);
+	QColor checkerColor1(DP_paint_engine_checker_color1(m_data));
+	QColor checkerColor2(DP_paint_engine_checker_color2(m_data));
+	QColor selectionColor =
+		QColor::fromRgba(DP_paint_engine_selection_color(m_data));
+	DP_paint_engine_free_join(m_data);
+	acls.reset(localUserId);
+	m_data = DP_paint_engine_new_inc(
+		m_paintDc.get(), m_mainDc.get(), m_previewDc.get(), acls.get(),
+		canvasState.get(), rendererChecker, checkerColor1.rgba(),
+		checkerColor2.rgba(), selectionColor.rgba(), rendererTileFn,
+		rendererUnlockFn, rendererResizeFn, rendererUser,
+		DP_snapshot_queue_on_save_point, sq.get(), softResetFn, softResetUser,
+		wantCanvasHistoryDump, getDumpDir().toUtf8().constData(),
+		&PaintEngine::getTimeMs, nullptr, player, playbackFn, dumpPlaybackFn,
+		playbackUser, streamResetStartFn, streamResetUser);
+	return localResetImage;
+}
+
+int PaintEngine::renderThreadCount() const
+{
+	return DP_paint_engine_render_thread_count(m_data);
+}
+
+void PaintEngine::setLocalDrawingInProgress(bool localDrawingInProgress)
+{
+	DP_paint_engine_local_drawing_in_progress_set(
+		m_data, localDrawingInProgress);
+}
+
+void PaintEngine::setWantCanvasHistoryDump(bool wantCanvasHistoryDump)
+{
+	DP_paint_engine_want_canvas_history_dump_set(m_data, wantCanvasHistoryDump);
+}
+
+QSet<int> PaintEngine::getLayersVisibleInFrame()
+{
+	QSet<int> layersVisibleInFrame;
+	DP_paint_engine_get_layers_visible_in_frame(
+		m_data, addLayerVisibleInFrame, &layersVisibleInFrame);
+	return layersVisibleInFrame;
+}
+
+int PaintEngine::activeLayerId() const
+{
+	return DP_paint_engine_active_layer_id(m_data);
+}
+
+int PaintEngine::activeFrameIndex() const
+{
+	return DP_paint_engine_active_frame_index(m_data);
+}
+
+DP_ViewMode PaintEngine::viewMode() const
+{
+	return DP_paint_engine_view_mode(m_data);
+}
+
+bool PaintEngine::revealCensored() const
+{
+	return DP_paint_engine_reveal_censored(m_data);
+}
+
+void PaintEngine::setRevealCensored(bool revealCensored)
+{
+	DP_paint_engine_reveal_censored_set(m_data, revealCensored);
+}
+
+void PaintEngine::setViewState(const drawdance::ViewState &vs)
+{
+	DP_paint_engine_view_state_set(m_data, vs.constViewState());
+}
+
+DP_ViewModePick PaintEngine::pick(int x, int y)
+{
+	return DP_paint_engine_pick(m_data, x, y);
+}
+
+void PaintEngine::setInspect(unsigned int contextId, bool showTiles)
+{
+	DP_paint_engine_inspect_set(m_data, contextId, showTiles);
+}
+
+void PaintEngine::setCheckerColor1(const QColor &color1)
+{
+	DP_paint_engine_checker_color1_set(m_data, color1.rgba());
+}
+
+void PaintEngine::setCheckerColor2(const QColor &color2)
+{
+	DP_paint_engine_checker_color2_set(m_data, color2.rgba());
+}
+
+void PaintEngine::setSelectionColor(const QColor &color)
+{
+	DP_paint_engine_selection_color_set(m_data, color.rgba());
+}
+
+bool PaintEngine::checkersVisible() const
+{
+	return DP_paint_engine_checkers_visible(m_data);
+}
+
+Tile PaintEngine::localBackgroundTile() const
+{
+	return Tile::inc(DP_paint_engine_local_background_tile_noinc(m_data));
+}
+
+RecordStartResult PaintEngine::makeRecorderParameters(
+	const QString &path, const QString &writer, const QString &writerVersion,
+	const QString &type, DP_RecorderType &outRecorderType,
+	JSON_Value *&outHeader)
+{
+	DP_RecorderType recorderType;
+	if(path.endsWith(".dprec", Qt::CaseInsensitive)) {
+		recorderType = DP_RECORDER_TYPE_BINARY;
+	} else if(path.endsWith(".dptxt", Qt::CaseInsensitive)) {
+		recorderType = DP_RECORDER_TYPE_TEXT;
+	} else {
+		return RECORD_START_UNKNOWN_FORMAT;
+	}
+
+	JSON_Value *header = DP_recorder_header_new(
+		"writer", qUtf8Printable(writer), "writerversion",
+		qUtf8Printable(writerVersion), "type", qUtf8Printable(type), NULL);
+	if(!header) {
+		return RECORD_START_HEADER_ERROR;
+	}
+
+	outRecorderType = recorderType;
+	outHeader = header;
+	return RECORD_START_SUCCESS;
+}
+
+RecordStartResult PaintEngine::startRecorder(
+	const QString &path, const QString &writer, const QString &writerVersion,
+	const QString &type)
+{
+	DP_RecorderType recorderType;
+	JSON_Value *header;
+	RecordStartResult result = makeRecorderParameters(
+		path, writer, writerVersion, type, recorderType, header);
+	if(result != RECORD_START_SUCCESS) {
+		return result;
+	}
+
+	QByteArray pathBytes = path.toUtf8();
+	if(DP_paint_engine_recorder_start(
+		   m_data, recorderType, header, pathBytes.constData())) {
+		return RECORD_START_SUCCESS;
+	} else {
+		return RECORD_START_OPEN_ERROR;
+	}
+}
+
+RecordStartResult PaintEngine::exportTemplate(
+	const QString &path, const net::MessageList &snapshot,
+	const QString &writer, const QString &writerVersion, const QString &type)
+{
+	DP_RecorderType recorderType;
+	JSON_Value *header;
+	RecordStartResult result = PaintEngine::makeRecorderParameters(
+		path, writer, writerVersion, type, recorderType, header);
+	if(result != drawdance::RECORD_START_SUCCESS) {
+		return result;
+	}
+
+	QByteArray pathBytes = path.toUtf8();
+	DP_Output *output =
+		DP_file_output_save_new_from_path(pathBytes.constData());
+	if(!output) {
+		return RECORD_START_OPEN_ERROR;
+	}
+
+	DP_Recorder *r = DP_recorder_new_inc(
+		recorderType, header, nullptr, nullptr, nullptr, output);
+	if(!r) {
+		return RECORD_START_RECORDER_ERROR;
+	}
+
+	for(const net::Message &msg : snapshot) {
+		if(!DP_recorder_message_push_inc(r, msg.get())) {
+			break;
+		}
+	}
+
+	char *error;
+	DP_recorder_free_join(r, &error);
+	if(error) {
+		DP_error_set("%s", error);
+		DP_free(error);
+		return RECORD_START_RECORDER_ERROR;
+	} else {
+		return RECORD_START_SUCCESS;
+	}
+}
+
+bool PaintEngine::stopRecorder()
+{
+	return DP_paint_engine_recorder_stop(m_data);
+}
+
+bool PaintEngine::recorderIsRecording() const
+{
+	return DP_paint_engine_recorder_is_recording(m_data);
+}
+
+void PaintEngine::startProjectRecording(
+	DP_ProjectWorker *pw, unsigned int fileId)
+{
+	DP_paint_engine_project_recording_start(m_data, pw, fileId);
+}
+
+void PaintEngine::resumeProjectRecording(
+	DP_ProjectWorker *pw, unsigned int fileId)
+{
+	DP_paint_engine_project_recording_resume(m_data, pw, fileId);
+}
+
+bool PaintEngine::stopProjectRecording()
+{
+	return DP_paint_engine_project_recording_stop(m_data);
+}
+
+bool PaintEngine::isProjectRecording() const
+{
+	return DP_paint_engine_is_project_recording(m_data);
+}
+
+bool PaintEngine::hasPlayback() const
+{
+	return DP_paint_engine_playback(m_data)->player != nullptr;
+}
+
+DP_PlayerResult PaintEngine::stepDumpPlayback(net::MessageList &outMsgs)
+{
+	return DP_paint_engine_playback_dump_step(
+		m_data, PaintEngine::pushMessage, &outMsgs);
+}
+
+DP_PlayerResult
+PaintEngine::jumpDumpPlaybackToPreviousReset(net::MessageList &outMsgs)
+{
+	return DP_paint_engine_playback_dump_jump_previous_reset(
+		m_data, PaintEngine::pushMessage, &outMsgs);
+}
+
+DP_PlayerResult
+PaintEngine::jumpDumpPlaybackToNextReset(net::MessageList &outMsgs)
+{
+	return DP_paint_engine_playback_dump_jump_next_reset(
+		m_data, PaintEngine::pushMessage, &outMsgs);
+}
+
+DP_PlayerResult
+PaintEngine::jumpDumpPlayback(long long position, net::MessageList &outMsgs)
+{
+	return DP_paint_engine_playback_dump_jump(
+		m_data, position, PaintEngine::pushMessage, &outMsgs);
+}
+
+bool PaintEngine::flushPlayback(net::MessageList &outMsgs)
+{
+	return DP_paint_engine_playback_flush(
+		m_data, PaintEngine::pushMessage, &outMsgs);
+}
+
+bool PaintEngine::closePlayback()
+{
+	return DP_paint_engine_playback_close(m_data);
+}
+
+void PaintEngine::previewCut(
+	const QSet<int> &layerIds, const QRect &bounds, const QImage &mask)
+{
+	Q_ASSERT(
+		mask.isNull() || mask.format() == QImage::Format_ARGB32_Premultiplied);
+	Q_ASSERT(mask.isNull() || mask.size() == bounds.size());
+	QVector<int> layerIdsVec(layerIds.begin(), layerIds.end());
+	DP_paint_engine_preview_cut(
+		m_data, bounds.x(), bounds.y(), bounds.width(), bounds.height(),
+		mask.isNull() ? nullptr
+					  : reinterpret_cast<const DP_Pixel8 *>(mask.constBits()),
+		layerIdsVec.size(), layerIdsVec.constData());
+}
+
+void PaintEngine::clearCutPreview()
+{
+	DP_paint_engine_preview_clear(m_data, DP_PREVIEW_CUT);
+}
+
+void PaintEngine::previewTransform(
+	int id, int layerId, int blendMode, qreal opacity, int x, int y,
+	const QImage &img, const QPolygon &dstPolygon, int interpolation)
+{
+	if(id >= 0 && id < DP_PREVIEW_TRANSFORM_COUNT) {
+		QPoint p1 = dstPolygon.point(0);
+		QPoint p2 = dstPolygon.point(1);
+		QPoint p3 = dstPolygon.point(2);
+		QPoint p4 = dstPolygon.point(3);
+		DP_Quad dstQuad = DP_quad_make(
+			p1.x(), p1.y(), p2.x(), p2.y(), p3.x(), p3.y(), p4.x(), p4.y());
+		DP_paint_engine_preview_transform(
+			m_data, id, layerId, blendMode,
+			DP_channel_float_to_15(qBound(0.0, opacity, 1.0)), x, y,
+			img.width(), img.height(), &dstQuad, interpolation,
+			getTransformPreviewPixels, disposeTransformPreviewPixels,
+			new QImage{img});
+	} else {
+		qWarning("Invalid preview transform id %d", id);
+	}
+}
+
+void PaintEngine::clearTransformPreview(int id)
+{
+	if(id >= 0 && id < DP_PREVIEW_TRANSFORM_COUNT) {
+		DP_paint_engine_preview_clear(m_data, DP_PREVIEW_TRANSFORM_FIRST + id);
+	} else {
+		qWarning("Invalid preview transform id %d", id);
+	}
+}
+
+void PaintEngine::clearAllTransformPreviews()
+{
+	DP_paint_engine_preview_clear_all_transforms(m_data);
+}
+
+void PaintEngine::previewDabs(int layerId, int count, const net::Message *msgs)
+{
+	DP_paint_engine_preview_dabs_inc(
+		m_data, layerId, count, net::Message::asRawMessages(msgs));
+}
+
+void PaintEngine::clearDabsPreview()
+{
+	DP_paint_engine_preview_clear(m_data, DP_PREVIEW_DABS);
+}
+
+void PaintEngine::previewFill(
+	int layerId, int blendMode, qreal opacity, int x, int y, const QImage &img)
+{
+	DP_paint_engine_preview_fill(
+		m_data, layerId, blendMode,
+		DP_channel_float_to_15(qBound(0.0, opacity, 1.0)), x, y, img.width(),
+		img.height(), reinterpret_cast<const DP_Pixel8 *>(img.constBits()));
+}
+
+void PaintEngine::clearFillPreview()
+{
+	DP_paint_engine_preview_clear(m_data, DP_PREVIEW_FILL);
+}
+
+CanvasState PaintEngine::viewCanvasState() const
+{
+	return drawdance::CanvasState::noinc(
+		DP_paint_engine_view_canvas_state_inc(m_data));
+}
+
+CanvasState PaintEngine::historyCanvasState() const
+{
+	return drawdance::CanvasState::noinc(
+		DP_paint_engine_history_canvas_state_inc(m_data));
+}
+
+CanvasState PaintEngine::sampleCanvasState() const
+{
+	return drawdance::CanvasState::noinc(
+		DP_paint_engine_sample_canvas_state_inc(m_data));
+}
+
+QString PaintEngine::getDumpDir()
+{
+	return utils::paths::writablePath("dumps", ".");
+}
+
+long long PaintEngine::getTimeMs(void *)
+{
+	return QDateTime::currentMSecsSinceEpoch();
+}
+
+void PaintEngine::pushMessage(void *user, DP_Message *msg)
+{
+	net::MessageList *outMsgs = static_cast<net::MessageList *>(user);
+	outMsgs->append(net::Message::noinc(msg));
+}
+
+bool PaintEngine::pushResetMessage(void *user, DP_Message *msg)
+{
+	pushMessage(user, msg);
+	return true;
+}
+
+void PaintEngine::addLayerVisibleInFrame(void *user, int layerId, bool visible)
+{
+	if(visible) {
+		QSet<int> *layersVisibleInFrame = static_cast<QSet<int> *>(user);
+		layersVisibleInFrame->insert(layerId);
+	}
+}
+
+const DP_Pixel8 *PaintEngine::getTransformPreviewPixels(void *user)
+{
+	QImage *img = static_cast<QImage *>(user);
+	return reinterpret_cast<const DP_Pixel8 *>(img->constBits());
+}
+
+void PaintEngine::disposeTransformPreviewPixels(void *user)
+{
+	QImage *img = static_cast<QImage *>(user);
+	delete img;
+}
+
+}

@@ -1,0 +1,49 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "libclient/canvas/documentmetadata.h"
+#include "libclient/canvas/paintengine.h"
+#include "libclient/drawdance/canvasstate.h"
+
+namespace canvas {
+
+DocumentMetadata::DocumentMetadata(PaintEngine *engine, QObject *parent)
+	: QObject(parent)
+	, m_engine(engine)
+{
+	Q_ASSERT(engine);
+	refreshMetadata(m_engine->historyCanvasState().documentMetadata());
+	connect(
+		engine, &PaintEngine::documentMetadataChanged, this,
+		&DocumentMetadata::refreshMetadata);
+}
+
+void DocumentMetadata::refreshMetadata(const drawdance::DocumentMetadata &dm)
+{
+	// Note: dpix and dpiy are presently not used in the GUI.
+	// To be included here when needed.
+
+	double framerate = dm.effectiveFramerate();
+	if(framerate != m_framerate) {
+		m_framerate = framerate;
+		emit framerateChanged(framerate);
+	}
+
+	int frameCount = dm.frameCount();
+	if(frameCount != m_frameCount) {
+		m_frameCount = frameCount;
+		emit frameCountChanged(frameCount);
+	}
+
+	m_actualFrameRangeFirst = dm.frameRangeFirst();
+	m_actualFrameRangeLast = dm.frameRangeLast();
+
+	int frameRangeFirst, frameRangeLast;
+	dm.effectiveFrameRange(frameRangeFirst, frameRangeLast);
+	if(m_frameRangeFirst != frameRangeFirst ||
+	   m_frameRangeLast != frameRangeLast) {
+		m_frameRangeFirst = frameRangeFirst;
+		m_frameRangeLast = frameRangeLast;
+		emit frameRangeChanged(frameRangeFirst, frameRangeLast);
+	}
+}
+
+}

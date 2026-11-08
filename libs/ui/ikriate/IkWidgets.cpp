@@ -1511,6 +1511,11 @@ void IkPopover::dismiss()
 
 bool IkPopover::eventFilter(QObject *watched, QEvent *event)
 {
+    // Content that shows or hides parts of itself (a field appearing for an
+    // option): fit the popover to it again once the layout has updated.
+    if (watched == this && event->type() == QEvent::LayoutRequest && isVisible() && !m_requested.isValid()) {
+        QTimer::singleShot(0, this, [this]() { place(); });
+    }
     if ((event->type() == QEvent::ShortcutOverride || event->type() == QEvent::KeyPress) && isVisible() && !m_modal) {
         const int key = static_cast<QKeyEvent *>(event)->key();
         if (key == Qt::Key_Escape || key == Qt::Key_Back) {

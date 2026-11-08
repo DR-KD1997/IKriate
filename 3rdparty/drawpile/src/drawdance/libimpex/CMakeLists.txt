@@ -1,0 +1,130 @@
+# SPDX-License-Identifier: MIT
+
+dp_add_library(dpimpex)
+dp_target_sources(dpimpex
+    dpimpex/image_impex.c
+    dpimpex/image_impex.h
+    dpimpex/image_jpeg.h
+    dpimpex/image_png.h
+    dpimpex/image_qoi.c
+    dpimpex/image_qoi.h
+    dpimpex/image_webp.c
+    dpimpex/image_webp.h
+    dpimpex/load.c
+    dpimpex/load.h
+    dpimpex/load_animation.c
+    dpimpex/load_animation.h
+    dpimpex/load_psd.cpp
+    dpimpex/paint_engine_playback.c
+    dpimpex/paint_engine_playback.h
+    dpimpex/process.h
+    dpimpex/save.c
+    dpimpex/save.h
+    dpimpex/save_psd.c
+    dpimpex/utf16be.h
+    dpimpex/utf16be_qt.cpp
+    dpimpex/xml_stream.h
+    dpimpex/xml_stream_qt.cpp
+    dpimpex/zip_archive.h
+)
+
+target_include_directories(dpimpex PUBLIC ${CMAKE_CURRENT_LIST_DIR})
+target_link_libraries(dpimpex PUBLIC
+    dpengine dpmsg dpcommon dpwebp::dpwebp psd_sdk
+    "Qt${QT_VERSION_MAJOR}::Core" "Qt${QT_VERSION_MAJOR}::Xml"
+)
+
+if(ANDROID OR EMSCRIPTEN)
+    target_sources(dpimpex PRIVATE dpimpex/process_dummy.c)
+else()
+    target_sources(dpimpex PRIVATE dpimpex/process_qt.cpp)
+    target_link_libraries(dpimpex PUBLIC "Qt${QT_VERSION_MAJOR}::Core")
+endif()
+
+if(ZIP_IMPL STREQUAL "QUAZIP")
+    # IKriate: QuaZip, as Krita finds it.
+    target_sources(dpimpex PRIVATE dpimpex/zip_archive_quazip.cpp)
+    if(TARGET QuaZip::QuaZip)
+        target_link_libraries(dpimpex PUBLIC QuaZip::QuaZip)
+    else()
+        target_include_directories(dpimpex SYSTEM PRIVATE ${QUAZIP_INCLUDE_DIRS})
+        target_link_libraries(dpimpex PUBLIC ${QUAZIP_LIBRARIES})
+    endif()
+elseif(ZIP_IMPL STREQUAL "LIBZIP")
+    target_sources(dpimpex PRIVATE dpimpex/zip_archive_libzip.c)
+    target_link_libraries(dpimpex PUBLIC libzip::zip)
+elseif(ZIP_IMPL STREQUAL "KARCHIVE")
+    target_sources(dpimpex PRIVATE dpimpex/zip_archive_karchive.cpp)
+    target_link_libraries(dpimpex PUBLIC KF${QT_VERSION_MAJOR}::Archive)
+else()
+    message(SEND_ERROR "Unknown ZIP_IMPL value '${ZIP_IMPL}'")
+endif()
+
+if(IMAGE_IMPL STREQUAL "LIBS")
+    target_sources(dpimpex PRIVATE
+        dpimpex/image_init.c
+        dpimpex/image_jpeg.c
+        dpimpex/image_png.c
+    )
+    target_link_libraries(dpimpex PUBLIC
+        PNG::PNG
+        JPEG::JPEG
+    )
+elseif(IMAGE_IMPL STREQUAL "QT")
+    target_sources(dpimpex PRIVATE dpimpex/image_qt.cpp)
+    target_link_libraries(dpimpex PUBLIC "Qt${QT_VERSION_MAJOR}::Gui")
+else()
+    message(SEND_ERROR "Unknown IMAGE_IMPL value '${IMAGE_IMPL}'")
+endif()
+
+if(TARGET LIBAV::LIBAV)
+    target_sources(dpimpex PRIVATE
+        dpimpex/save_video.c
+        dpimpex/save_video.h
+    )
+    target_link_libraries(dpimpex PUBLIC LIBAV::LIBAV)
+    target_compile_definitions(dpimpex PUBLIC DP_LIBAV=1)
+
+    if(ANDROID)
+        target_sources(dpimpex PRIVATE
+            dpimpex/android_video_encoder.cpp
+            dpimpex/android_video_encoder.h
+        )
+        if(QT_VERSION_MAJOR EQUAL 5)
+            target_link_libraries(dpimpex PUBLIC "Qt${QT_VERSION_MAJOR}::AndroidExtras")
+        endif()
+        target_compile_definitions(dpimpex PUBLIC DP_ANDROID_VIDEO_ENCODER=1)
+    elseif(WIN32)
+        target_sources(dpimpex PRIVATE
+            dpimpex/windows_video_encoder.cpp
+            dpimpex/windows_video_encoder.h
+        )
+	target_compile_definitions(dpimpex PUBLIC DP_WINDOWS_VIDEO_ENCODER=1)
+    endif()
+endif()
+
+if(FALSE)
+    add_library(dptest_impex)
+    target_sources(dptest_impex PRIVATE
+        test/dptest/dptest_impex.c
+        test/dptest/dptest_impex.h
+    )
+    target_include_directories(dptest_impex PUBLIC
+        "${CMAKE_CURRENT_LIST_DIR}/test/dptest"
+    )
+    target_link_libraries(dptest_impex PUBLIC dptest dpimpex)
+    add_dptest_targets(impex dptest_impex
+        test/image_thumbnail.c
+        test/resize_image.c
+    )
+endif()
+
+if(FALSE)
+    dp_add_executable(bench_multidab)
+    dp_target_sources(bench_multidab bench/bench_multidab.c)
+    target_link_libraries(bench_multidab PUBLIC dpimpex)
+
+    dp_add_executable(bench_flatten)
+    dp_target_sources(bench_flatten bench/bench_flatten.c)
+    target_link_libraries(bench_flatten PUBLIC dpimpex)
+endif()

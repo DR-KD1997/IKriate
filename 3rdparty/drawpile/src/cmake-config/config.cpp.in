@@ -1,0 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+#include "cmake-config/config.h"
+
+extern "C" const char *DP_cmake_config_version() { return "@GIT_VERSION@"; }

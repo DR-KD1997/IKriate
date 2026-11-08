@@ -77,6 +77,11 @@ public:
 
     QString buildLogString() const;
 
+    // IKriate (from Drawpile): whether Android ended the app while it was in
+    // the foreground because the device ran out of memory or the app used
+    // too much of it (devices that can't report that send a SIGKILL instead).
+    bool looksLikeForegroundResourceExhaustionExit() const;
+
 private:
     KisAndroidExitInfo();
     KisAndroidExitInfo(int reasonCode, int exitOrSignalCode, int importanceCode, const QString &description);

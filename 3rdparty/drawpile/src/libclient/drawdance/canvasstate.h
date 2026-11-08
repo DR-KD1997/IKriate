@@ -1,0 +1,153 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+#ifndef DRAWDANCE_CANVASSTATE_H
+#define DRAWDANCE_CANVASSTATE_H
+extern "C" {
+#include <dpengine/flood_fill.h>
+#include <dpengine/load_enums.h>
+#include <dpengine/save_enums.h>
+}
+#include "libclient/drawdance/annotationlist.h"
+#include "libclient/drawdance/documentmetadata.h"
+#include "libclient/drawdance/layercontent.h"
+#include "libclient/drawdance/layergroup.h"
+#include "libclient/drawdance/layerlist.h"
+#include "libclient/drawdance/layerprops.h"
+#include "libclient/drawdance/selectionset.h"
+#include "libclient/drawdance/tile.h"
+#include "libclient/drawdance/timeline.h"
+#include "libclient/net/message.h"
+#include <QColor>
+#include <QImage>
+#include <QMetaType>
+#include <QPoint>
+#include <QSet>
+#include <QSize>
+#include <variant>
+
+struct DP_CanvasState;
+struct DP_ViewModeFilter;
+struct DP_ViewState;
+
+namespace drawdance {
+
+struct LayerSearchResult {
+	LayerProps props;
+	std::variant<std::monostate, LayerContent, LayerGroup> data;
+};
+
+class CanvasState final {
+public:
+	static CanvasState null();
+	static CanvasState inc(DP_CanvasState *cs);
+	static CanvasState noinc(DP_CanvasState *cs);
+
+	static CanvasState load(
+		const QString &path, DP_LoadResult *outResult = nullptr,
+		DP_SaveImageType *outType = nullptr,
+		QString *outSessionSourceParam = nullptr,
+		long long *outSessionSequenceId = nullptr,
+		long long *outResumeSessionId = nullptr,
+		unsigned int *outPlayerFlags = nullptr,
+		DP_ViewState *outViewState = nullptr);
+
+	CanvasState();
+	CanvasState(const CanvasState &other);
+	CanvasState(CanvasState &&other);
+
+	CanvasState &operator=(const CanvasState &other);
+	CanvasState &operator=(CanvasState &&other);
+
+	~CanvasState();
+
+	DP_CanvasState *get() const;
+	DP_CanvasState *getInc() const;
+	DP_CanvasState *take();
+
+	bool isNull() const;
+
+	int width() const;
+	int height() const;
+	QSize size() const;
+
+	int offsetX() const;
+	int offsetY() const;
+	QPoint offset() const;
+
+	Tile backgroundTile() const;
+	DocumentMetadata documentMetadata() const;
+	LayerList layers() const;
+	AnnotationList annotations() const;
+	Timeline timeline() const;
+	SelectionSet selections() const;
+
+	int frameCount() const;
+	double effectiveFramerate() const;
+
+	bool sameFrame(int frameIndexA, int frameIndexB) const;
+
+	bool hasAnimation() const;
+
+	QSet<int> getLayersVisibleInTrackFrame(int trackId, int frameIndex) const;
+
+	QImage toFlatImage(
+		bool includeBackground = true, bool includeSublayers = true,
+		const QRect *rect = nullptr, const DP_ViewModeFilter *vmf = nullptr,
+		const QColor &overrideBackgroundColor = QColor()) const;
+
+	QImage layerToFlatImage(int layerId, const QRect &rect) const;
+
+	QRect layerBounds(int layerId, bool includeSublayers = false) const;
+
+	bool isBlankIn(int layerId, const QRect &rect, const QImage &mask) const;
+
+	bool isSizeInBounds() const;
+
+	void toResetImage(
+		net::MessageList &msgs, uint8_t contextId,
+		bool compatibilityMode) const;
+
+	QRect timelapseRectForViewState(
+		QSize outputSize, QSize viewportSize, QPointF pos, qreal zoom,
+		qreal rotation, bool mirror, bool flip) const;
+
+	net::Message makeLayerTreeMove(
+		uint8_t contextId, int sourceId, int targetId, bool intoGroup,
+		bool below) const;
+
+	LayerSearchResult searchLayer(int layerId, bool showCensored) const;
+	LayerProps searchLayerProps(int layerId) const;
+
+	bool selectionExists(unsigned int contextId, int selectionId) const;
+
+	DP_FloodFillResult floodFill(
+		unsigned int contextId, int selectionId, int x, int y,
+		const QColor &fillColor, double tolerance, int layerId, int sizeLimit,
+		int gap, int expand, DP_FloodFillKernel kernel, int featherRadius,
+		bool fromEdge, bool continuous, bool includeSublayers,
+		DP_ViewMode viewMode, int activeLayerId, int activeFrameIndex,
+		const QAtomicInt &cancel, QImage &outImg, int &outX, int &outY) const;
+
+	DP_FloodFillResult selectionFill(
+		unsigned int contextId, int selectionId, const QColor &fillColor,
+		int expand, DP_FloodFillKernel kernel, int featherRadius, bool fromEdge,
+		const QAtomicInt &cancel, QImage &outImg, int &outX, int &outY) const;
+
+	static unsigned int loadFlags(bool guessPlayer = false);
+
+private:
+	explicit CanvasState(DP_CanvasState *cs);
+
+	static void pushMessage(void *user, DP_Message *msg);
+
+	static void addLayerVisibleInFrame(void *user, int layerId, bool visible);
+
+	static bool shouldCancelFloodFill(void *user);
+
+	DP_CanvasState *m_data;
+};
+
+}
+
+Q_DECLARE_METATYPE(drawdance::CanvasState)
+
+#endif

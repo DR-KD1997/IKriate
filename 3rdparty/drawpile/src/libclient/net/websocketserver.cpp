@@ -1,0 +1,150 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "libclient/net/websocketserver.h"
+#include "libshared/net/websocketmessagequeue.h"
+#include <QWebSocket>
+#ifndef __EMSCRIPTEN__
+#	include "cmake-config/config.h"
+#	include "libshared/net/proxy.h"
+#	include <QNetworkProxy>
+#	include <QNetworkRequest>
+#endif
+
+namespace {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
+const auto WebSocketError = &QWebSocket::errorOccurred;
+#else
+const auto WebSocketError =
+	QOverload<QAbstractSocket::SocketError>::of(&QWebSocket::error);
+#endif
+}
+
+namespace net {
+
+WebSocketServer::WebSocketServer(int timeoutSecs, int proxyMode, Client *client)
+	: Server(client)
+{
+	m_socket = new QWebSocket(QString(), QWebSocketProtocol::Version13, this);
+#ifdef __EMSCRIPTEN__
+	Q_UNUSED(proxyMode);
+#else
+	if(shouldDisableProxy(proxyMode, m_socket->proxy(), true, false)) {
+		m_socket->setProxy(QNetworkProxy::NoProxy);
+	}
+#endif
+
+	m_msgqueue = new WebSocketMessageQueue(m_socket, true, this);
+	m_msgqueue->setIdleTimeout(timeoutSecs * 1000);
+	m_msgqueue->setPingInterval(15 * 1000);
+
+	// AutoConnection doesn't properly here. In Emscripten, stuff comes in on
+	// the wrong thread. On Android, we get error 1002 "Received Continuation
+	// frame, while there is nothing to continue." On Windows, we sometimes get
+	// random disconnects. A queued connection seems to fix all these.
+	connect(
+		m_socket, &QWebSocket::disconnected, this,
+		&WebSocketServer::handleDisconnect, Qt::QueuedConnection);
+	connect(
+		m_socket, WebSocketError, this, &WebSocketServer::handleSocketError,
+		Qt::QueuedConnection);
+	connect(
+		m_socket, &QWebSocket::stateChanged, this,
+		&WebSocketServer::handleSocketStateChange, Qt::QueuedConnection);
+
+	connectMessageQueue(m_msgqueue);
+}
+
+bool WebSocketServer::hasSslSupport() const
+{
+	return false;
+}
+
+QSslCertificate WebSocketServer::hostCertificate() const
+{
+	return QSslCertificate();
+}
+
+MessageQueue *WebSocketServer::messageQueue() const
+{
+	return m_msgqueue;
+}
+
+void WebSocketServer::connectToHost(const QUrl &url)
+{
+	qDebug() << "WebSocketServer connecting to" << url;
+#ifdef __EMSCRIPTEN__
+	m_socket->open(url);
+#else
+	QNetworkRequest request(url);
+	request.setHeader(
+		QNetworkRequest::UserAgentHeader,
+		QStringLiteral("DrawpileClient/%1").arg(cmake_config::version()));
+	m_socket->open(request);
+#endif
+}
+
+void WebSocketServer::disconnectFromHost()
+{
+	m_socket->close();
+}
+
+void WebSocketServer::abortConnection()
+{
+	m_socket->abort();
+}
+
+bool WebSocketServer::isConnected() const
+{
+	return m_socket->state() != QAbstractSocket::UnconnectedState;
+}
+
+QAbstractSocket::SocketError WebSocketServer::socketError() const
+{
+	return m_socket->error();
+}
+
+QString WebSocketServer::socketErrorString() const
+{
+	QString socketMessage = m_socket->errorString();
+	QWebSocketProtocol::CloseCode closeCode = m_socket->closeCode();
+	QString closeReason = m_socket->closeReason();
+
+	bool haveSocketMessage = !socketMessage.isEmpty();
+	bool haveCloseReason = !closeReason.isEmpty();
+	if(haveSocketMessage) {
+		if(haveCloseReason) {
+			return QStringLiteral("%1 (%2: %3)")
+				.arg(socketMessage)
+				.arg(int(closeCode))
+				.arg(closeReason);
+		} else {
+			return QStringLiteral("%1 (%2)")
+				.arg(socketMessage)
+				.arg(int(closeCode));
+		}
+	} else if(haveCloseReason) {
+		return QStringLiteral("(%1: %2)")
+			.arg(socketMessage)
+			.arg(int(closeCode));
+	} else {
+		return QStringLiteral("(%1)").arg(int(closeCode));
+	}
+}
+
+bool WebSocketServer::loginStartTls(LoginHandler *loginstate)
+{
+	Q_UNUSED(loginstate);
+	return false;
+}
+
+bool WebSocketServer::loginIgnoreTlsErrors(const QList<QSslError> &ignore)
+{
+	Q_UNUSED(ignore);
+	return false;
+}
+
+bool WebSocketServer::isWebSocket() const
+{
+	return true;
+}
+
+}

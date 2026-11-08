@@ -1,0 +1,621 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+extern "C" {
+#include <dpcommon/geom.h>
+#include <dpengine/canvas_state.h>
+#include <dpengine/flood_fill.h>
+#include <dpengine/image.h>
+#include <dpengine/key_frame.h>
+#include <dpengine/layer_content.h>
+#include <dpengine/layer_group.h>
+#include <dpengine/layer_list.h>
+#include <dpengine/layer_props.h>
+#include <dpengine/layer_props_list.h>
+#include <dpengine/layer_routes.h>
+#include <dpengine/snapshots.h>
+#include <dpengine/timeline.h>
+#include <dpengine/track.h>
+#include <dpengine/view_mode.h>
+#include <dpimpex/load.h>
+}
+#include "libclient/canvas/blendmodes.h"
+#include "libclient/drawdance/canvasstate.h"
+#include "libclient/drawdance/global.h"
+#include "libclient/drawdance/image.h"
+#include "libclient/drawdance/layergroup.h"
+#include "libclient/drawdance/layerprops.h"
+#include <QObject>
+#include <QPolygonF>
+#include <QRect>
+#include <QRectF>
+#include <QTransform>
+#ifdef Q_OS_ANDROID
+#	include "libshared/util/paths.h"
+#	include <QFile>
+#endif
+
+namespace drawdance {
+
+CanvasState CanvasState::null()
+{
+	return CanvasState{nullptr};
+}
+
+CanvasState CanvasState::inc(DP_CanvasState *cs)
+{
+	return CanvasState{DP_canvas_state_incref_nullable(cs)};
+}
+
+CanvasState CanvasState::noinc(DP_CanvasState *cs)
+{
+	return CanvasState{cs};
+}
+
+
+#ifdef Q_OS_ANDROID
+namespace {
+class CopyDpcsContext {
+public:
+	CopyDpcsContext(const QString &sourcePath)
+		: m_sourcePath(sourcePath)
+	{
+		tryRemoveTempPath();
+	}
+
+	~CopyDpcsContext()
+	{
+		if(!m_tempPathBytes.isEmpty()) {
+			tryRemoveTempPath();
+		}
+	}
+
+	const char *targetPath() const { return m_tempPathBytes.constData(); }
+
+	bool tryCopyDpcs()
+	{
+		QFile sourceFile(m_sourcePath);
+		qWarning(
+			"Copy '%s' to '%s'", qUtf8Printable(m_sourcePath),
+			qUtf8Printable(m_tempPath));
+		if(sourceFile.copy(m_tempPath)) {
+			m_tempPathBytes = m_tempPath.toUtf8();
+			return true;
+		} else {
+			tryRemoveTempPath();
+			DP_error_set(
+				"Failed to copy '%s' to '%s': %s", qUtf8Printable(m_sourcePath),
+				qUtf8Printable(m_tempPath),
+				qUtf8Printable(sourceFile.errorString()));
+			return false;
+		}
+	}
+
+	void tryRemoveTempPath()
+	{
+		qWarning("Remove temp '%s'", qUtf8Printable(m_tempPath));
+		QFile tempFile(m_tempPath);
+		if(tempFile.exists() && !tempFile.remove()) {
+			qWarning(
+				"Failed to remove temporary '%s': %s",
+				qUtf8Printable(m_tempPath),
+				qUtf8Printable(tempFile.errorString()));
+		}
+	}
+
+	static const char *copyDpcs(void *user)
+	{
+		CopyDpcsContext *copyDpcsContext = static_cast<CopyDpcsContext *>(user);
+		if(copyDpcsContext->tryCopyDpcs()) {
+			return copyDpcsContext->targetPath();
+		} else {
+			return nullptr;
+		}
+	}
+
+private:
+	const QString &m_sourcePath;
+	QString m_tempPath =
+		utils::paths::writablePath(QStringLiteral("_loadtemp.dpcs"));
+	QByteArray m_tempPathBytes;
+};
+}
+#endif
+
+CanvasState CanvasState::load(
+	const QString &path, DP_LoadResult *outResult, DP_SaveImageType *outType,
+	QString *outSessionSourceParam, long long *outSessionSequenceId,
+	long long *outResumeSessionId, unsigned int *outPlayerFlags,
+	DP_ViewState *outViewState)
+{
+	QByteArray pathBytes = path.toUtf8();
+	QByteArray flatImageLayerTitleBytes =
+		QObject::tr("Layer %1").arg(1).toUtf8();
+	DrawContext dc = DrawContextPool::acquire();
+
+	DP_LoadContext lc = DP_load_context_make(pathBytes.constData(), dc.get());
+	lc.in.flat_image_layer_title = flatImageLayerTitleBytes.constData();
+	lc.in.flags = loadFlags(outPlayerFlags != nullptr);
+
+	// Android needs to copy content:// URLs to a "real" file so that SQLite can
+	// actually open them.
+#ifdef Q_OS_ANDROID
+	CopyDpcsContext copyDpcsContext(path);
+	lc.in.copy_fn = &CopyDpcsContext::copyDpcs;
+	lc.in.user = &copyDpcsContext;
+#endif
+
+	DP_load_canvas(&lc);
+	if(outResult) {
+		*outResult = lc.out.result;
+	}
+	if(outType) {
+		*outType = lc.out.type;
+	}
+	if(outSessionSourceParam) {
+		*outSessionSourceParam =
+			lc.out.session_source_param
+				? QString::fromUtf8(lc.out.session_source_param)
+				: QString();
+	}
+	if(outSessionSequenceId) {
+		*outSessionSequenceId = lc.out.session_sequence_id;
+	}
+	if(outResumeSessionId) {
+		*outResumeSessionId = lc.out.resume_session_id;
+	}
+	if(outPlayerFlags) {
+		*outPlayerFlags = lc.out.player_flags;
+	}
+	if(outViewState) {
+		*outViewState = lc.out.vs;
+	}
+	return CanvasState::noinc(DP_load_context_dispose_take(&lc));
+}
+
+
+CanvasState::CanvasState()
+	: CanvasState{nullptr}
+{
+}
+
+CanvasState::CanvasState(const CanvasState &other)
+	: CanvasState{DP_canvas_state_incref_nullable(other.m_data)}
+{
+}
+
+CanvasState::CanvasState(CanvasState &&other)
+	: CanvasState{other.m_data}
+{
+	other.m_data = nullptr;
+}
+
+CanvasState &CanvasState::operator=(const CanvasState &other)
+{
+	DP_canvas_state_decref_nullable(m_data);
+	m_data = DP_canvas_state_incref_nullable(other.m_data);
+	return *this;
+}
+
+CanvasState &CanvasState::operator=(CanvasState &&other)
+{
+	DP_canvas_state_decref_nullable(m_data);
+	m_data = other.m_data;
+	other.m_data = nullptr;
+	return *this;
+}
+
+CanvasState::~CanvasState()
+{
+	DP_canvas_state_decref_nullable(m_data);
+}
+
+DP_CanvasState *CanvasState::get() const
+{
+	return m_data;
+}
+
+DP_CanvasState *CanvasState::getInc() const
+{
+	return DP_canvas_state_incref_nullable(m_data);
+}
+
+DP_CanvasState *CanvasState::take()
+{
+	DP_CanvasState *data = m_data;
+	m_data = nullptr;
+	return data;
+}
+
+bool CanvasState::isNull() const
+{
+	return !m_data;
+}
+
+int CanvasState::width() const
+{
+	return DP_canvas_state_width(m_data);
+}
+
+int CanvasState::height() const
+{
+	return DP_canvas_state_height(m_data);
+}
+
+QSize CanvasState::size() const
+{
+	return QSize{width(), height()};
+}
+
+int CanvasState::offsetX() const
+{
+	return DP_canvas_state_offset_x(m_data);
+}
+
+int CanvasState::offsetY() const
+{
+	return DP_canvas_state_offset_y(m_data);
+}
+
+QPoint CanvasState::offset() const
+{
+	return QPoint{offsetX(), offsetY()};
+}
+
+Tile CanvasState::backgroundTile() const
+{
+	return Tile::inc(DP_canvas_state_background_tile_noinc(m_data));
+}
+
+DocumentMetadata CanvasState::documentMetadata() const
+{
+	return DocumentMetadata::inc(DP_canvas_state_metadata_noinc(m_data));
+}
+
+LayerList CanvasState::layers() const
+{
+	return LayerList::inc(DP_canvas_state_layers_noinc(m_data));
+}
+
+AnnotationList CanvasState::annotations() const
+{
+	return AnnotationList::inc(DP_canvas_state_annotations_noinc(m_data));
+}
+
+Timeline CanvasState::timeline() const
+{
+	return Timeline::inc(DP_canvas_state_timeline_noinc(m_data));
+}
+
+SelectionSet CanvasState::selections() const
+{
+	return SelectionSet::inc(DP_canvas_state_selections_noinc_nullable(m_data));
+}
+
+int CanvasState::frameCount() const
+{
+	return DP_canvas_state_frame_count(m_data);
+}
+
+double CanvasState::effectiveFramerate() const
+{
+	return DP_canvas_state_effective_framerate(m_data);
+}
+
+bool CanvasState::sameFrame(int frameIndexA, int frameIndexB) const
+{
+	return DP_canvas_state_same_frame(m_data, frameIndexA, frameIndexB);
+}
+
+bool CanvasState::hasAnimation() const
+{
+	DP_Timeline *tl = DP_canvas_state_timeline_noinc(m_data);
+	int trackCount = DP_timeline_track_count(tl);
+	for(int i = 0; i < trackCount; ++i) {
+		DP_Track *t = DP_timeline_track_at_noinc(tl, i);
+		int keyFrameCount = DP_track_key_frame_count(t);
+		for(int j = 0; j < keyFrameCount; ++j) {
+			DP_KeyFrame *kf = DP_track_key_frame_at_noinc(t, j);
+			if(DP_key_frame_layer_id(kf) > 0) {
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+QSet<int>
+CanvasState::getLayersVisibleInTrackFrame(int trackId, int frameIndex) const
+{
+	QSet<int> layersVisibleInTrackFrame;
+	DP_view_mode_get_layers_visible_in_track_frame(
+		m_data, trackId, frameIndex, addLayerVisibleInFrame,
+		&layersVisibleInTrackFrame);
+	return layersVisibleInTrackFrame;
+}
+
+QImage CanvasState::toFlatImage(
+	bool includeBackground, bool includeSublayers, const QRect *rect,
+	const DP_ViewModeFilter *vmf, const QColor &overrideBackgroundColor) const
+{
+	unsigned int flags =
+		(includeBackground ? DP_FLAT_IMAGE_INCLUDE_BACKGROUND : 0) |
+		(includeSublayers ? DP_FLAT_IMAGE_INCLUDE_SUBLAYERS : 0);
+	DP_Rect area;
+	if(rect) {
+		area =
+			DP_rect_make(rect->x(), rect->y(), rect->width(), rect->height());
+	}
+
+	DP_Image *img;
+	if(overrideBackgroundColor.isValid()) {
+		drawdance::Tile overrideBackgroundTile =
+			drawdance::Tile::fromColor(overrideBackgroundColor);
+		img = DP_canvas_state_to_flat_image_with_background(
+			m_data, flags, rect ? &area : nullptr, vmf,
+			overrideBackgroundTile.get());
+	} else {
+		img = DP_canvas_state_to_flat_image(
+			m_data, flags, rect ? &area : nullptr, vmf);
+	}
+
+	return wrapImage(img);
+}
+
+QImage CanvasState::layerToFlatImage(int layerId, const QRect &rect) const
+{
+	DP_LayerRoutes *lr = DP_canvas_state_layer_routes_noinc(m_data);
+	DP_LayerRoutesEntry *lre = DP_layer_routes_search(lr, layerId);
+	if(lre) {
+		if(DP_layer_routes_entry_is_group(lre)) {
+			DP_LayerGroup *lg = DP_layer_routes_entry_group(lre, m_data);
+			DP_LayerProps *lp = DP_layer_routes_entry_props(lre, m_data);
+			return LayerGroup::inc(lg).toImage(LayerProps::inc(lp), rect);
+		} else {
+			DP_LayerContent *lc = DP_layer_routes_entry_content(lre, m_data);
+			return LayerContent::inc(lc).toImage(rect);
+		}
+	} else {
+		return QImage{};
+	}
+}
+
+QRect CanvasState::layerBounds(int layerId, bool includeSublayers) const
+{
+	DP_LayerRoutes *lr = DP_canvas_state_layer_routes_noinc(m_data);
+	DP_LayerRoutesEntry *lre = DP_layer_routes_search(lr, layerId);
+	bool haveBounds = false;
+	DP_Rect bounds = {0, 0, 0, 0}; // MSVC emits bogus uninitialized warnings.
+	if(lre) {
+		if(DP_layer_routes_entry_is_group(lre)) {
+			DP_LayerGroup *lg = DP_layer_routes_entry_group(lre, m_data);
+			haveBounds = DP_layer_group_bounds(lg, includeSublayers, &bounds);
+		} else {
+			DP_LayerContent *lc = DP_layer_routes_entry_content(lre, m_data);
+			haveBounds = DP_layer_content_bounds(lc, includeSublayers, &bounds);
+		}
+	}
+	return haveBounds ? QRect(
+							DP_rect_x(bounds), DP_rect_y(bounds),
+							DP_rect_width(bounds), DP_rect_height(bounds))
+					  : QRect();
+}
+
+bool CanvasState::isBlankIn(
+	int layerId, const QRect &rect, const QImage &mask) const
+{
+	Q_ASSERT(
+		mask.isNull() || mask.format() == QImage::Format_ARGB32_Premultiplied);
+	QRect bounds = QRect(QPoint(0, 0), size()).intersected(rect);
+	if(bounds.isEmpty()) {
+		return true;
+	}
+
+	DP_LayerRoutes *lr = DP_canvas_state_layer_routes_noinc(m_data);
+	DP_LayerRoutesEntry *lre = DP_layer_routes_search(lr, layerId);
+	if(!lre || DP_layer_routes_entry_is_group(lre)) {
+		return true;
+	}
+
+	DP_LayerContent *lc = DP_layer_routes_entry_content(lre, m_data);
+	DP_Rect area =
+		DP_rect_make(rect.x(), rect.y(), rect.width(), rect.height());
+	return mask.isNull()
+			   ? DP_layer_content_is_blank_in_bounds(lc, &area)
+			   : DP_layer_content_is_blank_in_mask(
+					 lc, &area,
+					 reinterpret_cast<const DP_Pixel8 *>(mask.constBits()));
+}
+
+bool CanvasState::isSizeInBounds() const
+{
+	return DP_canvas_state_dimensions_in_bounds(width(), height());
+}
+
+void CanvasState::toResetImage(
+	net::MessageList &msgs, uint8_t contextId, bool compatibilityMode) const
+{
+	DP_reset_image_build(
+		m_data, contextId, compatibilityMode, &CanvasState::pushMessage, &msgs);
+}
+
+QRect CanvasState::timelapseRectForViewState(
+	QSize outputSize, QSize viewportSize, QPointF pos, qreal zoom,
+	qreal rotation, bool mirror, bool flip) const
+{
+	QRect canvasRect(0, 0, width(), height());
+	if(canvasRect.isEmpty()) {
+		return QRect();
+	}
+
+	// Transform the viewport size into image coordinates.
+	QTransform matrix;
+	matrix.translate(
+		qreal(viewportSize.width()) / 2.0, qreal(viewportSize.height()) / 2.0);
+	matrix.scale(mirror ? -1.0 : 1.0, flip ? -1.0 : 1.0);
+	matrix.scale(zoom, zoom);
+	matrix.rotate(rotation);
+	matrix.translate(-pos.x(), -pos.y());
+	QPolygonF quad =
+		matrix.inverted().map(QRectF(QPointF(0.0, 0.0), QSizeF(viewportSize)));
+
+	// Wrap the output area around it.
+	QRectF bounds = quad.boundingRect().intersected(QRectF(canvasRect));
+	QRectF scaledRect(
+		QPointF(0.0, 0.0),
+		QSizeF(outputSize)
+			.scaled(bounds.size(), Qt::KeepAspectRatioByExpanding));
+	scaledRect.moveCenter(bounds.center());
+	QRect cropRect = scaledRect.toAlignedRect();
+
+	// If the crop area encompasses the entire canvas, just use that.
+	if(cropRect.contains(canvasRect)) {
+		return canvasRect;
+	}
+
+	// Keep as much of the cropped area on the canvas as possible.
+	QRect outputRect = cropRect;
+
+	if(cropRect.width() > canvasRect.width()) {
+		outputRect.setX(qRound(
+			(qreal(canvasRect.width()) - qreal(cropRect.width())) / 2.0));
+	} else if(cropRect.left() < canvasRect.left()) {
+		outputRect.moveLeft(canvasRect.left());
+	} else if(cropRect.right() > canvasRect.right()) {
+		outputRect.moveRight(canvasRect.right());
+	}
+
+	if(cropRect.height() > canvasRect.height()) {
+		outputRect.setY(qRound(
+			(qreal(canvasRect.height()) - qreal(cropRect.height())) / 2.0));
+	} else if(cropRect.top() < canvasRect.top()) {
+		outputRect.moveTop(canvasRect.top());
+	} else if(cropRect.bottom() > canvasRect.bottom()) {
+		outputRect.moveBottom(canvasRect.bottom());
+	}
+
+	return outputRect.intersected(canvasRect);
+}
+
+net::Message CanvasState::makeLayerTreeMove(
+	uint8_t contextId, int sourceId, int targetId, bool intoGroup,
+	bool below) const
+{
+	DP_LayerRoutes *lr = DP_canvas_state_layer_routes_noinc(m_data);
+	return net::Message::noinc(DP_layer_routes_layer_tree_move_make(
+		lr, m_data, contextId, sourceId, targetId, intoGroup, below));
+}
+
+LayerSearchResult CanvasState::searchLayer(int layerId, bool showCensored) const
+{
+	DP_LayerRoutes *lr = DP_canvas_state_layer_routes_noinc(m_data);
+	DP_LayerRoutesEntry *lre = DP_layer_routes_search(lr, layerId);
+	DP_LayerProps *lp =
+		lre ? DP_layer_routes_entry_props(lre, m_data) : nullptr;
+	if(lp && (showCensored || !DP_layer_props_censored_any(lp))) {
+		if(DP_layer_routes_entry_is_group(lre)) {
+			return {
+				LayerProps::inc(lp),
+				LayerGroup::inc(DP_layer_routes_entry_group(lre, m_data))};
+		} else {
+			return {
+				LayerProps::inc(lp),
+				LayerContent::inc(DP_layer_routes_entry_content(lre, m_data))};
+		}
+	} else {
+		return {LayerProps::null(), std::monostate()};
+	}
+}
+
+LayerProps CanvasState::searchLayerProps(int layerId) const
+{
+	DP_LayerRoutes *lr = DP_canvas_state_layer_routes_noinc(m_data);
+	DP_LayerRoutesEntry *lre = DP_layer_routes_search(lr, layerId);
+	if(lre) {
+		return LayerProps::inc(DP_layer_routes_entry_props(lre, m_data));
+	} else {
+		return LayerProps::null();
+	}
+}
+
+bool CanvasState::selectionExists(unsigned int contextId, int selectionId) const
+{
+	return DP_canvas_state_selection_search_noinc(
+		m_data, contextId, selectionId);
+}
+
+DP_FloodFillResult CanvasState::floodFill(
+	unsigned int contextId, int selectionId, int x, int y,
+	const QColor &fillColor, double tolerance, int layerId, int sizeLimit,
+	int gap, int expand, DP_FloodFillKernel kernel, int featherRadius,
+	bool fromEdge, bool continuous, bool includeSublayers, DP_ViewMode viewMode,
+	int activeLayerId, int activeFrameIndex, const QAtomicInt &cancel,
+	QImage &outImg, int &outX, int &outY) const
+{
+	DP_UPixelFloat fillPixel = DP_upixel_float_from_color(fillColor.rgba());
+	DP_Image *img;
+	DP_FloodFillResult result = DP_flood_fill(
+		m_data, contextId, selectionId, x, y, fillPixel, tolerance, layerId,
+		sizeLimit, gap, expand, kernel, featherRadius, fromEdge, continuous,
+		includeSublayers, viewMode, activeLayerId, activeFrameIndex, &img,
+		&outX, &outY, shouldCancelFloodFill, const_cast<QAtomicInt *>(&cancel));
+	if(result == DP_FLOOD_FILL_SUCCESS) {
+		outImg = wrapImage(img);
+	}
+	return result;
+}
+
+DP_FloodFillResult CanvasState::selectionFill(
+	unsigned int contextId, int selectionId, const QColor &fillColor,
+	int expand, DP_FloodFillKernel kernel, int featherRadius, bool fromEdge,
+	const QAtomicInt &cancel, QImage &outImg, int &outX, int &outY) const
+{
+	DP_UPixelFloat fillPixel = DP_upixel_float_from_color(fillColor.rgba());
+	DP_Image *img;
+	DP_FloodFillResult result = DP_selection_fill(
+		m_data, contextId, selectionId, fillPixel, expand,
+		DP_FloodFillKernel(kernel), featherRadius, fromEdge, &img, &outX, &outY,
+		shouldCancelFloodFill, const_cast<QAtomicInt *>(&cancel));
+	if(result == DP_FLOOD_FILL_SUCCESS) {
+		outImg = wrapImage(img);
+	}
+	return result;
+}
+
+unsigned int CanvasState::loadFlags(bool guessPlayer)
+{
+#if defined(Q_OS_ANDROID) || defined(__EMSCRIPTEN__)
+	// Android just kills the application if it uses too much memory for its
+	// taste, so it's not safe to use multiple threads to load image data. On
+	// Emscripten, "threads" are web workers, which have a lot of overhead. And
+	// it may also be running on a mobile device, so the above applies here too.
+	bool singleThread = true;
+#else
+	bool singleThread = false;
+#endif
+	return DP_flag_uint(singleThread, DP_LOAD_FLAG_SINGLE_THREAD) |
+		   DP_flag_uint(guessPlayer, DP_LOAD_FLAG_GUESS_PLAYER);
+}
+
+CanvasState::CanvasState(DP_CanvasState *cs)
+	: m_data{cs}
+{
+}
+
+void CanvasState::pushMessage(void *user, DP_Message *msg)
+{
+	static_cast<net::MessageList *>(user)->append(net::Message::noinc(msg));
+}
+
+void CanvasState::addLayerVisibleInFrame(void *user, int layerId, bool visible)
+{
+	if(visible) {
+		QSet<int> *layersVisibleInFrame = static_cast<QSet<int> *>(user);
+		layersVisibleInFrame->insert(layerId);
+	}
+}
+
+bool CanvasState::shouldCancelFloodFill(void *user)
+{
+	return *static_cast<const QAtomicInt *>(user);
+}
+
+}

@@ -17,8 +17,9 @@ class IkInterfaceManager;
 
 /**
  * IKriate's start screen, shown when no document is open: a header with
- * Favorites, Gallery and Settings tabs, the gallery of recent documents and a
- * floating "+" button for New, Template and Open.
+ * Online, Gallery and Settings tabs, the gallery of recent documents (sorted
+ * with favourites first by default) and a floating "+" button for New,
+ * Template and Open.
  *
  * Replaces Krita's welcome page in the main window.
  */
@@ -26,7 +27,10 @@ class KRITAUI_EXPORT IkHomeScreen : public QWidget
 {
     Q_OBJECT
 public:
-    enum Page { FavoritesPage = 0, GalleryPage = 1, SettingsPage = 2 };
+    enum Page { OnlinePage = 0, GalleryPage = 1, SettingsPage = 2 };
+    /// Gallery order. Favourites first: starred artworks, most recently
+    /// opened first, then the rest the same way.
+    enum SortMode { SortFavoritesFirst = 0, SortRecent = 1, SortNameAscending = 2, SortNameDescending = 3 };
 
     explicit IkHomeScreen(KisMainWindow *mainWindow);
     ~IkHomeScreen() override;
@@ -38,8 +42,10 @@ public:
     int settingsSection() const;
     void showSettingsSection(int section);
 
-    /// Documents the user starred (shown under the star tab).
+    /// Documents the user starred (shown first in the gallery).
     static QList<QUrl> favoriteDocuments();
+    static SortMode sortMode();
+    void setSortMode(SortMode mode);
     static void setFavoriteDocument(const QUrl &url, bool favorite);
 
 public Q_SLOTS:
@@ -56,6 +62,7 @@ private:
     void setCreateMenuOpen(bool open);
     void openDocument(const QUrl &url);
     void showDocumentMenu(const QUrl &url, const QPoint &globalPos);
+    void showSortMenu();
 
     struct Private;
     Private *d;

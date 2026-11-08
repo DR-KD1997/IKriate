@@ -1,0 +1,375 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+#ifndef LIBCLIENT_BRUSHES_BRUSHPRESETMODEL_H
+#define LIBCLIENT_BRUSHES_BRUSHPRESETMODEL_H
+#include "libclient/brushes/brush.h"
+#include "libclient/brushes/lazybrush.h"
+#include "libclient/brushes/lazythumbnail.h"
+#include <QAbstractItemModel>
+#include <QJsonValue>
+#include <QKeySequence>
+#include <QPixmap>
+#include <QSet>
+#include <functional>
+#include <optional>
+
+class QFile;
+class QFileInfo;
+
+namespace drawdance {
+class ZipReader;
+class ZipWriter;
+}
+
+namespace brushes {
+
+class ActiveBrush;
+class MyPaintBrush;
+class ClassicBrush;
+
+struct Tag {
+	int id;
+	QString name;
+
+	bool isAssignable() const { return id > 0; }
+	bool isEditable() const { return id > 0; }
+	bool isHistory() const;
+	bool accepts(const QSet<int> &tagIds) const;
+};
+
+struct TagAssignment {
+	int id;
+	QString name;
+	bool assigned;
+};
+
+struct Preset {
+	int id = 0;
+	int state = 0;
+	QString originalName;
+	QString originalDescription;
+	LazyThumbnail originalThumbnail;
+	LazyBrush originalBrush;
+	std::optional<QString> changedName;
+	std::optional<QString> changedDescription;
+	std::optional<LazyThumbnail> changedThumbnail;
+	std::optional<LazyBrush> changedBrush;
+
+	const QPixmap &originalThumbnailPixmap() const
+	{
+		return originalThumbnail.pixmap(id);
+	}
+
+	const ActiveBrush &originalConstBrushLoad() const
+	{
+		return originalBrush.constBrush(id);
+	}
+
+	const QString &effectiveName() const
+	{
+		return changedName.has_value() ? changedName.value() : originalName;
+	}
+
+	const QString &effectiveDescription() const
+	{
+		return changedDescription.has_value() ? changedDescription.value()
+											  : originalDescription;
+	}
+
+	const QPixmap &effectiveThumbnailPixmap() const
+	{
+		return changedThumbnail.has_value()
+				   ? changedThumbnail.value().pixmap(id)
+				   : originalThumbnail.pixmap(id);
+	}
+
+	const ActiveBrush &effectiveBrushLoad() const
+	{
+		return changedBrush.has_value() ? changedBrush.value().constBrush(id)
+										: originalConstBrushLoad();
+	}
+
+	QString effectivePreviewTitle() const;
+
+	static QString makeEffectivePreviewTitle(const QString &originalTitle);
+
+	bool hasChanges() const
+	{
+		return changedName.has_value() || changedDescription.has_value() ||
+			   changedThumbnail.has_value() || changedBrush.has_value();
+	}
+};
+
+struct ShortcutPreset {
+	int id;
+	QString name;
+	LazyThumbnail thumbnail;
+	QKeySequence shortcut;
+	QSet<int> tagIds;
+};
+
+struct PresetMetadata {
+	int id;
+	QString name;
+	QString description;
+	QByteArray thumbnail;
+};
+
+struct BrushImportResult {
+	QStringList errors;
+	QVector<Tag> importedTags;
+	int importedBrushCount;
+};
+
+struct BrushExportResult {
+	bool ok;
+	QStringList errors;
+	int exportedBrushCount;
+};
+
+struct BrushExportTag {
+	QString name;
+	QVector<int> presetIds;
+};
+
+class BrushPresetModel;
+
+class BrushPresetTagModel final : public QAbstractItemModel {
+	Q_OBJECT
+	friend class BrushPresetModel;
+
+public:
+	explicit BrushPresetTagModel(QObject *parent = nullptr);
+	~BrushPresetTagModel() override;
+
+	const QString &path() const;
+
+	BrushPresetModel *presetModel();
+
+	int rowCount(const QModelIndex &parent = QModelIndex()) const override;
+	int columnCount(const QModelIndex &parent = QModelIndex()) const override;
+
+	QModelIndex parent(const QModelIndex &index) const override;
+	QModelIndex index(
+		int row, int column = 0,
+		const QModelIndex &parent = QModelIndex()) const override;
+
+	QVariant
+	data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
+
+	static bool isExportableRow(int row);
+	static bool isHistoryRow(int row);
+
+	Tag getTagAt(int row) const;
+	int getTagRowById(int tagId) const;
+
+	int newTag(const QString &name);
+	int editTag(int tagId, const QString &name);
+	void deleteTag(int tagId);
+
+	int getStateInt(const QString &key, int defaultValue) const;
+	bool setStateInt(const QString &key, int value);
+
+	BrushImportResult importBrushPack(const QString &file);
+
+	BrushExportResult exportBrushPack(
+		const QString &file, const QVector<BrushExportTag> &exportTags) const;
+
+private:
+	enum class ImportBrushType { Unknown, Json, Old };
+
+	struct ImportBrushGroup {
+		QString name;
+		QStringList brushes;
+	};
+
+	struct ImportOldValue {
+		QString cname;
+		double baseValue;
+		QVector<QPointF> inputPoints;
+	};
+
+	static bool isBuiltInTag(int row);
+	bool isTagRowInBounds(int row) const;
+
+	static QVector<ImportBrushGroup> readOrderConf(
+		BrushImportResult &result, const QString &file,
+		const drawdance::ZipReader &zr);
+
+	static int
+	addOrderConfGroup(QVector<ImportBrushGroup> &groups, const QString &name);
+
+	static void addOrderConfBrush(QStringList &brushes, const QString &brush);
+
+	void readImportBrushes(
+		BrushImportResult &result, const drawdance::ZipReader &zr,
+		const QString &groupName, const QStringList &brushes);
+
+	static bool readImportBrush(
+		BrushImportResult &result, const drawdance::ZipReader &zr,
+		const QString &prefix, ActiveBrush &outBrush, QString &outDescription,
+		QPixmap &outThumbnail);
+
+	static ImportBrushType guessImportBrushType(const QByteArray &mybBytes);
+
+	static QJsonValue readImportBrushJson(
+		BrushImportResult &result, const QString &mybPath,
+		const QByteArray &mybBytes);
+
+	static QJsonValue readImportBrushOld(
+		BrushImportResult &result, const QString &mybPath,
+		const QByteArray &mybBytes);
+
+	static double scaleOldColorHue(double y);
+	static double scaleOldColorSaturationOrValue(double y);
+
+	void exportTag(
+		BrushExportResult &result, QStringList &order, QSet<QString> &tagPaths,
+		QSet<QString> &tagNames, drawdance::ZipWriter &zw,
+		const BrushExportTag &tag) const;
+
+	void exportPreset(
+		BrushExportResult &result, QStringList &order,
+		QSet<QString> &presetNames, drawdance::ZipWriter &zw,
+		const QString &tagPath, int presetId) const;
+
+	static QString
+	makeExportNameUnique(QSet<QString> &names, const QString &name);
+
+	static QString getExportName(int presetId, const QString presetName);
+
+	static QString makeExportSafe(const QString &t);
+
+	class Private;
+	Private *d;
+};
+
+class BrushPresetModel final : public QAbstractItemModel {
+	Q_OBJECT
+	friend class BrushPresetTagModel;
+
+public:
+	static constexpr int THUMBNAIL_SIZE = 64;
+
+	enum Roles {
+		FilterRole = Qt::UserRole + 1,
+		IdRole,
+		EffectiveTitleRole,
+		EffectiveThumbnailRole,
+		EffectiveDescriptionRole,
+		HasChangesRole,
+		PresetRole,
+		StateRole,
+	};
+
+	explicit BrushPresetModel(BrushPresetTagModel *tagModel);
+
+	bool isPresetRowInBounds(int row) const;
+
+	int rowCount(const QModelIndex &parent = QModelIndex()) const override;
+	int rowCountForTagId(int tagId) const;
+	int columnCount(const QModelIndex &parent = QModelIndex()) const override;
+
+	QModelIndex parent(const QModelIndex &index) const override;
+	QModelIndex index(
+		int row, int column = 0,
+		const QModelIndex &parent = QModelIndex()) const override;
+	QModelIndex cachedIndexForId(int presetId);
+	QModelIndex indexForTagId(int tagId, int row) const;
+
+	QVariant
+	data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
+
+	int getIdFromIndex(const QModelIndex &index);
+
+	void setTagIdToFilter(int tagId);
+
+	QList<TagAssignment> getTagAssignments(int presetId);
+	bool changeTagAssignment(int presetId, int tagId, bool assigned);
+
+	std::optional<Preset> searchPresetBrushData(int presetId);
+	QPixmap searchPresetThumbnail(int presetId);
+
+	// It is intentional that many of the parameters in the following functions
+	// aren't references! They will refresh the preset cache, so anything still
+	// referencing that will get invalidated.
+
+	std::optional<Preset> newPreset(
+		QString name, QString description, QPixmap thumbnail, ActiveBrush brush,
+		int tagId);
+
+	bool updatePreset(
+		int presetId, QString name, QString description, QPixmap thumbnail,
+		ActiveBrush brush);
+
+	bool updatePresetBrush(int presetId, ActiveBrush brush);
+
+	bool updatePresetShortcut(int presetId, QKeySequence shortcut);
+
+	bool deletePreset(int presetId);
+	bool undeletePreset(int presetId);
+
+	void changePreset(
+		int presetId, const std::optional<QString> &name = {},
+		const std::optional<QString> &description = {},
+		const std::optional<LazyThumbnail> &thumbnail = {},
+		const std::optional<LazyBrush> &brush = {}, bool inEraserSlot = false);
+	void resetAllPresetChanges();
+	void writePresetChanges();
+
+	bool saveTransientPreset(
+		int presetId, const QString &name, const QString &description,
+		const QPixmap &thumbnail, const QSet<int> &tagIds);
+
+	void addPresetIdToHistory(int presetId);
+	void removePresetFromHistory(int presetId);
+	void clearHistory();
+	int countHistoryPresetsPendingRemoval();
+	int getPresetState(int presetId);
+
+	int countNames(const QString &name) const;
+
+	int handleReceivedBrush(const QString &username, const ActiveBrush &brush);
+
+	void getShortcutActions(
+		const std::function<void(
+			const QString &, const QString &, const QKeySequence &)> &fn) const;
+
+	QKeySequence getShortcutForPresetId(int presetId);
+	QVector<int> getPresetIdsForShortcut(const QKeySequence &shortcut) const;
+	QVector<ShortcutPreset> getShortcutPresets() const;
+
+	QSize iconSize() const;
+	int iconDimension() const;
+	void setIconDimension(int dimension);
+
+	static bool looksLikeBrushShortcutObjectName(const QString &objectName);
+
+public slots:
+	void tagsAboutToBeReset();
+	void tagsReset();
+
+signals:
+	void presetChanged(
+		int presetId, const QString &name, const QString &description,
+		const QPixmap &thumbnail, const ActiveBrush &brush);
+	void transientPresetChanged(
+		int presetId, int state, const QString &name,
+		const QString &description, const QPixmap &thumbnail);
+	void presetShortcutChanged(int presetId, const QKeySequence &shortcut);
+	void presetStateChanged(int presetId, int state);
+	void presetRemoved(int presetId);
+	void presetPrepended(int presetId, bool inserted);
+	void shortcutActionAdded(
+		const QString &name, const QString &text, const QKeySequence &shortcut);
+	void shortcutActionChanged(const QString &name, const QString &text);
+	void shortcutActionRemoved(const QString &name);
+
+private:
+	BrushPresetTagModel::Private *d;
+};
+
+}
+
+Q_DECLARE_METATYPE(brushes::Preset)
+
+#endif

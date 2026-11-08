@@ -1,0 +1,12 @@
+{
+    "Id": "Krita Drawpile Export Filter",
+    "NoDisplay": "true",
+    "Type": "Service",
+    "X-KDE-Export": "application/x-drawpile-project,application/x-drawpile-canvas,image/qoi",
+    "X-KDE-Library": "kritadrawpileexport",
+    "X-KDE-ServiceTypes": [
+        "Krita/FileFilter"
+    ],
+    "X-KDE-Weight": 1,
+    "X-KDE-Extensions" : "dppr,dpcs,qoi"
+}

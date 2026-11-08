@@ -1,0 +1,332 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+extern "C" {
+#include <dpcommon/geom.h>
+#include <dpimpex/save.h>
+#ifdef DP_LIBAV
+#	include <dpimpex/save_video.h>
+#endif
+}
+#include "libclient/drawdance/global.h"
+#include "libclient/export/animationsaverrunnable.h"
+#include "libclient/export/canvassaverrunnable.h"
+#include "libclient/export/videoformat.h"
+#include <QDir>
+#include <QElapsedTimer>
+#include <QFile>
+#ifdef __EMSCRIPTEN__
+#	include <QDateTime>
+#	include <QFile>
+#endif
+
+AnimationSaverRunnable::AnimationSaverRunnable(
+#ifndef __EMSCRIPTEN__
+	const QString &path,
+#endif
+	int format, int width, int height, int loops,
+	const QVector<int> &frameIndexes, double framerate, const QRect &crop,
+	bool scaleSmooth, const drawdance::CanvasState &canvasState,
+	const QString &ffmpegPath, const QString &encoderKey, QObject *parent)
+	: QObject(parent)
+#ifndef __EMSCRIPTEN__
+	, m_path(path)
+#endif
+	, m_format(format)
+	, m_width(width)
+	, m_height(height)
+	, m_loops(loops)
+	, m_framerate(framerate)
+	, m_crop(crop)
+	, m_frameIndexes(frameIndexes)
+	, m_canvasState(canvasState)
+	, m_ffmpegPath(ffmpegPath)
+	, m_encoderKey(encoderKey)
+	, m_scaleSmooth(scaleSmooth)
+	, m_cancelled(false)
+{
+}
+
+#ifdef DP_LIBAV
+namespace {
+union VideoParams {
+	DP_SaveVideoFfmpegParams ffmpeg;
+	DP_SaveVideoAndroidParams android;
+};
+}
+#endif
+
+void AnimationSaverRunnable::run()
+{
+	QElapsedTimer timer;
+	timer.start();
+
+#ifdef __EMSCRIPTEN__
+	QString extension = getFormatExtension();
+	QString path = QStringLiteral("/anim%1.%2")
+					   .arg(QDateTime::currentMSecsSinceEpoch())
+					   .arg(extension);
+	QByteArray pathBytes = path.toUtf8();
+#else
+	QByteArray pathBytes = m_path.toUtf8();
+#endif
+
+	DP_Rect r, *pr;
+	QRect crop = m_crop & QRect(QPoint(0, 0), m_canvasState.size());
+	if(crop.isEmpty()) {
+		pr = nullptr;
+	} else {
+		r = DP_rect_make(crop.x(), crop.y(), crop.width(), crop.height());
+		pr = &r;
+	}
+
+	DP_SaveResult result;
+	switch(m_format) {
+#if !defined(__EMSCRIPTEN__) && !defined(Q_OS_ANDROID)
+	case int(VideoFormat::Frames): {
+		drawdance::DrawContext dc = drawdance::DrawContextPool::acquire();
+		result = DP_save_animation_frames(
+			m_canvasState.get(), dc.get(), pathBytes.constData(), pr, m_width,
+			m_height,
+			m_scaleSmooth ? DP_MSG_TRANSFORM_REGION_MODE_BILINEAR
+						  : DP_MSG_TRANSFORM_REGION_MODE_NEAREST,
+			m_frameIndexes.constData(), int(m_frameIndexes.size()), &onProgress,
+			this);
+		break;
+	}
+#endif
+	case int(VideoFormat::Zip): {
+		drawdance::DrawContext dc = drawdance::DrawContextPool::acquire();
+		result = DP_save_animation_zip(
+			m_canvasState.get(), dc.get(), pathBytes.constData(), pr, m_width,
+			m_height,
+			m_scaleSmooth ? DP_MSG_TRANSFORM_REGION_MODE_BILINEAR
+						  : DP_MSG_TRANSFORM_REGION_MODE_NEAREST,
+			m_frameIndexes.constData(), int(m_frameIndexes.size()), &onProgress,
+			this);
+		break;
+	}
+	case int(VideoFormat::SpriteSheet): {
+		drawdance::DrawContext dc = drawdance::DrawContextPool::acquire();
+		result = DP_save_animation_spritesheet(
+			m_canvasState.get(), dc.get(), pathBytes.constData(), pr, m_width,
+			m_height,
+			m_scaleSmooth ? DP_MSG_TRANSFORM_REGION_MODE_BILINEAR
+						  : DP_MSG_TRANSFORM_REGION_MODE_NEAREST,
+			m_frameIndexes.constData(), int(m_frameIndexes.size()), &onProgress,
+			this);
+		break;
+	}
+#ifdef DP_LIBAV
+	case int(VideoFormat::Gif): {
+		DP_SaveAnimationGifParams params = {
+			m_canvasState.get(),
+			pr,
+			DP_SAVE_VIDEO_DESTINATION_PATH,
+			const_cast<char *>(pathBytes.constData()),
+			DP_flag_uint(m_scaleSmooth, DP_SAVE_VIDEO_FLAGS_SCALE_SMOOTH),
+			m_width,
+			m_height,
+			m_frameIndexes.constData(),
+			int(m_frameIndexes.size()),
+			m_framerate,
+			&onProgress,
+			this,
+		};
+		result = DP_save_animation_gif(params);
+		break;
+	}
+	case int(VideoFormat::Webp):
+	case int(VideoFormat::Mp4Vp9):
+	case int(VideoFormat::WebmVp8):
+	case int(VideoFormat::Mp4H264):
+	case int(VideoFormat::Mp4Av1):
+	case int(VideoFormat::Apng): {
+		DP_SaveVideoDestination destination;
+		void *destinationParam;
+		VideoParams videoParams;
+		QString tempPath;
+		QByteArray extraPathBytes;
+
+		int encoderColonIndex = m_encoderKey.indexOf(QChar(':'));
+		QString encoderType;
+		QByteArray encoderNameBytes;
+		if(encoderColonIndex != -1) {
+			encoderType = m_encoderKey.mid(0, encoderColonIndex);
+		}
+
+		if(encoderType == QStringLiteral("ffmpeg")) {
+			destination = DP_SAVE_VIDEO_DESTINATION_FFMPEG;
+			destinationParam = &videoParams.ffmpeg;
+			extraPathBytes = m_ffmpegPath.toUtf8();
+			videoParams.ffmpeg = {
+				extraPathBytes.constData(),
+				nullptr,
+				pathBytes.constData(),
+			};
+
+		} else if(encoderType.startsWith(QStringLiteral("android"))) {
+			destination = DP_SAVE_VIDEO_DESTINATION_ANDROID;
+			destinationParam = &videoParams.android;
+			tempPath = QDir::temp().filePath(QStringLiteral("animtemp"));
+			QFile::remove(tempPath);
+			extraPathBytes = tempPath.toUtf8();
+			encoderNameBytes = m_encoderKey.mid(encoderColonIndex + 1).toUtf8();
+			videoParams.android = {
+				pathBytes.constData(),
+				extraPathBytes.constData(),
+				encoderNameBytes.constData(),
+			};
+
+		} else if(encoderType.startsWith(QStringLiteral("windows"))) {
+			destination = DP_SAVE_VIDEO_DESTINATION_WINDOWS;
+			destinationParam = pathBytes.data();
+
+		} else {
+			destination = DP_SAVE_VIDEO_DESTINATION_PATH;
+			destinationParam = pathBytes.data();
+		}
+
+		DP_SaveAnimationVideoParams params = {
+			m_canvasState.get(),
+			pr,
+			destination,
+			destinationParam,
+			nullptr,
+			0,
+			DP_flag_uint(m_scaleSmooth, DP_SAVE_VIDEO_FLAGS_SCALE_SMOOTH),
+			formatToSaveVideoFormat(),
+			m_width,
+			m_height,
+			m_frameIndexes.constData(),
+			int(m_frameIndexes.size()),
+			m_framerate,
+			m_loops,
+			&onProgress,
+			this,
+		};
+		result = DP_save_animation_video(params);
+		if(!tempPath.isEmpty()) {
+			QFile::remove(tempPath);
+		}
+		break;
+	}
+#endif
+	default:
+		DP_error_set("Unhandled animation format %d", m_format);
+		result = DP_SAVE_RESULT_UNKNOWN_FORMAT;
+		break;
+	}
+
+	if(result != DP_SAVE_RESULT_SUCCESS) {
+		qWarning(
+			"Error %d saving animation: %s", int(result),
+			result == DP_SAVE_RESULT_CANCEL ? "cancelled" : DP_error());
+	}
+
+#ifdef __EMSCRIPTEN__
+	if(result == DP_SAVE_RESULT_SUCCESS) {
+		QFile f(path);
+		if(f.open(QIODevice::ReadOnly)) {
+			emit downloadReady(
+				QStringLiteral("animation%1").arg(extension), f.readAll());
+		} else {
+			result = DP_SAVE_RESULT_OPEN_ERROR;
+		}
+	}
+	QFile::remove(path);
+#else
+	emit saveComplete(saveResultToErrorString(result), timer.elapsed());
+#endif
+}
+
+void AnimationSaverRunnable::cancelExport()
+{
+	m_cancelled = true;
+}
+
+#ifdef __EMSCRIPTEN__
+QString AnimationSaverRunnable::getFormatExtension() const
+{
+	switch(m_format) {
+	case int(VideoFormat::Gif):
+		return QStringLiteral(".gif");
+	case int(VideoFormat::Zip):
+		return QStringLiteral(".zip");
+	case int(VideoFormat::Webp):
+		return QStringLiteral(".webp");
+	case int(VideoFormat::Mp4Vp9):
+	case int(VideoFormat::Mp4H264):
+	case int(VideoFormat::Mp4Av1):
+		return QStringLiteral(".mp4");
+	case int(VideoFormat::WebmVp8):
+		return QStringLiteral(".webm");
+	case int(VideoFormat::Apng):
+		return QStringLiteral(".png");
+	default:
+		qWarning("Don't know extension for animation format %d", m_format);
+		return QString();
+	}
+}
+#endif
+
+#ifdef DP_LIBAV
+int AnimationSaverRunnable::formatToSaveVideoFormat() const
+{
+	switch(m_format) {
+	case int(VideoFormat::Webp):
+		return DP_SAVE_VIDEO_FORMAT_WEBP;
+	case int(VideoFormat::Mp4Vp9):
+		return DP_SAVE_VIDEO_FORMAT_MP4_VP9;
+	case int(VideoFormat::WebmVp8):
+		return DP_SAVE_VIDEO_FORMAT_WEBM_VP8;
+	case int(VideoFormat::Mp4H264):
+		return DP_SAVE_VIDEO_FORMAT_MP4_H264;
+	case int(VideoFormat::Mp4Av1):
+		return DP_SAVE_VIDEO_FORMAT_MP4_AV1;
+	case int(VideoFormat::Apng):
+		return DP_SAVE_VIDEO_FORMAT_APNG;
+	default:
+		qWarning("formatToSaveVideoFormat: unhandled format %d", m_format);
+		return -1;
+	}
+}
+#endif
+
+QString
+AnimationSaverRunnable::saveResultToErrorString(DP_SaveResult result) const
+{
+	if(result == DP_SAVE_RESULT_BAD_DIMENSIONS) {
+		switch(m_format) {
+		case int(VideoFormat::Frames):
+		case int(VideoFormat::Zip):
+		case int(VideoFormat::Apng):
+			return CanvasSaverRunnable::badDimensionsErrorString(
+				2147483647, QStringLiteral("PNG"));
+		case int(VideoFormat::Gif):
+			return CanvasSaverRunnable::badDimensionsErrorString(
+				65536, QStringLiteral("GIF"));
+		case int(VideoFormat::Webp):
+			return CanvasSaverRunnable::badDimensionsErrorString(
+				16384, QStringLiteral("WEBP"));
+		case int(VideoFormat::Mp4Vp9):
+		case int(VideoFormat::Mp4H264):
+		case int(VideoFormat::Mp4Av1):
+			return CanvasSaverRunnable::badDimensionsErrorString(
+				65536, QStringLiteral("MP4"));
+		case int(VideoFormat::WebmVp8):
+			return CanvasSaverRunnable::badDimensionsErrorString(
+				65536, QStringLiteral("WEBM"));
+		}
+	}
+	return CanvasSaverRunnable::saveResultToErrorString(result);
+}
+
+bool AnimationSaverRunnable::onProgress(void *user, double progress)
+{
+	AnimationSaverRunnable *saver = static_cast<AnimationSaverRunnable *>(user);
+	if(saver->m_cancelled) {
+		return false;
+	} else {
+		emit saver->progress(qRound(progress * 100));
+		return true;
+	}
+}

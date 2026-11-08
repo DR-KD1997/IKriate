@@ -13,7 +13,9 @@ management, and replaces the interface with a modern, minimal one built around t
 
 | | |
 |---|---|
-| **Home and gallery** | Starts on a gallery of your artworks with favourites, a recycle bin and a single **+** button for a new canvas, a template or an existing file. The Android launch screen stays up until the gallery is ready, so there is no black screen while the app loads. |
+| **Home and gallery** | Starts on a gallery of your artworks with a recycle bin and a single **+** button for a new canvas, a template or an existing file. **Sort:** in the gallery header orders it favourites first (the default: starred artworks by when you last opened them, then the rest), by last opened, or by name A–Z / Z–A. The Android launch screen stays up until the gallery is ready, so there is no black screen while the app loads. |
+| **Draw together online** | The globe tab joins and hosts live drawing sessions compatible with [Drawpile](https://drawpile.net) 2.3 (its servers, its public session list and its own clients). Host on this device for people on the same network, on pub.drawpile.net, or on your own Drawpile server; share an existing artwork or a blank canvas. Every IKriate brush and tool works on the shared canvas; a pill over the canvas shows who is there, the invite link, chat and (for operators) moderation. |
+| **Drawpile and QOI files** | Opens and saves Drawpile projects (`.dppr`) and canvases (`.dpcs`) with their layers, groups, blend modes and visibility, and QOI images (`.qoi`). |
 | **Three layouts** | *Desktop* (top bar, tool rail, colour and layers panel, brush bar; default on computers), *Kriate* (touch-first tool bar with a docked brush library; default on Android tablets) and *Minimal* (a few floating buttons around a full-screen canvas). All three are on every build: **Settings › Theme › Layout**. Krita's docker interface stays available for power users under **Settings › Advanced**. |
 | **Brush library** | Brushes grouped into Pencils, Pens, Calligraphy, Markers, Paint, Watercolor, Sprayers and more, each with a live stroke preview, favourites, recents and your own brushes under *New*. |
 | **Draw, erase, smudge** | Erasing is a mode, not a brush: any brush can draw or erase, and the pen's eraser end switches to erase mode with the current brush. |
@@ -62,5 +64,6 @@ build still uses Qt 5, because there are no Qt 6 Android dependency packages for
 ## Licence
 
 IKriate is free software under the GNU General Public License v3 (see `COPYING` and
-`LICENSES/`), like the Krita code it is based on. Krita's original README is kept in
+`LICENSES/`), like the Krita code it is based on. Online sessions and the Drawpile file formats
+use code from Drawpile 2.3.1 (GPL-3.0-or-later, `3rdparty/drawpile`). Krita's original README is kept in
 [README.krita.md](README.krita.md).
