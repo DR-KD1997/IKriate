@@ -29,6 +29,7 @@ libmypaint, SQLite or curve classes.
 | `src/libclient/utils/kis_cubic_curve.{h,cpp}` and its users (`brushes/brush.*`, `tools/toolcontroller.*`, `view/canvascontrollerbase.*`, `config/config.h`) | `KisCubicCurve` renamed `DpCubicCurve`: Drawpile carries an older copy of Krita's class, and two definitions of one class in one program crash. |
 | `src/drawdance/libcommon/dpcommon/curve.c` | Two comments follow the rename (no code change). |
 | `src/drawdance/bundled/CMakeLists.txt` and the CMake files using its targets | Bundled targets prefixed `dp_` (`dp_mypaint`, `dp_parson`, `dp_qgrayraster`, `dp_uthash`, `dp_psd_sdk`) and zstd linked as `dp_zstd`: Krita's dependencies define a global `mypaint` target on Android. |
+| `src/drawdance/bundled/psd_sdk/PsdMallocAllocator.cpp` | `_aligned_malloc` on all Windows compilers (MinGW defines `__GNUG__` but has no `memalign`). |
 | `src/libclient/CMakeLists.txt` | The parental-controls stub on every platform (the Windows version needs COM's Parental Controls API, which llvm-mingw may lack; IKriate filters NSFM sessions itself). |
 
 To update: replace `src/` and `zstd/` with the new release's, delete what is listed under

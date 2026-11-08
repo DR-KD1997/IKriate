@@ -18,7 +18,10 @@ PSD_NAMESPACE_BEGIN
 // ---------------------------------------------------------------------------------------------------------------------
 void* MallocAllocator::DoAllocate(size_t size, size_t alignment)
 {
-#if defined(__APPLE__)
+#if defined(_WIN32)
+	// IKriate: MinGW defines __GNUG__ but has no memalign.
+	return _aligned_malloc(size, alignment);
+#elif defined(__APPLE__)
     void *m = 0;
     size_t minAlignment = sizeof(void *);
     while (alignment > minAlignment) {
@@ -38,7 +41,9 @@ void* MallocAllocator::DoAllocate(size_t size, size_t alignment)
 // ---------------------------------------------------------------------------------------------------------------------
 void MallocAllocator::DoFree(void* ptr)
 {
-#if defined(__APPLE__) || defined(__GNUG__)
+#if defined(_WIN32)
+	_aligned_free(ptr);
+#elif defined(__APPLE__) || defined(__GNUG__)
 	free(ptr);
 #else
 	_aligned_free(ptr);
