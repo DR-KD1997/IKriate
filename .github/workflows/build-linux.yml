@@ -88,8 +88,8 @@ jobs:
         run: |
           exec > >(tee appimage.log) 2>&1
           set -x
-          wget -nv https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
-          wget -nv https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage
+          wget -nv --tries=6 --waitretry=30 --retry-connrefused --retry-on-http-error=502,503,504 https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
+          wget -nv --tries=6 --waitretry=30 --retry-connrefused --retry-on-http-error=502,503,504 https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage
           chmod +x linuxdeploy*.AppImage
           # Containers lack FUSE; unpack the tool AppImages instead of mounting them.
           export APPIMAGE_EXTRACT_AND_RUN=1
