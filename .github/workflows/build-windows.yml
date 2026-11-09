@@ -75,7 +75,8 @@ jobs:
       - name: Install llvm-mingw toolchain
         run: |
           $name = "llvm-mingw-$env:LLVM_MINGW_VERSION-ucrt-x86_64"
-          Invoke-WebRequest "https://github.com/mstorsjo/llvm-mingw/releases/download/$env:LLVM_MINGW_VERSION/$name.zip" -OutFile llvm-mingw.zip
+          # GitHub's release downloads time out now and then: retry.
+          Invoke-WebRequest "https://github.com/mstorsjo/llvm-mingw/releases/download/$env:LLVM_MINGW_VERSION/$name.zip" -OutFile llvm-mingw.zip -MaximumRetryCount 5 -RetryIntervalSec 30
           Expand-Archive llvm-mingw.zip -DestinationPath C:\tools
           "C:\tools\$name\bin" | Out-File -Append $env:GITHUB_PATH
           "C:\tools\$name\x86_64-w64-mingw32\bin" | Out-File -Append $env:GITHUB_PATH
