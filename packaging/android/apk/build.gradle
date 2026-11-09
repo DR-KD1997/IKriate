@@ -242,7 +242,12 @@ android {
         targetSdkVersion 36
         minSdkVersion 24
         versionCode project.ext.constant * 1000000 + versionMajor * 10000 + versionMinor * 100 + versionRelease
-        versionName "1.2.0"
+        // IKriate's release number (IKRIATE_VERSION in the source root; CI
+        // passes it in the environment).
+        versionName System.getenv('IKRIATE_VERSION') ?: {
+            def f = ['../../../IKRIATE_VERSION', "$installPrefix/../IKRIATE_VERSION"].collect { file(it) }.find { it.exists() }
+            f ? f.text.trim() : 'dev'
+        }()
         def unstableSuffix = System.getenv('KRITA_UNSTABLE_PACKAGE_SUFFIX')
         archivesBaseName = System.getenv('KRITA_BUILD_APPBUNDLE') ? "ikriate-$versionName$unstableSuffix" : "ikriate-$abi-$versionName$unstableSuffix"
     }

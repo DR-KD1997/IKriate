@@ -173,7 +173,10 @@ endif()
 
 # IKriate's own release number; KRITA_VERSION_STRING stays the upstream base
 # version, which file metadata and resource compatibility checks rely on.
-set(IKRIATE_VERSION_STRING "1.2.0")
+# The number lives in IKRIATE_VERSION (one place for CMake, Gradle and CI);
+# it goes up with every set of changes.
+file(STRINGS "${CMAKE_CURRENT_SOURCE_DIR}/IKRIATE_VERSION" IKRIATE_VERSION_STRING LIMIT_COUNT 1)
+string(STRIP "${IKRIATE_VERSION_STRING}" IKRIATE_VERSION_STRING)
 message(STATUS "IKriate version: ${IKRIATE_VERSION_STRING} (Krita ${KRITA_VERSION_STRING})")
 message(STATUS "Krita version: ${KRITA_VERSION_STRING}")
 

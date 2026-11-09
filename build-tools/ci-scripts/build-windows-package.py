@@ -48,7 +48,8 @@ kritaVersionString = ''
 
 with open(os.path.join(buildPath, "libs/version/kritaversion.h"), "r") as fp:
     for line in fp:
-        if line.strip().startswith('#define KRITA_VERSION_STRING'):
+        # IKriate: packages are named after IKriate's version, not Krita's.
+        if line.strip().startswith('#define IKRIATE_VERSION_STRING'):
             kritaVersionString = line.split()[-1].strip('\"')
             print ('krita version: {}'.format(kritaVersionString))
             break
